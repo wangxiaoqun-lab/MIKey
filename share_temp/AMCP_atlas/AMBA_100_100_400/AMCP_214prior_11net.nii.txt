@@ -1,0 +1,11 @@
+1 TN:Thalamus_Network 1
+2 OLN:Olfactory-Limbic_Network 2
+3 SMN:Sensorimotor_Network 3
+4 BSN:Brainstem_Network 4
+5 LPN:Limbic-prefrontal_Network 5
+6 ESN:Extended_Salience_Network 6
+7 EAHON:Extended_Amygdala-Hypothalamic-Olfactory_Network 7
+8 CBMN:Cerebellar-Basal_Ganglia-Motor_Network 8
+9 EHBN:Extended_Hypothalamic-Basal_Forebrain_Network 9
+10 MCSN:Medial_Cortical-Sensorimotor_Network 10
+11 SHIN:Sensory-Hippocampa-Integration_Network 11
