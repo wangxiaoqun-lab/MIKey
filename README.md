@@ -1,2 +1,0 @@
-# MIKey
-Mouse Image Key
