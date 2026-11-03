@@ -1,0 +1,44 @@
+classdef MIKeyRunControl < handle
+    % Cooperative GUI control. Native SPM/MEX calls finish before a checkpoint.
+    properties
+        Active = false
+        PauseRequested = false
+        Paused = false
+        StopRequested = false
+        CloseRequested = false
+    end
+    properties (Access=private)
+        LastYield
+    end
+    methods
+        function start(obj)
+            if obj.Active,error('MIKey:Busy','A MIKey task is already running.');end
+            obj.Active=true;obj.PauseRequested=false;obj.Paused=false;
+            obj.StopRequested=false;obj.CloseRequested=false;obj.LastYield=tic;
+        end
+        function requestPause(obj)
+            if obj.Active && ~obj.StopRequested,obj.PauseRequested=true;end
+        end
+        function resume(obj)
+            obj.PauseRequested=false;obj.Paused=false;
+        end
+        function requestStop(obj)
+            if obj.Active,obj.StopRequested=true;obj.PauseRequested=false;end
+        end
+        function finish(obj)
+            obj.Active=false;obj.PauseRequested=false;obj.Paused=false;
+        end
+        function checkpoint(obj,force)
+            if nargin<2,force=false;end
+            if ~obj.Active,return;end
+            if force || obj.PauseRequested || obj.StopRequested || toc(obj.LastYield)>=0.05
+                drawnow;pause(0.001);obj.LastYield=tic;
+            end
+            while obj.Active && obj.PauseRequested && ~obj.StopRequested
+                obj.Paused=true;pause(0.05);drawnow;
+            end
+            obj.Paused=false;
+            if obj.StopRequested,error('MIKey:Stopped','Stopped by user at a processing checkpoint.');end
+        end
+    end
+end

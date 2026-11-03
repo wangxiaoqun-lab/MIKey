@@ -1,0 +1,8 @@
+{
+  "MIKey.m": [],
+  "MIKey_sidecar_snapshot.m": [],
+  "MIKey_finalize_sidecars.m": [],
+  "tests/test_mikey_sidecars.m": [],
+  "docs/validation/20261019-sidecar-policy/run_checks.m": [],
+  "docs/validation/20261019-sidecar-policy/run_final_sidecar_check.m": []
+}

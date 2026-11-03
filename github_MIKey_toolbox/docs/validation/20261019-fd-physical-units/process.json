@@ -1,0 +1,15 @@
+{
+  "pid": 6012,
+  "args": [
+    "-nodesktop",
+    "-nosplash",
+    "-logfile",
+    "C:/MIKeyValidation/20261019-fd-physical-units/startup.log",
+    "-r",
+    "run('K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/docs/validation/20261019-fd-physical-units/run_checks.m')"
+  ],
+  "started": "2026-10-19T10:00:21.964Z",
+  "status": "exited",
+  "exitCode": 3221225477,
+  "signal": null
+}

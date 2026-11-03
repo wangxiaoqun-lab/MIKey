@@ -1,0 +1,24 @@
+{
+  "modified": [
+    "MIKey_config.m",
+    "MIKeyBatchState.m",
+    "MIKey_preflight.m",
+    "MIKey_check_stage.m",
+    "MIKey_write_derivative_metadata.m",
+    "MIKey.m",
+    "examples/run_mikey.m",
+    "README.md",
+    "tests/test_mikey_pc_config.m",
+    "tests/test_mikey_config_choices.m",
+    "tests/test_mikey_batch.m",
+    "tests/test_mikey_pc_strategies.m",
+    "tests/test_mikey_ui_layout.m",
+    "tests/test_mikey_gui_filters.m"
+  ],
+  "added": [
+    "MIKey_parameter_scope.m",
+    "MIKey_batch_controls.m",
+    "tests/test_mikey_config_scopes.m",
+    "tests/test_mikey_config_flow.m"
+  ]
+}

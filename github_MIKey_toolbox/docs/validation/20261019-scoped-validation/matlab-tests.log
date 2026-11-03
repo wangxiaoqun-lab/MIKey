@@ -1,0 +1,23 @@
+MIKEY_SCOPE_CHECKS_STARTED 2026-10-19 12:24:14
+MATLAB 9.4.0.813654 (R2018a)
+RUN test_mikey_config_scopes
+                status: 'passed'
+    inactiveTypeChecks: 455
+                phases: {'1'  '2:10'}
+
+MIKEY_CONFIG_SCOPES_PASS
+PASS test_mikey_config_scopes
+RUN test_mikey_pc_config
+MIKEY_PC_CONFIG_PASS
+PASS test_mikey_pc_config
+RUN test_mikey_config_choices
+MIKEY_CONFIG_CHOICES_PASS
+PASS test_mikey_config_choices
+RUN test_mikey_config_flow
+2026-10-19 12:24:32: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 12:24:32: Starting Voxel Scaling
+2026-10-19 12:24:32: Voxel scaling completed: 0 files processed, 0 files skipped
+2026-10-19 12:24:32: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+MIKEY_CONFIG_FLOW_PASS
+PASS test_mikey_config_flow
+MIKEY_SCOPE_CHECKS_ALL_PASS

@@ -1,0 +1,210 @@
+[
+  {
+    "from": "MIKeyBatchState.m",
+    "to": "scripts/MIKeyBatchState.m"
+  },
+  {
+    "from": "MIKeyRunControl.m",
+    "to": "scripts/MIKeyRunControl.m"
+  },
+  {
+    "from": "MIKey_anat_path.m",
+    "to": "scripts/MIKey_anat_path.m"
+  },
+  {
+    "from": "MIKey_atlas_catalog.m",
+    "to": "scripts/MIKey_atlas_catalog.m"
+  },
+  {
+    "from": "MIKey_batch_controls.m",
+    "to": "scripts/MIKey_batch_controls.m"
+  },
+  {
+    "from": "MIKey_bids_name.m",
+    "to": "scripts/MIKey_bids_name.m"
+  },
+  {
+    "from": "MIKey_bids_path.m",
+    "to": "scripts/MIKey_bids_path.m"
+  },
+  {
+    "from": "MIKey_bold_files.m",
+    "to": "scripts/MIKey_bold_files.m"
+  },
+  {
+    "from": "MIKey_builtin_prior.m",
+    "to": "scripts/MIKey_builtin_prior.m"
+  },
+  {
+    "from": "MIKey_check_fd_scale.m",
+    "to": "scripts/MIKey_check_fd_scale.m"
+  },
+  {
+    "from": "MIKey_check_label_grid.m",
+    "to": "scripts/MIKey_check_label_grid.m"
+  },
+  {
+    "from": "MIKey_check_parallel_configs.m",
+    "to": "scripts/MIKey_check_parallel_configs.m"
+  },
+  {
+    "from": "MIKey_check_runtime.m",
+    "to": "scripts/MIKey_check_runtime.m"
+  },
+  {
+    "from": "MIKey_check_stage.m",
+    "to": "scripts/MIKey_check_stage.m"
+  },
+  {
+    "from": "MIKey_config.m",
+    "to": "scripts/MIKey_config.m"
+  },
+  {
+    "from": "MIKey_copy_nifti.m",
+    "to": "scripts/MIKey_copy_nifti.m"
+  },
+  {
+    "from": "MIKey_defaults.m",
+    "to": "scripts/MIKey_defaults.m"
+  },
+  {
+    "from": "MIKey_export_config.m",
+    "to": "scripts/MIKey_export_config.m"
+  },
+  {
+    "from": "MIKey_fd_dvars_correlation.m",
+    "to": "scripts/MIKey_fd_dvars_correlation.m"
+  },
+  {
+    "from": "MIKey_finalize_sidecars.m",
+    "to": "scripts/MIKey_finalize_sidecars.m"
+  },
+  {
+    "from": "MIKey_fmap_files.m",
+    "to": "scripts/MIKey_fmap_files.m"
+  },
+  {
+    "from": "MIKey_framewise_displacement.m",
+    "to": "scripts/MIKey_framewise_displacement.m"
+  },
+  {
+    "from": "MIKey_group_analysis.m",
+    "to": "scripts/MIKey_group_analysis.m"
+  },
+  {
+    "from": "MIKey_group_network.m",
+    "to": "scripts/MIKey_group_network.m"
+  },
+  {
+    "from": "MIKey_load_config_function.m",
+    "to": "scripts/MIKey_load_config_function.m"
+  },
+  {
+    "from": "MIKey_load_mask.m",
+    "to": "scripts/MIKey_load_mask.m"
+  },
+  {
+    "from": "MIKey_mask_file.m",
+    "to": "scripts/MIKey_mask_file.m"
+  },
+  {
+    "from": "MIKey_match_entity.m",
+    "to": "scripts/MIKey_match_entity.m"
+  },
+  {
+    "from": "MIKey_motion_files.m",
+    "to": "scripts/MIKey_motion_files.m"
+  },
+  {
+    "from": "MIKey_nifti_files.m",
+    "to": "scripts/MIKey_nifti_files.m"
+  },
+  {
+    "from": "MIKey_noise_result.m",
+    "to": "scripts/MIKey_noise_result.m"
+  },
+  {
+    "from": "MIKey_parameter_map.m",
+    "to": "scripts/MIKey_parameter_map.m"
+  },
+  {
+    "from": "MIKey_parameter_scope.m",
+    "to": "scripts/MIKey_parameter_scope.m"
+  },
+  {
+    "from": "MIKey_pc_counts.m",
+    "to": "scripts/MIKey_pc_counts.m"
+  },
+  {
+    "from": "MIKey_prefixed_file.m",
+    "to": "scripts/MIKey_prefixed_file.m"
+  },
+  {
+    "from": "MIKey_preflight.m",
+    "to": "scripts/MIKey_preflight.m"
+  },
+  {
+    "from": "MIKey_readable_nifti.m",
+    "to": "scripts/MIKey_readable_nifti.m"
+  },
+  {
+    "from": "MIKey_read_label.m",
+    "to": "scripts/MIKey_read_label.m"
+  },
+  {
+    "from": "MIKey_registration_pair.m",
+    "to": "scripts/MIKey_registration_pair.m"
+  },
+  {
+    "from": "MIKey_registration_qc.m",
+    "to": "scripts/MIKey_registration_qc.m"
+  },
+  {
+    "from": "MIKey_resolve_config_path.m",
+    "to": "scripts/MIKey_resolve_config_path.m"
+  },
+  {
+    "from": "MIKey_roi_timeseries.m",
+    "to": "scripts/MIKey_roi_timeseries.m"
+  },
+  {
+    "from": "MIKey_run.m",
+    "to": "scripts/MIKey_run.m"
+  },
+  {
+    "from": "MIKey_scale_nifti.m",
+    "to": "scripts/MIKey_scale_nifti.m"
+  },
+  {
+    "from": "MIKey_scans.m",
+    "to": "scripts/MIKey_scans.m"
+  },
+  {
+    "from": "MIKey_selection_key.m",
+    "to": "scripts/MIKey_selection_key.m"
+  },
+  {
+    "from": "MIKey_select_noise_strategy.m",
+    "to": "scripts/MIKey_select_noise_strategy.m"
+  },
+  {
+    "from": "MIKey_setup.m",
+    "to": "scripts/MIKey_setup.m"
+  },
+  {
+    "from": "MIKey_sidecar_snapshot.m",
+    "to": "scripts/MIKey_sidecar_snapshot.m"
+  },
+  {
+    "from": "MIKey_subjects.m",
+    "to": "scripts/MIKey_subjects.m"
+  },
+  {
+    "from": "MIKey_timepoints.m",
+    "to": "scripts/MIKey_timepoints.m"
+  },
+  {
+    "from": "MIKey_write_derivative_metadata.m",
+    "to": "scripts/MIKey_write_derivative_metadata.m"
+  }
+]

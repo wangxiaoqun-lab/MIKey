@@ -1,0 +1,31 @@
+function map = MIKey_parameter_map()
+% Public config name -> existing GUI control (single source for both modes).
+map = {
+    'templatePath', 'templateEdit'; 'codePath', 'codeEdit';
+    'subjectFilter', 'subjectsEdit'; 'steps', 'stagesEdit';
+    'sessionFilter', 'sessionEdit'; 'taskFilter', 'taskEdit'; 'runFilter', 'runEdit';
+    'minTimepoints', 'minTimepointsEdit';
+    'voxelScaleFactor', 'voxelScaleEdit';
+    'sliceTimingTR', 'sliceTimingTR'; 'sliceTimingNSlices', 'sliceTimingNSlices';
+    'sliceTimingOrder', 'sliceTimingOrder'; 'smoothFWHM', 'smoothFWHM';
+    'coregInterp', 'coregInterpEdit'; 'normInterp', 'normInterpEdit';
+    'useDefaultTemplate', 'useDefaultTemplateCheckbox';
+    'customTemplatePath', 'templateCustomEdit';
+    'detrendFlag', 'detrendCheckbox'; 'filterFlag', 'filterCheckbox';
+    'highFreq', 'highFreqEdit'; 'lowFreq', 'lowFreqEdit';
+    'useDefaultPCStrategy', 'defaultPCStrategyCheckbox'; 'customPCCounts', 'customPCCountsEdit';
+    'fdMethod', 'fdMethodSetting'; 'fdRadius', 'fdRadiusSetting';
+    'advRegressionPCOnly', 'advRegressionPCOnlyCheckbox';
+    'advRegressionPCCSF', 'advRegressionPCCSFCheckbox';
+    'advRegressionPCGS', 'advRegressionPCGSCheckbox';
+    'advRegressionPCCSFGS', 'advRegressionPCCSFGSCheckbox';
+    'fcLabel', 'fcLabelDropdown'; 'fcCustomPath', 'fcCustomEdit';
+    'parcNetwork', 'parcNetworkDropdown'; 'useCustomParc', 'useCustomParcCheckbox';
+    'networkCustomPath', 'networkCustomEdit'; 'labelCustomPath', 'labelCustomEdit';
+    'groupNetworkPath', 'groupNetworkEdit';
+    'clustROINums', 'clustROIEdit'; 'voxelDownsampleFactor', 'voxelDownsampleEdit';
+    'percentTop', 'percentTopEdit'; 'maxIter', 'maxIterEdit';
+    'changeThr', 'changeThrEdit'; 'confThr', 'confThrEdit';
+    'useTSNR', 'useTSNRCheckbox'; 'useInterSubjectVar', 'useInterSubjectVarCheckbox';
+    'parcellationUseParallel', 'parcellationUseParallelCheckbox'};
+end

@@ -1,0 +1,20 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+2026-10-12 12:20:39: Run directory: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\logs\tp2228b1d5_9ea9_445c_9b24_44f337f6cd65
+2026-10-12 12:20:39: === Starting Step 16 ===
+2026-10-12 12:20:39: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 12:20:39: Starting Individual Parcellation - Voxel Mode
+2026-10-12 12:20:40: Using voxel mode parameters - Downsample Factor: 2, Use tSNR: 0, Use Inter-Subject Var: 0
+2026-10-12 12:20:40: Voxel parcellation will use strategies: Regressedpc
+2026-10-12 12:20:40: Parcellation parameters - Percent Top: 0.8, Max Iter: 2, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:20:40: Selected parcellation mode: Concatenated Runs (single folder)
+2026-10-12 12:20:40: Individual parcellation (voxel mode) for: sub-01\ses-baseline
+2026-10-12 12:20:40: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+2026-10-12 12:20:40: Skipping - concatenated voxel parcellation already exists for pc
+2026-10-12 12:20:40: Individual parcellation (voxel mode) completed: 0 files processed, 1 files skipped
+2026-10-12 12:20:40: === Step 16: completed (1.11 s) ===
+2026-10-12 12:20:40: All selected steps completed.
+MIKEY_CONCATENATED_SELECTION_PASS
+MIKEY_UPDATED_CHECKCODE_PASS

@@ -1,0 +1,230 @@
+function ui = MIKey_gui_controls(fig)
+% Fixed readable canvas with scrollbars; compatible with MATLAB R2018a.
+root = fileparts(mfilename('fullpath'));
+fig.AutoResizeChildren = 'off';
+fig.Color = [0.96 0.96 0.96];
+screen = get(groot,'ScreenSize');
+width = min(1400,max(900,screen(3)-80));
+height = min(1050,max(640,screen(4)-100));
+fig.Position = [max(10,(screen(3)-width)/2) max(10,(screen(4)-height)/2) width height];
+viewport = uipanel(fig,'BorderType','none','AutoResizeChildren','off');
+canvas = uipanel(viewport,'BorderType','none','AutoResizeChildren','off', ...
+    'Position',[0 0 1320 910]);
+ui = struct('viewport',viewport,'canvas',canvas,'canvasSize',[1320 910]);
+ui.verticalScroll = uislider(fig,'Orientation','vertical','Limits',[0 1], ...
+    'MajorTicks',[],'MinorTicks',[]);
+ui.horizontalScroll = uislider(fig,'Limits',[0 1],'MajorTicks',[],'MinorTicks',[]);
+ui.statusLabel = label(fig,16,112,1200,20,'Status Display:',11,true);
+ui.statusText = uitextarea(fig,'Position',[16 12 1200 94],'Editable',false,'FontSize',11);
+
+x1=18; x2=458; x3=898;
+label(canvas,x1,876,410,20,'Select BIDS Root Folder',11,true);
+ui.bidsButton = button(canvas,x1,844,160,'Select BIDS Folder');
+label(canvas,x2,876,410,20,'Template:',11,false);
+ui.templateEdit = textField(canvas,x2,844,404,fullfile(root,'share_temp'));
+label(canvas,x3,876,410,20,'Code Path:',11,false);
+ui.codeEdit = textField(canvas,x3,844,404,fullfile(root,'scripts'));
+label(canvas,x1,800,72,24,'Subject:',11,false);
+ui.subjectsEdit = textField(canvas,x1+76,800,125,'sub-*');
+label(canvas,x1+216,800,62,24,'Session:',11,false);
+ui.sessionEdit = textField(canvas,x1+282,800,122,'*');
+label(canvas,x2,800,54,24,'Steps:',11,false);
+ui.stagesEdit = textField(canvas,x2+58,800,100,'1:17');
+label(canvas,x2+180,800,46,24,'Task:',11,false);
+ui.taskEdit = textField(canvas,x2+230,800,174,'*');
+label(canvas,x3,800,42,24,'Run:',11,false);
+ui.runEdit = textField(canvas,x3+46,800,100,'*');
+ui.runStepsButton = button(canvas,x3+160,800,244,'Run Selected Steps');
+uipanel(canvas,'Position',[18 786 1284 2],'BorderType','none','BackgroundColor',[0.7 0.7 0.7]);
+
+title(canvas,x1,750,'1. Voxel Scaling');
+ui.scalingButton=button(canvas,x1,720,150,'Execute');
+label(canvas,x1+170,720,64,26,'Scale:',11,false);
+ui.voxelScaleEdit=number(canvas,x1+238,720,82,20,false);
+gray(canvas,x1,682,410,30,{'Generate and check brain masks on scaled images.', 'Save one *brainmask.nii per subject/session/modality.'});
+title(canvas,x1,654,'2. Mask Data');
+ui.maskButton=button(canvas,x1,624,150,'Whole-brain Mask');
+title(canvas,x1,594,'3. Fieldmap Correction (Optional)');
+ui.fieldmapButton=button(canvas,x1,564,150,'Fieldmap Correction');
+title(canvas,x1,534,'4. Slice Timing (Optional)');
+ui.slicetimeButton=button(canvas,x1,504,150,'Slice Timing');
+label(canvas,x1+162,504,32,26,'TR:',11,false);
+ui.sliceTimingTR=number(canvas,x1+198,504,62,2,false);
+label(canvas,x1+274,504,52,26,'Slices:',11,false);
+ui.sliceTimingNSlices=number(canvas,x1+330,504,74,30,true);
+label(canvas,x1,474,84,26,'Slice Order:',11,false);
+ui.sliceTimingOrder=uidropdown(canvas,'Position',[x1+88 474 230 26], ...
+    'Items',{'Auto-detect','ascending','descending','interleaved'},'Value','Auto-detect','FontSize',11);
+title(canvas,x1,438,'5. Realignment');
+ui.realignButton=button(canvas,x1,408,150,'Realignment');
+title(canvas,x1,378,'6. Coregistration');
+ui.coregButton=button(canvas,x1,348,150,'Coregistration');
+label(canvas,x1+170,348,64,26,'Interp:',11,false);
+ui.coregInterpEdit=number(canvas,x1+238,348,82,2,true);
+ui.coregInterpEdit.Limits=[0 7];
+interpHelp = {'0 - Nearest neighbour; 1 - Trilinear', ...
+    '2 - 2nd degree B-spline; 3 - 3rd degree B-spline', ...
+    '4 - 4th degree B-spline; 5 - 5th degree B-spline', ...
+    '6 - 6th degree B-spline; 7 - 7th degree B-spline'};
+ui.coregInterpHelp=gray(canvas,x1,284,410,56,interpHelp);
+title(canvas,x1,250,'7. Normalization');
+ui.normButton=button(canvas,x1,220,150,'Normalization');
+label(canvas,x1+170,220,64,26,'Interp:',11,false);
+ui.normInterpEdit=number(canvas,x1+238,220,82,2,true);
+ui.normInterpEdit.Limits=[0 7];
+ui.normInterpHelp=gray(canvas,x1,156,410,56,interpHelp);
+ui.useDefaultTemplateCheckbox=checkbox(canvas,x1,126,270,'Use default template',true);
+ui.templateCustomLabel=label(canvas,x1,96,72,26,'Custom:',11,false);
+ui.templateCustomEdit=textField(canvas,x1+76,96,294,'');
+ui.templateCustomButton=button(canvas,x1+374,96,30,'...');
+title(canvas,x1,60,'8. Smoothing');
+ui.smoothButton=button(canvas,x1,30,150,'Smoothing');
+label(canvas,x1+170,30,64,26,'FWHM:',11,false);
+ui.smoothFWHM=textField(canvas,x1+238,30,130,'6 6 6');
+
+title(canvas,x2,750,'9. Non-brain Noise PCs Estimation');
+ui.noiseButton=button(canvas,x2,720,170,'Estimate Noise PCs');
+title(canvas,x2,674,'10. Noise Regression Strategy Estimation');
+ui.regressionButton=button(canvas,x2,644,170,'Estimate Strategies');
+ui.defaultPCStrategyCheckbox=checkbox(canvas,x2,612,300,'Use default PC counts',true);
+label(canvas,x2,580,140,26,'Custom PC counts:',11,false);
+ui.customPCCountsEdit=textField(canvas,x2+144,580,260,'0 5 10 20');
+ui.pcStrategyHelp=gray(canvas,x2,538,410,34, ...
+    {'Default: 0, 20, 40, ... (limited by T-1 and available PCs).', ...
+     'Custom: enter multiple PC counts, e.g. 0 5 10 20.'});
+title(canvas,x2,508,'11. Optimal Noise Strategy');
+ui.groupNoiseButton=button(canvas,x2,478,170,'Cross-run Estimation');
+title(canvas,x2,440,'12. Final Noise Regression Strategy');
+ui.advRegressionButton=button(canvas,x2,410,180,'Run Final Regression');
+ui.detrendCheckbox=checkbox(canvas,x2+196,410,96,'Detrend',true);
+ui.filterCheckbox=checkbox(canvas,x2+300,410,104,'Filter',true);
+label(canvas,x2,376,98,26,'Upper Hz:',11,false);
+ui.highFreqEdit=number(canvas,x2+102,376,68,0.1,false);
+label(canvas,x2+206,376,98,26,'Lower Hz:',11,false);
+ui.lowFreqEdit=number(canvas,x2+308,376,68,0.01,false);
+label(canvas,x2,346,404,20,'Regression strategies:',11,true);
+ui.advRegressionPCOnlyCheckbox=checkbox(canvas,x2,316,90,'PC only',true);
+ui.advRegressionPCCSFCheckbox=checkbox(canvas,x2+96,316,98,'PC+CSF',true);
+ui.advRegressionPCGSCheckbox=checkbox(canvas,x2+202,316,92,'PC+GS',true);
+ui.advRegressionPCCSFGSCheckbox=checkbox(canvas,x2+302,316,112,'PC+CSF+GS',true);
+title(canvas,x2,268,'13. Region/Network FC');
+ui.fcButton=button(canvas,x2,238,150,'FC Analysis');
+label(canvas,x2+170,238,58,26,'Label:',11,false);
+ui.fcLabelDropdown=uidropdown(canvas,'Position',[x2+232 238 172 26], ...
+    'Items',{'214','428','604','1184','Custom...'},'Value','428','FontSize',11);
+ui.fcCustomLabel=label(canvas,x2,206,72,26,'Custom:',11,false);
+ui.fcCustomEdit=textField(canvas,x2+76,206,294,'');
+ui.fcCustomButton=button(canvas,x2+374,206,30,'...');
+title(canvas,x2,162,'14. Parcellation - Prior Label');
+ui.parcellationButton=button(canvas,x2,132,150,'Network Parcellation');
+ui.networkChoiceLabel=label(canvas,x2+164,132,70,26,'Network:',11,false);
+ui.parcNetworkDropdown=uidropdown(canvas,'Position',[x2+238 132 166 26], ...
+    'Items',{'214rois','428rois','604rois','1184rois'},'Value','428rois','FontSize',11);
+ui.useCustomParcCheckbox=checkbox(canvas,x2,100,320,'Use custom network and label',false);
+ui.networkCustomLabel=label(canvas,x2,68,72,26,'Network:',11,false);
+ui.networkCustomEdit=textField(canvas,x2+76,68,294,'');
+ui.networkCustomButton=button(canvas,x2+374,68,30,'...');
+ui.labelCustomLabel=label(canvas,x2,36,72,26,'Label:',11,false);
+ui.labelCustomEdit=textField(canvas,x2+76,36,294,'');
+ui.labelCustomButton=button(canvas,x2+374,36,30,'...');
+
+title(canvas,x3,750,'15. Parcellation - Clustering');
+ui.parcellationClustButton=button(canvas,x3,720,170,'Clustering Parcellation');
+label(canvas,x3+190,720,78,26,'ROI Num:',11,false);
+ui.clustROIEdit=number(canvas,x3+272,720,100,100,true); ui.clustROIEdit.Limits=[1 Inf];
+ui.roiHelp=gray(canvas,x3,678,410,34, ...
+    {'Partition the whole brain into N spatial ROIs.', ...
+     'Enter one integer N; k-means ROI sizes may differ.'});
+title(canvas,x3,628,'16. Parcellation - Voxel Mode');
+ui.parcellationVoxelButton=button(canvas,x3,598,170,'Voxel Parcellation');
+label(canvas,x3+190,598,104,26,'Downsample:',11,false);
+ui.voxelDownsampleEdit=number(canvas,x3+298,598,74,2,true);
+title(canvas,x3,550,'17. Tissue Segmentation');
+ui.tissueSegButton=button(canvas,x3,520,170,'Tissue Segmentation');
+title(canvas,x3,470,'Parcellation Parameters');
+label(canvas,x3,436,100,26,'Percent Top:',11,false);
+ui.percentTopEdit=number(canvas,x3+104,436,76,0.8,false);
+label(canvas,x3+206,436,96,26,'Max Iter:',11,false);
+ui.maxIterEdit=number(canvas,x3+306,436,76,30,true);
+label(canvas,x3,402,100,26,'Change Thr:',11,false);
+ui.changeThrEdit=number(canvas,x3+104,402,76,0.001,false);
+label(canvas,x3+206,402,96,26,'Conf Thr:',11,false);
+ui.confThrEdit=number(canvas,x3+306,402,76,2.5,false);
+ui.useTSNRCheckbox=checkbox(canvas,x3,354,104,'Use tSNR',false);
+ui.useInterSubjectVarCheckbox=checkbox(canvas,x3+120,354,284,'Inter-subject variability',false);
+ui.parcellationUseParallelCheckbox=checkbox(canvas,x3,320,350,'Parallel clustering (requires worker resources)',false);
+label(canvas,x3,282,404,20,'Group Network:',11,false);
+ui.groupNetworkEdit=textField(canvas,x3,250,370,'');
+ui.groupNetworkButton=button(canvas,x3+374,250,30,'...');
+gray(canvas,x3,216,410,26,'Leave blank to use Network / Use Custom selection.');
+ui.configButton=button(canvas,x3,174,170,'Load Config');
+ui.saveConfigButton=button(canvas,x3+190,174,170,'Save Config');
+
+ui.verticalScroll.ValueChangedFcn=@(src,event) scrollCanvas(fig,'y',event.Value);
+ui.verticalScroll.ValueChangingFcn=@(src,event) scrollCanvas(fig,'y',event.Value);
+ui.horizontalScroll.ValueChangedFcn=@(src,event) scrollCanvas(fig,'x',event.Value);
+ui.horizontalScroll.ValueChangingFcn=@(src,event) scrollCanvas(fig,'x',event.Value);
+fig.UserData=ui;
+fig.SizeChangedFcn=@(src,event) resizeCanvas(fig);
+resizeCanvas(fig);
+ui=fig.UserData;
+end
+
+function h = label(parent,x,y,w,height,text,size,bold)
+h=uilabel(parent,'Position',[x y w height],'Text',text,'FontSize',size);
+if bold, h.FontWeight='bold'; end
+end
+function title(parent,x,y,text)
+label(parent,x,y,414,24,text,12,true);
+end
+function h = gray(parent,x,y,w,height,text)
+h=label(parent,x,y,w,height,text,9,false); h.FontColor=[0.45 0.45 0.45];
+end
+function h = button(parent,x,y,w,text)
+h=uibutton(parent,'Position',[x y w 26],'Text',text,'FontSize',11);
+end
+function h = textField(parent,x,y,w,value)
+h=uieditfield(parent,'text','Position',[x y w 26],'Value',value,'FontSize',11);
+end
+function h = number(parent,x,y,w,value,integer)
+h=uieditfield(parent,'numeric','Position',[x y w 26],'Value',value,'FontSize',11);
+if integer && isprop(h,'RoundFractionalValues'), h.RoundFractionalValues='on'; end
+end
+function h = checkbox(parent,x,y,w,text,value)
+h=uicheckbox(parent,'Position',[x y w 26],'Text',text,'Value',value,'FontSize',11);
+end
+
+function resizeCanvas(fig)
+if ~isfield(fig.UserData,'canvas'),return;end
+ui=fig.UserData; sz=fig.Position(3:4);
+if any(sz < [480 340])
+    sz=max(sz,[480 340]);fig.Position(3:4)=sz;
+end
+viewportWidth=max(80,sz(1)-52); viewportHeight=max(80,sz(2)-174);
+oldMax=ui.verticalScroll.Limits(2); fraction=ui.verticalScroll.Value/oldMax;
+overflowY=max(0,ui.canvasSize(2)-viewportHeight);
+overflowX=max(0,ui.canvasSize(1)-viewportWidth);
+ui.viewport.Position=[16 150 viewportWidth viewportHeight];
+ui.verticalScroll.Position=[sz(1)-25 160 3 max(30,viewportHeight-20)];
+ui.horizontalScroll.Position=[24 142 max(30,viewportWidth-16) 3];
+ui.verticalScroll.Limits=[0 max(1,overflowY)];
+ui.verticalScroll.Value=fraction*overflowY;
+ui.horizontalScroll.Limits=[0 max(1,overflowX)];
+ui.horizontalScroll.Value=min(ui.horizontalScroll.Value,overflowX);
+if overflowY>0,ui.verticalScroll.Visible='on';else,ui.verticalScroll.Visible='off';end
+if overflowX>0,ui.horizontalScroll.Visible='on';else,ui.horizontalScroll.Visible='off';end
+ui.canvas.Position=[-ui.horizontalScroll.Value -ui.verticalScroll.Value ui.canvasSize];
+ui.statusLabel.Position=[16 112 max(80,sz(1)-32) 20];
+ui.statusText.Position=[16 12 max(80,sz(1)-32) 94];
+% Initial position and larger windows align the canvas to the top.
+if ~isfield(ui,'layoutReady')
+    ui.verticalScroll.Value=overflowY; ui.canvas.Position(2)=-overflowY;
+    ui.layoutReady=true; fig.UserData=ui;
+end
+end
+
+function scrollCanvas(fig,direction,value)
+position=fig.UserData.canvas.Position;
+if strcmp(direction,'x'),position(1)=-value;else,position(2)=-value;end
+fig.UserData.canvas.Position=position;
+end

@@ -1,0 +1,154 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+MIKEY_BIDS_NAMES_PASS
+2026-10-14 15:55:14: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:55:14: Starting Slice Timing
+2026-10-14 15:55:14: Slice timing for: sub-01
+2026-10-14 15:55:14: Inferred slice order from JSON: interleaved ascending
+2026-10-14 15:55:14: Completed slice timing for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:55:14: Parameters - TR: 2, Slices: 4, Order: interleaved ascending
+2026-10-14 15:55:14: Slice timing completed: 1 files processed, 0 files skipped, 0 errors
+2026-10-14 15:55:14: Please proceed to the next step
+2026-10-14 15:55:14: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:55:14: Starting Realignment
+2026-10-14 15:55:14: Realignment for: sub-01
+2026-10-14 15:55:14: Completed realignment for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:55:14: Realignment completed: 1 files processed, 0 files skipped
+2026-10-14 15:55:14: Please proceed to the next step
+2026-10-14 15:55:15: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:55:15: Starting Coregistration
+2026-10-14 15:55:15: Using coregistration interpolation method: 2 (0-Nearest neighbour; 1-Trilinear; 2-2nd Degree B-Spline; 3-3rd Degree B-Spline; 4-4th Degree B-Spline; 5-5th Degree B-Spline; 6-6th Degree B-Spline; 7-7th Degree B-Spline)
+2026-10-14 15:55:15: Coregistration for: sub-01
+2026-10-14 15:55:15: Completed coregistration for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:55:15: Coregistration completed: 1 files processed, 0 files skipped
+2026-10-14 15:55:15: Please proceed to the next step
+2026-10-14 15:55:15: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:55:15: Starting Normalization
+2026-10-14 15:55:15: Using custom template: C:\Users\Administrator\AppData\Local\Temp\tpd144cc13_42b7_4bfa_9720_287face408cf\sub-01\anat\sub-01_T2w.nii
+2026-10-14 15:55:15: Using normalization interpolation method: 2 (0-Nearest neighbour; 1-Trilinear; 2-2nd Degree B-Spline; 3-3rd Degree B-Spline; 4-4th Degree B-Spline; 5-5th Degree B-Spline; 6-6th Degree B-Spline; 7-7th Degree B-Spline)
+2026-10-14 15:55:15: Normalization for: sub-01
+2026-10-14 15:55:15: Completed normalization for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:55:15: Normalization completed: 1 files processed, 0 files skipped
+2026-10-14 15:55:15: Please proceed to the next step
+MIKEY_BIDS_SPM_ROUTING_PASS
+[警告: 在路径中未找到 "K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\tests\fixtures\spm_naming_stub"。] 
+[> In rmpath (line 75)] 
+                   ok: 1
+               issues: {0x1 cell}
+                notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+             subjects: {'sub-01\ses-baseline'}
+            rawCounts: [1 1]
+                steps: 1
+       requiredImages: {}
+            functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+            selection: [1x1 struct]
+         excludedBold: [0x0 struct]
+    groupAnalysisPath: 'C:\Users\Administrator\AppData\Local\Temp\tpe27ba11b_4bbe_4792_91c1_0e06a131a366\derivatives\MIKey\group_analysis\selection-190c65dab33a2ca2'
+           subjectIDs: {'sub-01'}
+               scopes: [1x1 struct]
+
+2026-10-14 15:55:55: Run directory: C:\Users\Administrator\AppData\Local\Temp\tpe27ba11b_4bbe_4792_91c1_0e06a131a366\derivatives\MIKey\logs\tpafefc107_ebbf_4676_8df0_2c1c91523a33
+2026-10-14 15:55:55: === Starting Step 1 ===
+2026-10-14 15:55:55: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:55:55: Starting Voxel Scaling
+2026-10-14 15:55:55: Processing subject: sub-01\ses-baseline
+2026-10-14 15:55:55: Using voxel scaling factor: 2
+2026-10-14 15:55:56: Completed voxel scaling for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-14 15:55:56: Completed voxel scaling for: sub-01_T2w.nii
+2026-10-14 15:55:56: Completed voxel scaling for: sub-01_magnitude1.nii
+2026-10-14 15:55:56: Completed voxel scaling for: sub-01_magnitude2.nii
+2026-10-14 15:55:56: Completed voxel scaling for: sub-01_phase1.nii
+2026-10-14 15:55:56: Completed voxel scaling for: sub-01_phase2.nii
+2026-10-14 15:55:56: Voxel scaling completed: 6 files processed, 0 files skipped
+2026-10-14 15:55:56: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+2026-10-14 15:55:57: === Step 1: completed (1.70 s) ===
+2026-10-14 15:55:57: All selected steps completed.
+2026-10-14 15:56:07: Run directory: C:\Users\Administrator\AppData\Local\Temp\tpe27ba11b_4bbe_4792_91c1_0e06a131a366\derivatives\MIKey\logs\tp3313e4b7_8be3_4e10_bf8d_ee97dab5db6a
+2026-10-14 15:56:07: === Starting Step 2 ===
+2026-10-14 15:56:07: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:56:07: Starting Mask Generation
+2026-10-14 15:56:07: Generating whole-brain masked data for: sub-01\ses-baseline
+2026-10-14 15:56:07: Using BOLD mask: C:\Users\Administrator\AppData\Local\Temp\tpe27ba11b_4bbe_4792_91c1_0e06a131a366\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_desc-boldbrain_mask.nii.gz
+2026-10-14 15:56:08: Completed BOLD masking for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-14 15:56:08: Using T2w mask: C:\Users\Administrator\AppData\Local\Temp\tpe27ba11b_4bbe_4792_91c1_0e06a131a366\derivatives\MIKey\sub-01\ses-baseline\anat\sub-01_desc-anatbrain_mask.nii
+2026-10-14 15:56:08: Completed T2w masking for: sub-01_T2w.nii
+2026-10-14 15:56:08: Mask application completed: 2 files processed, 0 files skipped
+2026-10-14 15:56:08: Please proceed to the next step
+2026-10-14 15:56:08: === Step 2: completed (0.97 s) ===
+2026-10-14 15:56:08: All selected steps completed.
+2026-10-14 15:56:15: Run directory: C:\Users\Administrator\AppData\Local\Temp\tpe27ba11b_4bbe_4792_91c1_0e06a131a366\derivatives\MIKey\logs\tp9541be06_2e37_472f_9c27_d3f1a20dd92f
+2026-10-14 15:56:15: === Starting Step 9 ===
+2026-10-14 15:56:16: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:56:16: Starting Non-brain Noise PCs Estimation
+2026-10-14 15:56:16: Noise PC estimation for: sub-01\ses-baseline
+2026-10-14 15:56:36: Completed noise PC estimation for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-14 15:56:36: Noise PC estimation completed: 1 files processed, 0 files skipped
+2026-10-14 15:56:36: === Step 9: completed (20.92 s) ===
+2026-10-14 15:56:36: All selected steps completed.
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tpe27ba11b_4bbe_4792_91c1_0e06a131a366'
+          testedStages: [1 2 9]
+
+MIKEY_COMPRESSED_INPUTS_PASS
+MIKEY_UI_LAYOUT_PASS
+MIKEY_GUI_FILTERS_PASS
+
+--------------------------------------------------------------------------------
+         Access violation detected at 周三 10月 14 03:57:23 2026 +0800
+--------------------------------------------------------------------------------
+
+Configuration:
+  Crash Decoding           : Disabled - No sandbox or build area path
+  Crash Mode               : continue (default)
+  Default Encoding         : GBK
+  Deployed                 : false
+  Graphics Driver          : Unknown software 
+  Graphics card 1          : Shanghai Best Oray Information Technology Co., Ltd. ( 0x0 ) OrayIddDriver Device Version 17.50.19.949 (2025-6-11)
+  Graphics card 2          : Intel Corporation ( 0x8086 ) Intel(R) HD Graphics Version 9.17.10.4459 (2016-5-19)
+  Java Version             : Java 1.8.0_144-b01 with Oracle Corporation Java HotSpot(TM) 64-Bit Server VM mixed mode
+  MATLAB Architecture      : win64
+  MATLAB Entitlement ID    : 6257193
+  MATLAB Root              : D:\Program Files\MATLAB\R2018a
+  MATLAB Version           : 9.4.0.813654 (R2018a)
+  OpenGL                   : software
+  Operating System         : Microsoft Windows 10 教育版
+  Process ID               : 14332
+  Processor ID             : x86 Family 6 Model 42 Stepping 7, GenuineIntel
+  Session Key              : 851742f4-f31e-4bb4-97cb-8be20d0f10fa
+  Window System            : Version 10.0 (Build 19045)
+
+Fault Count: 1
+
+
+Abnormal termination
+
+Register State (from fault):
+  RAX = 00007ffdfaa94ea4  RBX = 00000000f73d1040
+  RCX = 000000000002fae8  RDX = ffffffffffffffff
+  RSP = 00000000043f0fc8  RBP = 00000000043f1050
+  RSI = 00000000f73d1070  RDI = 00000000f72b9c00
+ 
+   R8 = 00000000f73d1070   R9 = 0000000000000000
+  R10 = 0000000000000000  R11 = 0000000000000246
+  R12 = ffffffffffffffff  R13 = 00000000003b6000
+  R14 = 000000007ffe0300  R15 = 0000000000800000
+ 
+  RIP = 00007ffdfaa94ea4  EFL = 00010286
+ 
+   CS = 0033   FS = 0053   GS = 002b
+
+Stack Trace (from fault):
+[  0] 0x00007ffdfaa94ea4                                   <unknown-module>+00000000
+[  1] 0x00007ffe3c724d42                      C:\Windows\SYSTEM32\ntdll.dll+00085314
+[  2] 0x00000000f73d1040                                   <unknown-module>+00000000
+[  3] 0x00000000f72b9c00                                   <unknown-module>+00000000
+[  4] 0x00000000f72b9c00                                   <unknown-module>+00000000
+[  5] 0x0000000000170cf0                                   <unknown-module>+00000000
+
+** This crash report has been saved to disk as C:\Users\ADMINI~1\AppData\Local\Temp\matlab_crash_dump.14332-1 **
+
+
+
+MATLAB is exiting because of fatal error

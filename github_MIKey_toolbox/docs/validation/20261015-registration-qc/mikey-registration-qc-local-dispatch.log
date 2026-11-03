@@ -1,0 +1,6 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+错误: 文件:K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\tests\test_mikey_registration_dispatch.m 行:23 列:14
+变量 "path" 以前用作函数或命令名称。

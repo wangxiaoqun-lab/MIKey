@@ -1,0 +1,33 @@
+function spm_jobman(action,batch)
+% Filename-routing fixture only. Does not perform registration or correction.
+assert(strcmp(action,'run'),'Unexpected SPM action in naming fixture.');
+job=batch{1}.spm;
+if isfield(job,'temporal')
+    copyScans(job.temporal.st.scans,job.temporal.st.prefix);
+elseif isfield(job,'spatial') && isfield(job.spatial,'realign')
+    scans=flatten(job.spatial.realign.estwrite.data);
+    copyScans(scans,job.spatial.realign.estwrite.roptions.prefix);
+    copyScans(scans(1),'mean');
+    input=regexprep(scans{1},',\d+$','');volumes=spm_vol(input);
+    motion=zeros(numel(volumes),6);
+    [directory,base]=fileparts(input);
+    save(fullfile(directory,['rp_' base '.txt']),'motion','-ascii');
+elseif isfield(job,'spatial') && isfield(job.spatial,'coreg')
+    copyScans(job.spatial.coreg.estwrite.source,job.spatial.coreg.estwrite.roptions.prefix);
+elseif isfield(job,'tools') && isfield(job.tools,'oldnorm')
+    copyScans(job.tools.oldnorm.estwrite.subj.resample,job.tools.oldnorm.estwrite.roptions.prefix);
+else
+    error('MIKey:Test','Unexpected SPM job in naming fixture.');
+end
+end
+
+function copyScans(scans,prefix)
+scans=flatten(scans);scans=regexprep(scans,',\d+$','');scans=unique(scans);
+for i=1:numel(scans),copyfile(scans{i},MIKey_prefixed_file(prefix,scans{i}));end
+end
+
+function result=flatten(value)
+result={};
+if ischar(value),result={value};return;end
+for i=1:numel(value),result=[result;flatten(value{i})];end %#ok<AGROW>
+end

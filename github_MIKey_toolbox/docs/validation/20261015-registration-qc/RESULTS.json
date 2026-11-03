@@ -1,0 +1,12 @@
+{
+  "geometry": "passed; real SPM I/O and sampling, launcher exit 0",
+  "dispatch": "passed; COPY-ONLY SPM fixture",
+  "gui_stop_callback": "passed; not physical pointer clicks",
+  "failed_candidate_retention": "passed",
+  "matlab2018a_static_parser": "passed; 8 changed files",
+  "legacy_naming_regression": "incomplete; stalled after Starting Coregistration",
+  "native_code_analyzer": "not reached",
+  "combined_launcher_exit": 1,
+  "computer_use": "list_apps and list_windows timed out; no window state or input actions",
+  "user_matlab_process_preserved": 16048
+}

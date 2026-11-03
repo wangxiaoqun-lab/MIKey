@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-20",
+  "gitCommit": null,
+  "reason": "Original toolbox folder is not a Git checkout",
+  "sourceManifestSHA256": "610294e22f3bdced234031634d2610cedfc62ea88f84ba7b0fd310d295f457bd",
+  "coreManifestSHA256": "b8d1fd2f205c97c710ce6fe73a127fc6b83e5ac9cba3843eb6aa26066e685b26",
+  "images": [
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_1184prior_13net.nii",
+      "sha256": "e51df460a73e0b2de1d9d3ae6827c52d4fe7460308c0e444886aac7034bbe99f"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_214prior_11net.nii",
+      "sha256": "0a49e21c18036002239a08faf5f5a6ab474ad1ab00fb0f578d90cdcaa5e10f6f"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_428prior_11net.nii",
+      "sha256": "7b499de6741be95d6c5fa74e9d94ce6a7585aeca7370f5c3cf38d54333fc73d3"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_428prior_17net.nii",
+      "sha256": "b9dd8c6e21117a7dae9c7f6520840e414f14010f8a817cf317d98fa177fdd1c9"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_604prior_12net.nii",
+      "sha256": "f79f91db554f9092cdd7bfa49b5d078ef4dcf7db5712ed3e3fb5387ba33c9b78"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_GMWM_mask.nii",
+      "sha256": "676dc9a9d05619d4a4610d099c3ce1fba59187937f8b279aea0bc2180709e2bd"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_TPM.nii",
+      "sha256": "5f7ba731e7233cb40c3f7a4e03aff9e69a5a4c63a425d8774d90499935d6c9e9"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_ventricle_mask.nii",
+      "sha256": "804fab157efeabb7b34f7677c034504e3a71aaf7a137d08a6ab72f0201335df5"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/brainmask_Mouse_v38.nii",
+      "sha256": "2af20b6391169cfe156546b6e7644e4cfdfa9ebdc00c4be0bd6d01cfc963d056"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_1184_v38.nii",
+      "sha256": "5686568e354ce0a48273cd3e84625226b2214be185a12c9be4d6873a95342f51"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_214_v38.nii",
+      "sha256": "7beea3bba9c4746f64d78e2312731b47ddbf40401f07a40de01f2c2939bbfaf4"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_296_v38.nii",
+      "sha256": "c42bc6dbfd266b4fc4183bf5cbd8aeb6bbaf77c52da9c694695304b7b5bd289a"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_428_v38.nii",
+      "sha256": "3179a484e415a7827ec3bb8163afdf5e97f4033ead0ee670032bf2f7af9ce52a"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_592_v38.nii",
+      "sha256": "54fba2624f5941b1053542b0c82fdd68116e0bcbc4f388ec60952df037ae5ed3"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_604_v38.nii",
+      "sha256": "d0ed7e986b47607e334930bb6cdfb81f3009655efca22b007b25fcc3a3cc15ef"
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Template_Mouse_v38.nii",
+      "sha256": "e5c16b92dd51622e7faaa7ce663f0d40d7a288c5584fc7b0e778e66856523386"
+    },
+    {
+      "file": "G:/AMCP_dataset_BIDS/derivatives/template/tpl-Mousev38_T2w.nii",
+      "sha256": "e5c16b92dd51622e7faaa7ce663f0d40d7a288c5584fc7b0e778e66856523386"
+    },
+    {
+      "file": "G:/AMCP_dataset_BIDS/derivatives/template/tpl-Mousev38_desc-ROIAtlas296_dseg.nii",
+      "sha256": "c42bc6dbfd266b4fc4183bf5cbd8aeb6bbaf77c52da9c694695304b7b5bd289a"
+    }
+  ]
+}

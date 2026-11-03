@@ -1,0 +1,381 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+                   ok: 1
+               issues: {0x1 cell}
+                notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+             subjects: {'sub-01\ses-baseline'}
+            rawCounts: [1 1]
+                steps: 1
+       requiredImages: {}
+            functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+            selection: [1x1 struct]
+    groupAnalysisPath: 'C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\group_analysis\selection-190c65dab33a2ca2'
+           subjectIDs: {'sub-01'}
+               scopes: [1x1 struct]
+
+2026-10-12 12:15:59: Run directory: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\logs\tpdc567e1a_8ae8_4b40_8979_fb5e89dafce9
+2026-10-12 12:15:59: === Starting Step 1 ===
+2026-10-12 12:15:59: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 12:15:59: Starting Voxel Scaling
+2026-10-12 12:15:59: Processing subject: sub-01\ses-baseline
+2026-10-12 12:15:59: Using voxel scaling factor: 2
+2026-10-12 12:16:00: Completed voxel scaling for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-12 12:16:00: Completed voxel scaling for: sub-01_T2w.nii
+2026-10-12 12:16:00: Voxel scaling completed: 2 files processed, 0 files skipped
+2026-10-12 12:16:00: Please generate brain mask with scaled images [sub*bold-brainmask.nii] before next step
+2026-10-12 12:16:00: === Step 1: completed (1.04 s) ===
+2026-10-12 12:16:00: All selected steps completed.
+2026-10-12 12:16:07: Run directory: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\logs\tp84c04f9c_dae3_4b3d_9022_2e90e12b4d07
+2026-10-12 12:16:07: === Starting Step 15 ===
+2026-10-12 12:16:07: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 12:16:07: Starting Individual Parcellation - Clustering
+2026-10-12 12:16:07: Using ROI numbers: 2
+2026-10-12 12:16:07: Clustering parcellation will use strategies: Regressedpc
+2026-10-12 12:16:07: Parcellation parameters - Percent Top: 0.8, Max Iter: 2, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:16:07: Correction parameters - Use tSNR: 0, Use Inter-Subject Var: 0
+2026-10-12 12:16:07: Selected parcellation mode: Individual Runs (separate folders)
+2026-10-12 12:16:07: Individual parcellation (clustering) for: sub-01\ses-baseline
+2026-10-12 12:16:07: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+No inter-subject variability map provided
+Creating 2 ROIs using k-means clustering
+Identified 2 valid networks for initialization
+
+===== Starting Iterative Reconstruction =====
+Intermediate iteration results will NOT be saved (only final results)
+
+----- Iteration 1/2 -----
+Stopping: Both thresholds reached (Change: 0.00% <= 0.10%, Confidence: 2.68 >= 2.50)
+Units changed: 0.00% | Mean confidence: 2.68 | Mean weight: 0.88 | Time: 0.0 sec
+
+===== Processing completed after 1 iterations =====
+Final change: 0.00% (Threshold: 0.10%)
+Final mean confidence: 2.68 (Threshold: 2.50)
+[警告: MATLAB 已通过改用 OpenGL 软件禁用了某些高级的图形渲染功能。欲了解有关详细信息，请点击<a href="matlab:opengl('problems')">此处</a>。] 
+Saved iteration progress plot
+
+===== Calculating Network Functional Connectivity =====
+Found 2 final networks for FC calculation
+Network 1: 48 voxels
+Network 2: 48 voxels
+Calculating FC matrix for 2 valid networks...
+Saved FC matrix to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_clust_2_Regressedpc\Final_Parcellation\Network_FC.mat
+Saved FC matrix (CSV) to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_clust_2_Regressedpc\Final_Parcellation\Network_FC.csv
+Plotting FC heatmap...
+Saved FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_clust_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.png
+Saved high-res FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_clust_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.fig
+Results saved to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_clust_2_Regressedpc
+2026-10-12 12:16:17: Completed individual parcellation for: sub-01_ses-baseline_task-rest_run-02_bold.nii with ROI 2 and pc
+2026-10-12 12:16:17: Parcellation parameters - Percent Top: 0.8, Max Iter: 2, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:16:17: ROI 2 strategy pc average Dice (across runs): NaN
+2026-10-12 12:16:17: Individual parcellation (clustering) completed: 1 files processed, 0 files skipped
+2026-10-12 12:16:17: === Step 15: completed (10.16 s) ===
+2026-10-12 12:16:17: All selected steps completed.
+2026-10-12 12:16:26: Run directory: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\logs\tpa51a24d1_3778_4c19_a36d_961d0067d1ea
+2026-10-12 12:16:26: === Starting Step 16 ===
+2026-10-12 12:16:27: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 12:16:27: Starting Individual Parcellation - Voxel Mode
+2026-10-12 12:16:27: Using voxel mode parameters - Downsample Factor: 2, Use tSNR: 0, Use Inter-Subject Var: 0
+2026-10-12 12:16:27: Voxel parcellation will use strategies: Regressedpc
+2026-10-12 12:16:27: Parcellation parameters - Percent Top: 0.8, Max Iter: 2, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:16:27: Selected parcellation mode: Individual Runs (separate folders)
+2026-10-12 12:16:27: Individual parcellation (voxel mode) for: sub-01\ses-baseline
+2026-10-12 12:16:27: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+No inter-subject variability map provided
+Using voxel-based approach with downsampling factor: 2
+Downsampling method: nearest
+Downsampling from 5x6x4 to 3x3x2
+Downsampling time point 1/16
+Downsampling time point 2/16
+Downsampling time point 3/16
+Downsampling time point 4/16
+Downsampling time point 5/16
+Downsampling time point 6/16
+Downsampling time point 7/16
+Downsampling time point 8/16
+Downsampling time point 9/16
+Downsampling time point 10/16
+Downsampling time point 11/16
+Downsampling time point 12/16
+Downsampling time point 13/16
+Downsampling time point 14/16
+Downsampling time point 15/16
+Downsampling time point 16/16
+Downsampled from 5x6x4 to 3x3x2, 12 voxels selected
+Identified 2 valid networks for initialization
+
+===== Starting Iterative Reconstruction =====
+Intermediate iteration results will NOT be saved (only final results)
+
+----- Iteration 1/2 -----
+Units changed: 33.33% | Mean confidence: 1.23 | Mean weight: 0.88 | Time: 0.0 sec
+
+----- Iteration 2/2 -----
+Change threshold reached (0.00% <= 0.10%) but confidence not met (-0.38 < 2.50)
+Units changed: 0.00% | Mean confidence: -0.38 | Mean weight: 1.00 | Time: 0.0 sec
+
+===== Processing completed after 2 iterations =====
+Final change: 0.00% (Threshold: 0.10%)
+Final mean confidence: -0.38 (Threshold: 2.50)
+Upsampling results to original space...
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Saved iteration progress plot
+
+===== Calculating Network Functional Connectivity =====
+Found 2 final networks for FC calculation
+[警告: Network 1 has insufficient voxels (5), skipping] 
+[> In individualized_parcellation_rsfMRI_v3 (line 624)
+  In MIKey>processIndividualRuns_Voxel (line 3232)
+  In MIKey>processIndividualParcellationVoxel_BIDS (line 3128)
+  In MIKey>executeStage (line 732)
+  In MIKey (line 7)
+  In MIKey_run (line 61)
+  In test_mikey_bids_filters (line 84)] 
+Network 2: 11 voxels
+Calculating FC matrix for 1 valid networks...
+Saved FC matrix to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.mat
+Saved FC matrix (CSV) to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.csv
+Plotting FC heatmap...
+Saved FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.png
+Saved high-res FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.fig
+Results saved to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc
+2026-10-12 12:16:32: Completed voxel parcellation for: sub-01_ses-baseline_task-rest_run-02_bold.nii with downsample factor 2 and pc
+2026-10-12 12:16:32: Parcellation parameters - Percent Top: 0.8, Max Iter: 2, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:16:32: Voxel mode strategy pc average Dice (across runs): NaN
+2026-10-12 12:16:32: Individual parcellation (voxel mode) completed: 1 files processed, 0 files skipped
+2026-10-12 12:16:32: === Step 16: completed (5.41 s) ===
+2026-10-12 12:16:32: All selected steps completed.
+                status: 'passed'
+    syntheticDirectory: 'C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f'
+          testedStages: [1 15 16]
+
+MIKEY_BIDS_FILTERS_PASS
+2026-10-12 12:16:51: Run directory: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\logs\tp8abcaab6_9574_47d3_94a0_775538451d5a
+2026-10-12 12:16:51: === Starting Step 11 ===
+2026-10-12 12:16:51: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 12:16:51: Starting Group Level Noise Estimation
+2026-10-12 12:16:51: Starting group level noise estimation...
+2026-10-12 12:16:51: Found optimal strategy at the minimum point of absolute value decreasing trend
+2026-10-12 12:16:51: Group level analysis completed. Total runs: 4
+2026-10-12 12:16:51: Best regression strategy: 12rp
+2026-10-12 12:16:51: Original mean correlation: 0.3
+2026-10-12 12:16:51: Absolute mean correlation: 0.3
+2026-10-12 12:16:54: Group level noise estimation completed. Results saved to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\group_analysis\selection-ee3f8c4e30fb9b8d
+2026-10-12 12:16:54: Best strategy saved for advanced regression: 12rp
+2026-10-12 12:16:54: === Step 11: completed (2.56 s) ===
+2026-10-12 12:16:54: All selected steps completed.
+2026-10-12 12:17:01: Run directory: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\logs\tp6026c0be_eac7_41c8_800a_6fb553c37baf
+2026-10-12 12:17:01: === Starting Step 16 ===
+2026-10-12 12:17:01: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 12:17:01: Starting Individual Parcellation - Voxel Mode
+2026-10-12 12:17:01: Using voxel mode parameters - Downsample Factor: 2, Use tSNR: 0, Use Inter-Subject Var: 1
+2026-10-12 12:17:01: Voxel parcellation will use strategies: Regressedpc
+2026-10-12 12:17:01: Parcellation parameters - Percent Top: 0.8, Max Iter: 1, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:17:01: Calculating Inter-Subject Variability map...
+2026-10-12 12:17:01: Starting inter-subject variability calculation for strategy: Regressedpc
+2026-10-12 12:17:01: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+2026-10-12 12:17:02: Processed subject sub-01: 2 selected runs
+2026-10-12 12:17:02: Processed subject sub-02: 2 selected runs
+2026-10-12 12:17:02: Calculating variability across 2 valid subjects...
+2026-10-12 12:17:05: Inter-subject variability map saved: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\group_analysis\selection-ee3f8c4e30fb9b8d\InterSubjectVariability_Regressedpc.nii
+2026-10-12 12:17:05: Based on 2 subjects
+2026-10-12 12:17:05: Inter-Subject Variability map computed successfully.
+2026-10-12 12:17:05: Selected parcellation mode: Individual Runs (separate folders)
+2026-10-12 12:17:05: Individual parcellation (voxel mode) for: sub-01\ses-baseline
+2026-10-12 12:17:05: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+2026-10-12 12:17:05: Skipping - voxel parcellation already exists for: sub-01_ses-baseline_task-rest_run-02_bold.nii with pc
+2026-10-12 12:17:05: Voxel mode strategy pc average Dice (across runs): NaN
+2026-10-12 12:17:05: Individual parcellation (voxel mode) for: sub-01\ses-followup
+2026-10-12 12:17:05: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+Loaded inter-subject variability map
+Using voxel-based approach with downsampling factor: 2
+Downsampling method: nearest
+Downsampling from 5x6x4 to 3x3x2
+Downsampling time point 1/16
+Downsampling time point 2/16
+Downsampling time point 3/16
+Downsampling time point 4/16
+Downsampling time point 5/16
+Downsampling time point 6/16
+Downsampling time point 7/16
+Downsampling time point 8/16
+Downsampling time point 9/16
+Downsampling time point 10/16
+Downsampling time point 11/16
+Downsampling time point 12/16
+Downsampling time point 13/16
+Downsampling time point 14/16
+Downsampling time point 15/16
+Downsampling time point 16/16
+Downsampled from 5x6x4 to 3x3x2, 12 voxels selected
+Calculating unit-level weights...
+Identified 2 valid networks for initialization
+
+===== Starting Iterative Reconstruction =====
+Intermediate iteration results will NOT be saved (only final results)
+
+----- Iteration 1/1 -----
+Units changed: 33.33% | Mean confidence: 1.23 | Mean weight: 1.00 | Time: 0.0 sec
+
+===== Processing completed after 1 iterations =====
+Final change: 33.33% (Threshold: 0.10%)
+Final mean confidence: 1.23 (Threshold: 2.50)
+Upsampling results to original space...
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Saved iteration progress plot
+
+===== Calculating Network Functional Connectivity =====
+Found 2 final networks for FC calculation
+[警告: Network 1 has insufficient voxels (5), skipping] 
+[> In individualized_parcellation_rsfMRI_v3 (line 624)
+  In MIKey>processIndividualRuns_Voxel (line 3232)
+  In MIKey>processIndividualParcellationVoxel_BIDS (line 3128)
+  In MIKey>executeStage (line 732)
+  In MIKey (line 7)
+  In MIKey_run (line 61)
+  In test_mikey_group_selection (line 38)] 
+Network 2: 11 voxels
+Calculating FC matrix for 1 valid networks...
+Saved FC matrix to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-followup\func\sub-01_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.mat
+Saved FC matrix (CSV) to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-followup\func\sub-01_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.csv
+Plotting FC heatmap...
+Saved FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-followup\func\sub-01_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.png
+Saved high-res FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-followup\func\sub-01_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.fig
+Results saved to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-01\ses-followup\func\sub-01_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc
+2026-10-12 12:17:09: Completed voxel parcellation for: sub-01_ses-followup_task-rest_run-02_bold.nii with downsample factor 2 and pc
+2026-10-12 12:17:09: Parcellation parameters - Percent Top: 0.8, Max Iter: 1, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:17:09: Voxel mode strategy pc average Dice (across runs): NaN
+2026-10-12 12:17:09: Individual parcellation (voxel mode) for: sub-02\ses-baseline
+2026-10-12 12:17:09: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+Loaded inter-subject variability map
+Using voxel-based approach with downsampling factor: 2
+Downsampling method: nearest
+Downsampling from 5x6x4 to 3x3x2
+Downsampling time point 1/16
+Downsampling time point 2/16
+Downsampling time point 3/16
+Downsampling time point 4/16
+Downsampling time point 5/16
+Downsampling time point 6/16
+Downsampling time point 7/16
+Downsampling time point 8/16
+Downsampling time point 9/16
+Downsampling time point 10/16
+Downsampling time point 11/16
+Downsampling time point 12/16
+Downsampling time point 13/16
+Downsampling time point 14/16
+Downsampling time point 15/16
+Downsampling time point 16/16
+Downsampled from 5x6x4 to 3x3x2, 12 voxels selected
+Calculating unit-level weights...
+Identified 2 valid networks for initialization
+
+===== Starting Iterative Reconstruction =====
+Intermediate iteration results will NOT be saved (only final results)
+
+----- Iteration 1/1 -----
+Units changed: 33.33% | Mean confidence: 1.23 | Mean weight: 1.00 | Time: 0.0 sec
+
+===== Processing completed after 1 iterations =====
+Final change: 33.33% (Threshold: 0.10%)
+Final mean confidence: 1.23 (Threshold: 2.50)
+Upsampling results to original space...
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Saved iteration progress plot
+
+===== Calculating Network Functional Connectivity =====
+Found 2 final networks for FC calculation
+[警告: Network 1 has insufficient voxels (5), skipping] 
+[> In individualized_parcellation_rsfMRI_v3 (line 624)
+  In MIKey>processIndividualRuns_Voxel (line 3232)
+  In MIKey>processIndividualParcellationVoxel_BIDS (line 3128)
+  In MIKey>executeStage (line 732)
+  In MIKey (line 7)
+  In MIKey_run (line 61)
+  In test_mikey_group_selection (line 38)] 
+Network 2: 11 voxels
+Calculating FC matrix for 1 valid networks...
+Saved FC matrix to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-baseline\func\sub-02_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.mat
+Saved FC matrix (CSV) to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-baseline\func\sub-02_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.csv
+Plotting FC heatmap...
+Saved FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-baseline\func\sub-02_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.png
+Saved high-res FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-baseline\func\sub-02_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.fig
+Results saved to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-baseline\func\sub-02_ses-baseline_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc
+2026-10-12 12:17:15: Completed voxel parcellation for: sub-02_ses-baseline_task-rest_run-02_bold.nii with downsample factor 2 and pc
+2026-10-12 12:17:15: Parcellation parameters - Percent Top: 0.8, Max Iter: 1, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:17:15: Voxel mode strategy pc average Dice (across runs): NaN
+2026-10-12 12:17:15: Individual parcellation (voxel mode) for: sub-02\ses-followup
+2026-10-12 12:17:15: Using group network: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\user_network.nii
+Loaded inter-subject variability map
+Using voxel-based approach with downsampling factor: 2
+Downsampling method: nearest
+Downsampling from 5x6x4 to 3x3x2
+Downsampling time point 1/16
+Downsampling time point 2/16
+Downsampling time point 3/16
+Downsampling time point 4/16
+Downsampling time point 5/16
+Downsampling time point 6/16
+Downsampling time point 7/16
+Downsampling time point 8/16
+Downsampling time point 9/16
+Downsampling time point 10/16
+Downsampling time point 11/16
+Downsampling time point 12/16
+Downsampling time point 13/16
+Downsampling time point 14/16
+Downsampling time point 15/16
+Downsampling time point 16/16
+Downsampled from 5x6x4 to 3x3x2, 12 voxels selected
+Calculating unit-level weights...
+Identified 2 valid networks for initialization
+
+===== Starting Iterative Reconstruction =====
+Intermediate iteration results will NOT be saved (only final results)
+
+----- Iteration 1/1 -----
+Units changed: 33.33% | Mean confidence: 1.23 | Mean weight: 1.00 | Time: 0.0 sec
+
+===== Processing completed after 1 iterations =====
+Final change: 33.33% (Threshold: 0.10%)
+Final mean confidence: 1.23 (Threshold: 2.50)
+Upsampling results to original space...
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Upsampled from 3x3x2 to 5x6x4
+Saved iteration progress plot
+
+===== Calculating Network Functional Connectivity =====
+Found 2 final networks for FC calculation
+[警告: Network 1 has insufficient voxels (5), skipping] 
+[> In individualized_parcellation_rsfMRI_v3 (line 624)
+  In MIKey>processIndividualRuns_Voxel (line 3232)
+  In MIKey>processIndividualParcellationVoxel_BIDS (line 3128)
+  In MIKey>executeStage (line 732)
+  In MIKey (line 7)
+  In MIKey_run (line 61)
+  In test_mikey_group_selection (line 38)] 
+Network 2: 11 voxels
+Calculating FC matrix for 1 valid networks...
+Saved FC matrix to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-followup\func\sub-02_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.mat
+Saved FC matrix (CSV) to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-followup\func\sub-02_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC.csv
+Plotting FC heatmap...
+Saved FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-followup\func\sub-02_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.png
+Saved high-res FC heatmap to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-followup\func\sub-02_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc\Final_Parcellation\Network_FC_heatmap.fig
+Results saved to: C:\MIKeyTest\tp51d6f13f_86ab_4b45_9bf0_71f9454cd48f\derivatives\MIKey\sub-02\ses-followup\func\sub-02_ses-followup_task-rest_run-02_bold_parcellation_voxel_2_Regressedpc
+2026-10-12 12:17:20: Completed voxel parcellation for: sub-02_ses-followup_task-rest_run-02_bold.nii with downsample factor 2 and pc
+2026-10-12 12:17:20: Parcellation parameters - Percent Top: 0.8, Max Iter: 1, Change Thr: 0.001, Conf Thr: 2.5
+2026-10-12 12:17:20: Voxel mode strategy pc average Dice (across runs): NaN
+2026-10-12 12:17:20: Individual parcellation (voxel mode) completed: 3 files processed, 1 files skipped
+2026-10-12 12:17:20: === Step 16: completed (19.23 s) ===
+2026-10-12 12:17:20: All selected steps completed.
+MIKEY_GROUP_SELECTION_PASS
+MIKEY_GUI_FILTERS_PASS

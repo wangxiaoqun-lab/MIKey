@@ -1,0 +1,84 @@
+                status: 'passed'
+    inactiveTypeChecks: 522
+                phases: {'1'  '2:10'}
+
+MIKEY_CONFIG_SCOPES_PASS
+USER_CONFIG_PASS steps=1 fcLabel=296 parcNetwork=296rois
+USER_CONFIG_PASS steps=[2 3 4 5 6 7 8 9 10] fcLabel=296 parcNetwork=296rois
+2026-10-19 12:29:48: Run directory: C:\MIKeyTest\tp557602bd_e24c_4827_b0d6_4d59e8c35ccc\derivatives\MIKey\logs\tp166164fb_2766_4f58_82f8_1515124ef9c9
+2026-10-19 12:29:48: === Starting Step 10 ===
+2026-10-19 12:29:48: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 12:29:48: Starting Noise Regression Strategy Estimation
+2026-10-19 12:29:48: Motion regression for: sub-01
+2026-10-19 12:29:49: Estimating PC counts: 0  1  3
+2026-10-19 12:29:49: Completed motion regression for: sub-01_task-rest_run-01_bold.nii
+2026-10-19 12:29:49: Estimating PC counts: 0  1  3
+2026-10-19 12:29:49: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 12:29:49: Motion regression completed: 2 files processed, 0 files skipped
+2026-10-19 12:29:49: === Step 10: completed (1.80 s) ===
+2026-10-19 12:29:49: All selected steps completed.
+2026-10-19 12:29:57: Run directory: C:\MIKeyTest\tp557602bd_e24c_4827_b0d6_4d59e8c35ccc\derivatives\MIKey\logs\tp174a1804_4290_4863_8b69_a9e5ae5d8f70
+2026-10-19 12:29:57: === Starting Step 10 ===
+2026-10-19 12:29:58: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 12:29:58: Starting Noise Regression Strategy Estimation
+2026-10-19 12:29:58: Motion regression for: sub-01
+2026-10-19 12:29:58: PC counts changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 12:29:58: Estimating PC counts: 0  2  3
+2026-10-19 12:29:58: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 12:29:58: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 12:29:58: === Step 10: completed (0.65 s) ===
+2026-10-19 12:29:58: All selected steps completed.
+2026-10-19 12:30:06: Run directory: C:\MIKeyTest\tp557602bd_e24c_4827_b0d6_4d59e8c35ccc\derivatives\MIKey\logs\tpc5110359_e66c_4a89_8732_fd8ca7a33cc6
+2026-10-19 12:30:06: === Starting Step 10 ===
+2026-10-19 12:30:06: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 12:30:06: Starting Noise Regression Strategy Estimation
+2026-10-19 12:30:06: Motion regression for: sub-01
+2026-10-19 12:30:06: Skipping - strategy estimates already match PC counts for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 12:30:06: Motion regression completed: 0 files processed, 1 files skipped
+2026-10-19 12:30:06: === Step 10: completed (0.46 s) ===
+2026-10-19 12:30:06: All selected steps completed.
+2026-10-19 12:30:15: Run directory: C:\MIKeyTest\tp557602bd_e24c_4827_b0d6_4d59e8c35ccc\derivatives\MIKey\logs\tp22367bf1_42bf_497e_b81e_857b54fa7913
+2026-10-19 12:30:15: === Starting Step 11 ===
+2026-10-19 12:30:16: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 12:30:16: Starting Group Level Noise Estimation
+2026-10-19 12:30:16: Starting group level noise estimation...
+2026-10-19 12:30:16: Comparing shared PC counts: 0  3
+2026-10-19 12:30:16: Found optimal strategy at the minimum point of absolute value decreasing trend
+2026-10-19 12:30:16: Group level analysis completed. Total runs: 2
+2026-10-19 12:30:16: Best regression strategy: No regress
+2026-10-19 12:30:16: Original mean correlation: 0.010392
+2026-10-19 12:30:16: Absolute mean correlation: 0.067861
+[警告: MATLAB 已通过改用 OpenGL 软件禁用了某些高级的图形渲染功能。欲了解有关详细信息，请点击<a href="matlab:opengl('problems')">此处</a>。] 
+2026-10-19 12:30:20: Group level noise estimation completed. Results saved to: C:\MIKeyTest\tp557602bd_e24c_4827_b0d6_4d59e8c35ccc\derivatives\MIKey\group_analysis
+2026-10-19 12:30:20: Best strategy saved for advanced regression: No regress
+2026-10-19 12:30:20: === Step 11: completed (4.57 s) ===
+2026-10-19 12:30:20: All selected steps completed.
+2026-10-19 12:30:28: Run directory: C:\MIKeyTest\tp557602bd_e24c_4827_b0d6_4d59e8c35ccc\derivatives\MIKey\logs\tpeb51fbb0_4e95_40a5_8f0e_daf7f67a5e51
+2026-10-19 12:30:28: === Starting Step 12 ===
+2026-10-19 12:30:28: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 12:30:28: Starting Final Noise Regression Strategy
+2026-10-19 12:30:28: Using best regression strategy: No regress
+2026-10-19 12:30:28: Selected regression strategies: pc
+2026-10-19 12:30:28: Head Motion Regression Parameters - Detrend: 1, Filter: 1, High Freq: 0.1, Low Freq: 0.01
+2026-10-19 12:30:28: Advanced regression for: sub-01
+Adding back intercept terms to residuals...
+Applying detrending...
+Applying filtering...
+Saving processed data...
+Processing complete with intercept added back.
+2026-10-19 12:30:30: Completed noise regression for: sub-01_task-rest_run-01_bold.nii
+Adding back intercept terms to residuals...
+Applying detrending...
+Applying filtering...
+Saving processed data...
+Processing complete with intercept added back.
+2026-10-19 12:30:32: Completed noise regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 12:30:32: Advanced regression completed: 2 files processed, 0 files skipped
+2026-10-19 12:30:32: === Step 12: completed (3.93 s) ===
+2026-10-19 12:30:32: All selected steps completed.
+                status: 'passed'
+    syntheticDirectory: 'C:\MIKeyTest\tp557602bd_e24c_4827_b0d6_4d59e8c35ccc'
+          testedStages: [10 11 12]
+
+MIKEY_PC_STRATEGIES_PASS
+MIKEY_SCOPE_RECHECK_ALL_PASS

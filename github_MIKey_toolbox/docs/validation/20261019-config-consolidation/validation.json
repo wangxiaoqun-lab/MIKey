@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "singleParameterSource": "examples/mikey_config_example.m",
+  "executionEntry": "examples/run_mikey.m",
+  "allSavedConfigFieldsExplicit": 50,
+  "matchesSavedGUIExcept": [
+    "subjectFilter=sub-002",
+    "steps=1"
+  ],
+  "matlabExecution": "not run",
+  "syntax": "MATLAB-2018a parser and native R2018a Code Analyzer passed"
+}

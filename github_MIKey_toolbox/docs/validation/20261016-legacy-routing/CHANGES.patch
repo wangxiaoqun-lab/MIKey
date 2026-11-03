@@ -1,0 +1,85 @@
+--- original/MIKey.m
++++ updated/MIKey.m
+@@ -1712,6 +1712,7 @@
+             end
+             job = MY_get_default_coreg_batch_struct({[meanBold ',1']}, {[sourceCopy ',1']}, {''}, interp);
+             guiCheckpoint(fig, true);
++            updateStatus(fig, ['Starting SPM coregistration estimation and reslicing for: ' boldFile]);
+             spm_jobman('run', job);
+             candidate = MIKey_prefixed_file('coreg', sourceCopy);
+             runRegistrationCheck(fig, 6, 'post', meanBold, candidate, df, base);
+@@ -1769,6 +1770,7 @@
+             scans = [MIKey_scans(bold); source];
+             job = UN_get_default_oldnormalize_batch_struct(ref, source, scans, interp);
+             guiCheckpoint(fig, true);
++            updateStatus(fig, ['Starting SPM normalization estimation and reslicing for: ' boldFile]);
+             spm_jobman('run', job);
+             candidateBold = MIKey_prefixed_file('norm', bold);
+             candidateT2 = MIKey_prefixed_file('norm', t2);
+@@ -1791,6 +1793,7 @@
+ function runRegistrationCheck(fig, stage, phase, reference, moving, directory, base)
+ entities = regexprep(base, '_bold(?=_|$)', '');
+ reportPath = fullfile(directory, 'registration_qc', sprintf('%s_desc-step%d%sQC.json', entities, stage, phase));
++updateStatus(fig, sprintf('Registration QC started: Step %d %s. Reference: %s. Moving: %s', stage, phase, reference, moving));
+ MIKey_registration_qc(stage, phase, reference, moving, reportPath, @() guiCheckpoint(fig));
+ updateStatus(fig, sprintf('Registration QC passed: Step %d %s. Report: %s', stage, phase, reportPath));
+ end
+@@ -1798,6 +1801,7 @@
+ function runRegistrationPair(fig, stage, original, output, anatomy, directory, base)
+ entities = regexprep(base, '_bold(?=_|$)', '');
+ reportPath = fullfile(directory, 'registration_qc', sprintf('%s_desc-step%dgridQC.json', entities, stage));
++updateStatus(fig, sprintf('Registration grid QC started: Step %d. BOLD: %s. T2w: %s', stage, output, anatomy));
+ MIKey_registration_pair(stage, original, output, anatomy, reportPath, @() guiCheckpoint(fig));
+ updateStatus(fig, sprintf('Registration grid QC passed: Step %d. Report: %s', stage, reportPath));
+ end
+--- original/tests/test_mikey_bids_spm_routing.m
++++ updated/tests/test_mikey_bids_spm_routing.m
+@@ -1,5 +1,7 @@
+ function test_mikey_bids_spm_routing(spmPath)
+ % Actual MIKey dispatch + real NIfTI I/O; SPM transforms are COPY-ONLY stubs.
++oldRng=rng;rngCleanup=onCleanup(@()rng(oldRng)); %#ok<NASGU>
++rng(0);
+ root=fileparts(fileparts(mfilename('fullpath')));addpath(root);addpath(fullfile(root,'scripts'));addpath(spmPath);
+ spm('defaults','fmri');spm_get_defaults('cmdline',true);
+ work=tempname;mkdir(work);func=fullfile(work,'sub-01','func');mkdir(func);
+@@ -20,8 +22,13 @@
+ mock=fullfile(work,'spm_naming_stub');mkdir(mock);
+ copyfile(fullfile(root,'tests','fixtures','spm_naming_stub','spm_jobman.m.fixture'),fullfile(mock,'spm_jobman.m'));
+ addpath(mock,'-begin');clear spm_jobman;
++assert(strcmp(MIKey_bids_path(df,[base '_desc-masked.nii'],'input'),fullfile(df,[base '_desc-masked.nii'])));
++assert(strcmp(MIKey_bids_path(da,[t2base '_desc-masked.nii'],'input'),fullfile(da,[t2base '_desc-masked.nii'])));
+ for step=[4 5 6 7]
++    assert(strcmp(which('spm_jobman'),fullfile(mock,'spm_jobman.m')),'Naming test must use its COPY-ONLY fixture.');
++    fprintf('MIKEY_BIDS_ROUTING_STAGE_%d_BEGIN\n',step);stageTimer=tic;
+     MIKey('batch',state,step);
++    fprintf('MIKEY_BIDS_ROUTING_STAGE_%d_PASS %.3f seconds\n',step,toc(stageTimer));
+ end
+ assert(exist(MIKey_bids_path(df,[base '_desc-slicetimed.nii']),'file')==2);
+ assert(exist(MIKey_bids_path(df,[base '_desc-realign.nii']),'file')==2);
+--- original/README.md
++++ updated/README.md
+@@ -287,6 +287,8 @@
+ | Missing SPM/helper function | Check `which <function> -all`, root/scripts paths and SPM root. |
+ | Missing `pca/strel/imerode/corr/kmeans` | Check `ver`, toolbox installation and license availability on the compute node. |
+ | `License checkout failed` | Verify license-server access from the compute node; MATLAB path changes do not resolve license access. |
++| Empty test log / a waiting MATLAB launch | Check for a startup or license dialog before assuming a processing loop. A local attempt stopped at `License Manager Error -8` before entering the test. A launcher exit code alone does not prove test execution; require the test result/PASS marker. Use a working licensed MATLAB session or resolve the license configuration. |
++| Changed code appears not to run | MATLAB can retain loaded functions/callbacks. Reopen MIKey after an update. For controlled script validation, refresh only the affected functions with `clear MIKey test_mikey_bids_spm_routing; rehash path`; do not clear the user workspace. |
+ | Configuration error | Check exact field spelling, allowed values, PC bounds and cutoff frequencies. |
+ | Missing template | Check the actually selected default/user image path. No fixed `final_network_428rois_12clusters.nii` is required. |
+ | Compression/read error | Confirm a valid, complete gzip/NIfTI input and sufficient temporary-disk space. Raw compressed inputs are not overwritten. |
+@@ -312,6 +314,7 @@
+ test_mikey_streaming_scaling(spmPath);
+ test_mikey_registration_qc(spmPath);
+ test_mikey_registration_dispatch(spmPath);
++test_mikey_bids_spm_routing(spmPath);
+ % Optional GUI callback stop-propagation check:
+ % test_mikey_registration_dispatch(spmPath, true);
+ % Optional: exercise Run/Execute through UITest in a desktop session
+@@ -320,3 +323,7 @@
+ ```
+ 
+ Additional tests cover configuration import, failure reports, subject/session/task/run selection, selected group/concatenation operations and custom PC strategies. See `docs/VALIDATION.md`, task records and `docs/validation/20261012/` logs. Small synthetic tests verify execution and routing; they do not establish scientific validity, real-acquisition registration quality, or performance on a cluster. Original files are preserved in `docs/backups/`.
++
++The routing fixture uses COPY-ONLY SPM jobs with real NIfTI I/O; it does not estimate scientific registration quality. It fixes and restores its random state, verifies legacy input fallbacks, and prints a begin/completion marker and duration for each stage. Steps 6/7 also log the input paths before QC, grid checks and SPM estimation, so the last started operation is visible.
++
++For automated R2018a Code Analyzer gates, inspect all `checkcode(...,'-id')` message IDs; syntax diagnostics include `SYNER` and `EOLPAR`, not just `PARSE`. Validate the gate with deliberately malformed temporary code. The completed legacy replay, GUI-to-legacy replay and 38-file native analysis are recorded in `docs/validation/20261016-legacy-routing/` and `docs/tasks/20261016-legacy-routing.md`.

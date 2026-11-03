@@ -1,0 +1,126 @@
+function MIKey_check_stage(cfg, step)
+% Check derivatives immediately before a step, after earlier steps have run.
+selection = cfg; selection.steps = step;
+subjects = MIKey_subjects(selection);
+if ismember(step, [11 12])
+    if step == 12
+        requireFile(fullfile(MIKey_group_analysis(cfg),'best_regression_strategy.mat'));
+    end
+end
+flags = [cfg.advRegressionPCOnly cfg.advRegressionPCCSF cfg.advRegressionPCGS cfg.advRegressionPCCSFGS];
+strategies = {'Regressedpc','RegressedpcCSF','RegressedpcGS','RegressedpcCSFGS'};
+strategies = strategies(flags);
+for i = 1:numel(subjects)
+    subject = fullfile(subjects(i).folder, subjects(i).name);
+    deriv = fullfile(cfg.bidsPath,'derivatives','MIKey',subjects(i).name);
+    bold = MIKey_bold_files(fullfile(subject,'func'),cfg);
+    t2 = dir(fullfile(MIKey_anat_path(subject),'*_T2w.nii'));
+    for j = 1:numel(bold)
+        [~,base] = fileparts(bold(j).name);
+        func = fullfile(deriv,'func');
+        image = @(suffix) fullfile(func,[base suffix '.nii']);
+        switch step
+            case 2
+                if ~exist(image('_desc-masked'),'file')
+                    requireFile(image('_desc-scaled'));
+                    checkMask(func,image('_desc-scaled'));
+                end
+            case 3
+                if ~exist(image('_desc-fieldmap'),'file')
+                    requireFile(image('_desc-masked'));
+                    for part = {'magnitude1','phase1','magnitude2','phase2'}
+                        matches = dir(fullfile(deriv,'fmap',['sub*' part{1} '_desc-scaled.nii']));
+                        if numel(matches) ~= 1
+                            error('MIKey:Prerequisite','Expected one %s fieldmap for %s; found %d.',part{1},subjects(i).name,numel(matches));
+                        end
+                    end
+                end
+            case 4
+                if ~exist(image('_desc-slicetimed'),'file')
+                    requireAny({image('_desc-fieldmap'),image('_desc-masked')});
+                end
+            case 5
+                if ~exist(image('_desc-realign'),'file')
+                    requireAny({image('_desc-slicetimed'),image('_desc-fieldmap'),image('_desc-masked')});
+                end
+            case 6
+                if ~exist(image('_desc-T2coreg'),'file')
+                    requireFile(image('_desc-realign'));
+                    if numel(t2) ~= 1
+                        error('MIKey:Prerequisite','Coregistration requires one unambiguous T2w for %s; found %d.',subjects(i).name,numel(t2));
+                    end
+                    [~,t2base] = fileparts(t2(1).name);
+                    requireFile(fullfile(deriv,'anat',[t2base '_desc-masked.nii']));
+                end
+            case 7
+                if ~exist(image('_space-template_desc-normalized'),'file') || ~exist(image('_space-template_desc-T2normalized'),'file')
+                    requireFile(image('_desc-realign'));
+                    requireFile(image('_desc-T2coreg'));
+                end
+            case 8
+                if ~exist(image('_space-template_desc-smoothed'),'file')
+                    requireFile(image('_space-template_desc-normalized'));
+                end
+            case 9
+                if ~exist(fullfile(func,[base '_desc-NBPCs.mat']),'file')
+                    requireFile(image('_desc-scaled'));
+                    checkMask(func,image('_desc-scaled'));
+                end
+            case {10,12}
+                requireFile(image('_space-template_desc-smoothed'));
+                requireFile(fullfile(func,[base '_desc-NBPCs.mat']));
+                motion = dir(fullfile(func,['rp_' base '*']));
+                if numel(motion) ~= 1
+                    error('MIKey:Prerequisite','Expected one rp_ motion file for %s; found %d.',base,numel(motion));
+                end
+            case 11
+                requireFile(fullfile(func,[base '_desc-regressionResults.mat']));
+            case {13,14,15,16}
+                for k = 1:numel(strategies)
+                    requireFile(image(['_space-template_desc-' strategies{k}]));
+                end
+        end
+    end
+    if ismember(step,[2 17])
+        for j = 1:numel(t2)
+            [~,base] = fileparts(t2(j).name);
+            anat = fullfile(deriv,'anat');
+            if step == 2 && ~exist(fullfile(anat,[base '_desc-masked.nii']),'file')
+                scaled = fullfile(anat,[base '_desc-scaled.nii']);
+                requireFile(scaled); checkMask(anat,scaled);
+            elseif step == 17 && ~exist(fullfile(anat,[base '_desc-gmvol.nii']),'file')
+                requireFile(fullfile(anat,[base '_desc-scaled.nii']));
+                requireFile(fullfile(anat,[base '_desc-masked.nii']));
+            end
+        end
+    end
+end
+end
+
+function requireFile(filename)
+if ~exist(filename,'file')
+    error('MIKey:Prerequisite','Required input missing: %s',filename);
+end
+end
+
+function requireAny(filenames)
+if ~any(cellfun(@(name) exist(name,'file')==2,filenames))
+    error('MIKey:Prerequisite','None of the alternative inputs exist: %s',strjoin(filenames,', '));
+end
+end
+
+function checkMask(directory,image)
+masks = dir(fullfile(directory,'*brainmask.nii'));
+if numel(masks) ~= 1
+    error('MIKey:Prerequisite','Expected exactly one *brainmask.nii in %s; found %d.',directory,numel(masks));
+end
+maskHead = spm_vol(fullfile(masks(1).folder,masks(1).name));
+imageHead = spm_vol(image);
+if numel(maskHead) ~= 1 || ~isequal(maskHead.dim,imageHead(1).dim) || norm(maskHead.mat-imageHead(1).mat,'fro') > 1e-4
+    error('MIKey:MaskGeometry','Mask dimensions/affine must match scaled image: %s',image);
+end
+values = spm_read_vols(maskHead);
+if any(~isfinite(values(:)) | (values(:)~=0 & values(:)~=1)) || ~any(values(:))
+    error('MIKey:MaskValues','Brain mask must be nonempty binary 0/1: %s',masks(1).name);
+end
+end

@@ -1,0 +1,103 @@
+--- before/examples/run_mikey.m
++++ updated/examples/run_mikey.m
+@@ -1,45 +1,9 @@
+-% General headless entry: edit cfg fields below, then run this script.
+-% First use cfg.steps = 1; prepare masks externally; then use cfg.steps = 2:10.
++% General headless entry. Edit parameters only in mikey_config_example.m.
++% Run Step 1, prepare masks externally, then change cfg.steps to 2:10 there.
+ toolboxRoot = fileparts(fileparts(mfilename('fullpath')));
+ addpath(toolboxRoot, '-begin');
+-
+-% Optional saved GUI configuration. Set configFile = '' to start from defaults.
+-configFile = fullfile(toolboxRoot, 'MIKey_BIDS_config.mat');
+-if isempty(configFile)
+-    cfg = MIKey_defaults();
+-else
+-    cfg = MIKey_config(configFile);
+-end
+-
+-% ----------------------- EDIT PARAMETERS HERE ---------------------------
+-cfg.bidsPath = '/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main/BIDS_demo';
+-cfg.spmPath = ''; % Set '/absolute/server/path/spm12', or use SPM already on path.
+-cfg.codePath = fullfile(toolboxRoot, 'scripts');
+-cfg.templatePath = fullfile(toolboxRoot, 'share_temp');
+-cfg.subjectFilter = 'sub-002'; % Any subject ID/pattern, e.g. 'sub-003' or 'sub-*'.
+-cfg.sessionFilter = '*';
+-cfg.taskFilter = '*';
+-cfg.runFilter = '*';
+-cfg.steps = 1; % Run alone. After preparing masks, change this to 2:10.
+-cfg.minTimepoints = 100;
+-cfg.voxelScaleFactor = 20;
+-cfg.sliceTimingTR = 1;
+-cfg.sliceTimingNSlices = 28;
+-cfg.sliceTimingOrder = 'Auto-detect';
+-cfg.smoothFWHM = [6 6 6];
+-cfg.coregInterp = 2;
+-cfg.normInterp = 2;
+-cfg.useDefaultTemplate = true;
+-cfg.customTemplatePath = ''; % Used for Step 7 when useDefaultTemplate=false.
+-cfg.useDefaultPCStrategy = true;
+-cfg.customPCCounts = [0 5 10 20]; % Used when useDefaultPCStrategy=false.
+-cfg.dryRun = false; % true checks configuration/dependencies without processing.
+-cfg.failFast = true;
+-cfg.strictWarnings = true;
+-cfg.logDir = ''; % Default: BIDS/derivatives/MIKey/logs, unique folder per run.
+-% Other GUI parameters remain in cfg from configFile or MIKey_defaults().
+-% Add further cfg.<parameter> assignments here as needed.
+-% ------------------------------------------------------------------------
++addpath(fullfile(toolboxRoot, 'examples'), '-begin');
++cfg = mikey_config_example();
+ 
+ cfg = MIKey_config(cfg);
+ if ismember(1, cfg.steps) && numel(cfg.steps) > 1
+--- before/examples/mikey_config_example.m
++++ updated/examples/mikey_config_example.m
+@@ -1,16 +1,21 @@
+ function cfg = mikey_config_example()
+-% Copy this function, edit absolute server paths, then call MIKey_run(cfg).
++% Edit parameters only in this file; examples/run_mikey.m loads and runs them.
++root = fileparts(fileparts(mfilename('fullpath')));
++addpath(root, '-begin');
+ cfg = MIKey_defaults();
+-cfg.spmPath = '/shared/software/spm12';
+-cfg.bidsPath = '/shared/project/BIDS_work';
+-cfg.subjectFilter = 'sub-*';
++cfg.spmPath = ''; % Set the server SPM12 root, or use SPM already on path.
++cfg.codePath = fullfile(root, 'scripts');
++cfg.templatePath = fullfile(root, 'share_temp');
++cfg.bidsPath = '/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main/BIDS_demo';
++cfg.subjectFilter = 'sub-002'; % Edit the subject ID/pattern here.
+ cfg.sessionFilter = '*'; % e.g. '01', 'ses-01', '01,02', or 'none'
+ cfg.taskFilter = '*'; % e.g. 'rest' or 'rest,motor'
+ cfg.runFilter = '*'; % e.g. '01', '01,03', or 'none'
+-cfg.steps = 1; % First scale, then create masks externally; see README.md.
++cfg.steps = 1; % Run alone; prepare masks externally; then change to 2:10.
++cfg.minTimepoints = 100;
+ cfg.voxelScaleFactor = 20;
+-cfg.sliceTimingTR = 2;
+-cfg.sliceTimingNSlices = 30;
++cfg.sliceTimingTR = 1;
++cfg.sliceTimingNSlices = 28;
+ cfg.sliceTimingOrder = 'Auto-detect';
+ cfg.smoothFWHM = [6 6 6];
+ cfg.coregInterp = 2;
+@@ -44,7 +49,7 @@
+ cfg.useInterSubjectVar = false;
+ cfg.parcellationUseParallel = false; % true requires Parallel Computing Toolbox and allocated workers.
+ cfg.parcellationMode = 'individual'; % or 'concatenated'
+-cfg.dryRun = true; % Review preflight, then set false to process.
++cfg.dryRun = false; % true checks configuration/dependencies without processing.
+ cfg.failFast = true;
+ cfg.strictWarnings = true;
+ cfg.logDir = ''; % default: BIDS/derivatives/MIKey/logs
+--- before/README.md
++++ updated/README.md
+@@ -166,7 +166,7 @@
+ 
+ `MIKey_config` validates fields and values and supplies defaults. Unknown fields are rejected. Relative paths resolve against the calling MATLAB working directory; use absolute paths for cluster jobs. Steps accept numeric vectors or strings such as `'2,4:10'`, without evaluating MATLAB expressions. Execution preserves the supplied order and rejects duplicate steps.
+ 
+-See [examples/mikey_config_example.m](examples/mikey_config_example.m). Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
++Edit parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m), then run [examples/run_mikey.m](examples/run_mikey.m). The execution script loads this configuration and does not define a second parameter block. This example uses the explicit settings in the configuration function; it does not load the saved GUI MAT file. Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
+ 
+ ## Processing steps and prerequisites
+ 

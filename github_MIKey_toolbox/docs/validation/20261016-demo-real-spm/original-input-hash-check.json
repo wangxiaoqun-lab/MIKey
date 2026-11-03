@@ -1,0 +1,136 @@
+{
+  "status": "passed",
+  "seconds": 109.55406451225281,
+  "files": [
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_dir-AP_bold.nii",
+      "sha256": "3d757e2b3a78da6a7b3d3613e3e441e35cf768d4501069df87cfed800e5ee3c3",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_dir-PA_bold.nii",
+      "sha256": "8a11c79d6659be8ff38f4e30cc350ba9226d12b613dc124d44b692d68c37632a",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-01_bold.nii",
+      "sha256": "f50f73bb738a0670dd0eab9389beb5e820dde294584e2df47c2f0aa3edce53e6",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-02_bold.nii",
+      "sha256": "ba2fa60b8d6ae6aa5639f2d5ebb066f84d7b5fc7874f6321e526ee85c37b7b96",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-03_bold.nii",
+      "sha256": "9b37189b2896b898c48a2bc30c6f7280fdf4c5e3f1d41e621697fb2c2b80806e",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-04_bold.nii",
+      "sha256": "7437783445f5c7624f3367e9ccd24631b4682c039b9958348fd16c49e1978732",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_dir-AP_bold.json",
+      "sha256": "4828ba0a7e6fe60b0f5f3435711cbe6426489dda593b62e2983fa36b2212ea62",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_dir-PA_bold.json",
+      "sha256": "42a35ac0c5723e9000e8b2d067c7aa7e87c800f1466c0ce501d49dd412e0994e",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-01_bold.json",
+      "sha256": "02db832a6fce715d2c86677f4c06dba98f002560b8d858b7a092547510171c5c",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-02_bold.json",
+      "sha256": "76436ebe0711c84e1a4716eb66a51d0894fe8e87a7d33d617316650333fa7d4c",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-03_bold.json",
+      "sha256": "e58455c6061549b22d70b0a30a36583d5e470c98fe00efdb2de78cd4f6ed83d9",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\func\\sub-001_task-rest_run-04_bold.json",
+      "sha256": "e92b71a43f133f023835b2c5165196804616b24a79cda181ac77200f973ab322",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\anat\\sub-001_acq-t2fsetra_run-01_T2w.nii",
+      "sha256": "827e1c0758b09fa29c2ab050410faeb826252a250bcfdd49e30de8046e7a78c0",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\sub-001\\anat\\sub-001_acq-t2fsetra_run-01_T2w.json",
+      "sha256": "4cfb1c88249b97ac838160d9ab29efe1eb0bd8978a7c358c75ff08235a1ae4c7",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-01_desc-realign_bold.nii",
+      "sha256": "bc53f08a3eef72bc68e05bcdcb5587158b3e0a7f4f5608092d2769d3438fc6f9",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-02_desc-realign_bold.nii",
+      "sha256": "c9074ec2481149386e0ef224b0a94d102ddea04d92dbbadafdf2d3bb2845b35a",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-03_desc-realign_bold.nii",
+      "sha256": "bfda4d73fd63b734242703bcb240cd29a48a189acad81882e8d9b001fa214fc3",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-04_desc-realign_bold.nii",
+      "sha256": "6c9323f59d3728300765d47cbbd6b68b4c4e0d86b5ff3bbff5812449213bbc49",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-01_desc-mean_boldref.nii",
+      "sha256": "42711dc76c1fb5ba7c192b88b3f7501943f0b79e742e3440615f647ed391586e",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-02_desc-mean_boldref.nii",
+      "sha256": "fb1ceaaa6f8205770eef9879f3084b92fdc03d84bca1ccf6c50b10af4031c86a",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-03_desc-mean_boldref.nii",
+      "sha256": "227459f599cdd8597e81e46f1049fa39f69a3f61a1552487321c03166cfa9906",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-04_desc-mean_boldref.nii",
+      "sha256": "6f6f10580f477760fe932c65208f8101c5340e9bbe0342b8150829172646c1ad",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_desc-boldbrain_mask.nii",
+      "sha256": "63e12fb3f5e81d9cbb3e065fc9f25664a3d7ed751ac4ca984eb0e878411c4655",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\anat\\sub-001_acq-t2fsetra_run-01_desc-masked_T2w.nii",
+      "sha256": "68f0f416631da6de717306d87abb153e88e6a8f98510655efc9c165550890c28",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\anat\\sub-001_desc-anatbrain_mask.nii",
+      "sha256": "8fefde5ffecf4f034a8e812d9d645b9edef0aa1af61a8d1a589ed0bb1e7c33f5",
+      "unchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\share_temp\\Template_Mouse_v38.nii",
+      "sha256": "e5c16b92dd51622e7faaa7ce663f0d40d7a288c5584fc7b0e778e66856523386",
+      "unchanged": true
+    }
+  ]
+}

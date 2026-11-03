@@ -1,0 +1,1798 @@
+{
+  "status": "prepared",
+  "reference": "G:/AMCP_dataset_BIDS/derivatives/MIKey/sub-001/func/sub-001_task-rest_run-01_space-template_desc-Regressedpc_bold.nii.gz",
+  "coordinateConvention": "Requested SPM 1-based translation; exact NIfTI 0-based floats copied from BOLD",
+  "offsets": [
+    268,
+    272,
+    276,
+    292,
+    308,
+    324
+  ],
+  "images": [
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_1184prior_13net.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "e24e8b518eb8de64a167692f4a1e3c8d2b8ec9a2dd65b81c8229edef0f27f66f",
+      "sha256After": "e51df460a73e0b2de1d9d3ae6827c52d4fe7460308c0e444886aac7034bbe99f",
+      "payloadOffset": 352,
+      "payloadSHA256": "8796384de3745b4dd48470bd80607183ad5f077231de979c6ae038a8c6396670",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_214prior_11net.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "23458a7eca6c3435056aa3de2397a4596216be1732082359b2dca4d269f1c0cc",
+      "sha256After": "0a49e21c18036002239a08faf5f5a6ab474ad1ab00fb0f578d90cdcaa5e10f6f",
+      "payloadOffset": 352,
+      "payloadSHA256": "48ac9cb74192702e3e3017dc20ca03ea474e237ebd223ba8adb98f77762aa888",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_428prior_11net.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "00f0d12d20c139e3f7df8830856d86981a82b92fd6d0a84c2a55ddb5189430c5",
+      "sha256After": "7b499de6741be95d6c5fa74e9d94ce6a7585aeca7370f5c3cf38d54333fc73d3",
+      "payloadOffset": 352,
+      "payloadSHA256": "665eca12ab0b586bc1624a23709733f2a9d52a283f1e8e65d31ff794aa95850b",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_428prior_17net.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAACEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAACEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "a6e3f7308b729386968a285a2039ab29e5c729bb1b6a93ccc271bf9ca953e3bb",
+      "sha256After": "b9dd8c6e21117a7dae9c7f6520840e414f14010f8a817cf317d98fa177fdd1c9",
+      "payloadOffset": 352,
+      "payloadSHA256": "cd3bb35a0ce5ef96f3146f66e6564735721bfe3f7ff4565bc01ad727f9ff0ea5",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_604prior_12net.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "e86f6a3f5ee96f8d45625a1842b6937019a27405925ce7ea5a15664e09a51d85",
+      "sha256After": "f79f91db554f9092cdd7bfa49b5d078ef4dcf7db5712ed3e3fb5387ba33c9b78",
+      "payloadOffset": 352,
+      "payloadSHA256": "a3c4d903f2d67e05d5f2e66875d0afff498e99086e8e2cc6ee64e31c1ed4817b",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_GMWM_mask.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "b4a6e6bfe061598b7f14910154958e810aa79176f409552c0ecada40bd0f9c5b",
+      "sha256After": "676dc9a9d05619d4a4610d099c3ce1fba59187937f8b279aea0bc2180709e2bd",
+      "payloadOffset": 352,
+      "payloadSHA256": "08738a60f3dadd7653dd3dfee61565dc64869222806e01f6cef85567ff67fee7",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_TPM.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAQAcgBQACYABQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEF2ZyBvZiAyMTIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAQAcgBQACYABQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEF2ZyBvZiAyMTIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "0167d65e92b9ff9e0292369591f6d731eb51e710fda09a010a07789c8dc81fef",
+      "sha256After": "5f7ba731e7233cb40c3f7a4e03aff9e69a5a4c63a425d8774d90499935d6c9e9",
+      "payloadOffset": 352,
+      "payloadSHA256": "6e43143621b17d9c2570e520c7d12dd762183973477639dc39653c021a82c86c",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_ventricle_mask.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "46e78f5c1047f09939cea325bd124cd43fcc305d5771e6f1282703b3a5a3b1a1",
+      "sha256After": "804fab157efeabb7b34f7677c034504e3a71aaf7a137d08a6ab72f0201335df5",
+      "payloadOffset": 352,
+      "payloadSHA256": "cafdded78095c663158c3c8329d8418f7593d360e9a015443b8884b404d47761",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/brainmask_Mouse_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAACEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAACEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "de402c32d441397691f5ace80b6dcb63c1ab953430c3f2cdb9177ab64281bbeb",
+      "sha256After": "2af20b6391169cfe156546b6e7644e4cfdfa9ebdc00c4be0bd6d01cfc963d056",
+      "payloadOffset": 352,
+      "payloadSHA256": "47101ab9d44a16b60ac857780a828542be65945456472f75c36811a5f817c275",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_1184_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "c0cf233e7941adb1453bc3fd6865cce5a85a30b14a3b917f96fda4cc0fea235c",
+      "sha256After": "5686568e354ce0a48273cd3e84625226b2214be185a12c9be4d6873a95342f51",
+      "payloadOffset": 352,
+      "payloadSHA256": "de899a2721ed02ec937f3336e9d406754ab348ed937c48c04f2527a2b660d4f7",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_214_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "c9f48fe54567ef041cf78d2ce2b6e913b82625bb43b6d02190db2858362398e1",
+      "sha256After": "7beea3bba9c4746f64d78e2312731b47ddbf40401f07a40de01f2c2939bbfaf4",
+      "payloadOffset": 352,
+      "payloadSHA256": "e819b8cf64b44b435d96d8c56cb5e795169eb5df36fa974c20d6cf0f728a42d1",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_296_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "8d2ab206dbab0dbbccd51b535c05e0dbf331f82b5252b2475d4d9ceddfe05b2a",
+      "sha256After": "c42bc6dbfd266b4fc4183bf5cbd8aeb6bbaf77c52da9c694695304b7b5bd289a",
+      "payloadOffset": 352,
+      "payloadSHA256": "1c9066a3f41fb518511dac6af426d815e1a8fce20d7178ba84db64bc07338308",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_428_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "71e620f8a4630cbde21a0237f2e8769a14c2548667b683f5b7f925cf98ae9aa7",
+      "sha256After": "3179a484e415a7827ec3bb8163afdf5e97f4033ead0ee670032bf2f7af9ce52a",
+      "payloadOffset": 352,
+      "payloadSHA256": "f6c1c1caee08ced92e74a71fdfc6b47db1589141565cafd4aeb66a3509f2a61b",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_592_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "159f897c9ea360bba598845ef41832a8f9ac1cc91a8d16f8ef0e540947e60f22",
+      "sha256After": "54fba2624f5941b1053542b0c82fdd68116e0bcbc4f388ec60952df037ae5ed3",
+      "payloadOffset": 352,
+      "payloadSHA256": "3a888a992e7a52263e8e7919aa467a53de676fbdff07a0c5626a3444298bed78",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Label_Mouse_604_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "42b3727ffe033bd9f123d1988c909dcd8959ae09c042732cbf4c69a058b04b78",
+      "sha256After": "d0ed7e986b47607e334930bb6cdfb81f3009655efca22b007b25fcc3a3cc15ef",
+      "payloadOffset": 352,
+      "payloadSHA256": "aa59b74c8e6dbde75dd536bdfd0781e2542de76980228bb999363bc150358676",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/share_temp/Template_Mouse_v38.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "b70face814f49990d97b1e9534c42339bcbba81a78176419bfd868b5e4d53bb5",
+      "sha256After": "e5c16b92dd51622e7faaa7ce663f0d40d7a288c5584fc7b0e778e66856523386",
+      "payloadOffset": 352,
+      "payloadSHA256": "e43c861c0c1e4d64d8773da7f1aac083c05000c7f517867c1b67959b7ef0e742",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "G:/AMCP_dataset_BIDS/derivatives/template/tpl-Mousev38_T2w.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAABAAIAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIHRlbXBsYXRlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "b70face814f49990d97b1e9534c42339bcbba81a78176419bfd868b5e4d53bb5",
+      "sha256After": "e5c16b92dd51622e7faaa7ce663f0d40d7a288c5584fc7b0e778e66856523386",
+      "payloadOffset": 352,
+      "payloadSHA256": "e43c861c0c1e4d64d8773da7f1aac083c05000c7f517867c1b67959b7ef0e742",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    },
+    {
+      "file": "G:/AMCP_dataset_BIDS/derivatives/template/tpl-Mousev38_desc-ROIAtlas296_dseg.nii",
+      "before": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -113.443359375
+          ],
+          [
+            0,
+            2,
+            0,
+            -99.43016815185547
+          ],
+          [
+            0,
+            0,
+            -8,
+            169.7859344482422
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "after": {
+        "dim": [
+          114,
+          80,
+          38
+        ],
+        "sformCode": 2,
+        "qformCode": 2,
+        "matrix": [
+          [
+            2,
+            0,
+            0,
+            -112.10980224609375
+          ],
+          [
+            0,
+            2,
+            0,
+            -83.44133758544922
+          ],
+          [
+            0,
+            0,
+            -8,
+            152.00149536132812
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "headerBeforeBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAAADj4sI/3MbCM8kpQwAAAEAAAAAAAAAAAADj4sIAAAAAAAAAQAAAAAA/3MbCAAAAAAAAAAAAAADBM8kpQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "headerAfterBase64": "XAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByAAMAcgBQACYAAQABAAEAAQAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAgL8AAABAAAAAQAAAAEEAAAAAAAAAAAAAAAAAAAAAAACwQwAAgD8AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHNwbSAtIDNEIG5vcm1hbGl6ZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgACAAAAAAAAAAAAAAAAADg44ML34abCYgAYQwAAAEAAAAAAAAAAADg44MIAAAAAAAAAQAAAAAD34abCAAAAAAAAAAAAAADBYgAYQwAAAAAAAAAAAAAAAAAAAABuKzEAAAAAAA==",
+      "sha256Before": "8d2ab206dbab0dbbccd51b535c05e0dbf331f82b5252b2475d4d9ceddfe05b2a",
+      "sha256After": "c42bc6dbfd266b4fc4183bf5cbd8aeb6bbaf77c52da9c694695304b7b5bd289a",
+      "payloadOffset": 352,
+      "payloadSHA256": "1c9066a3f41fb518511dac6af426d815e1a8fce20d7178ba84db64bc07338308",
+      "changedBytes": [
+        268,
+        269,
+        270,
+        272,
+        273,
+        274,
+        276,
+        277,
+        278,
+        292,
+        293,
+        294,
+        308,
+        309,
+        310,
+        324,
+        325,
+        326
+      ]
+    }
+  ],
+  "scopeNote": "Expanded by owner to include the separate shared ROIAtlas296; subject-specific space-DWI outputs are not template-space resources."
+}

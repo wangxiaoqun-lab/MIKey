@@ -1,0 +1,3 @@
+# Keep one root GUI entry and group implementation in scripts
+
+Retain MIKey.m at root for direct GUI launch. Put core helpers/classes and processing algorithms in scripts; keep examples for editable configs/general runners. Resolve assets/examples relative to the toolbox root rather than the implementation file's former location. Bootstrap supported entries and reject legacy root duplicates because Current Folder can shadow added paths. Preserve configs/data and archive only the exact former source filenames during an overlay migration. Restart MATLAB after class moves. Do not recursively add backups to path.

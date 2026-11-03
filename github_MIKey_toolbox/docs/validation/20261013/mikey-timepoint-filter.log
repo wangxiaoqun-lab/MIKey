@@ -1,0 +1,52 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+                   ok: 1
+               issues: {0x1 cell}
+                notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+             subjects: {'sub-01'}
+            rawCounts: [2 0]
+                steps: 1
+       requiredImages: {}
+            functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+            selection: [1x1 struct]
+         excludedBold: [1x1 struct]
+    groupAnalysisPath: 'C:\Users\Administrator\AppData\Local\Temp\tp5377b6b9_0d55_429c_8741_83ac5588cde5\derivatives\MIKey\group_analysis\selection-1b4fc1d0909429f7'
+           subjectIDs: {'sub-01'}
+               scopes: [1x1 struct]
+
+2026-10-13 11:20:48: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5377b6b9_0d55_429c_8741_83ac5588cde5\derivatives\MIKey\logs\tp1144d4a1_6e84_4b60_85d5_32689aa251db
+2026-10-13 11:20:48: === Starting Step 1 ===
+2026-10-13 11:20:49: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-13 11:20:49: Starting Voxel Scaling
+2026-10-13 11:20:49: Excluded short BOLD (T=5 < N=10): C:\Users\Administrator\AppData\Local\Temp\tp5377b6b9_0d55_429c_8741_83ac5588cde5\sub-01\func\sub-01_task-rest_run-01_bold.nii.gz
+2026-10-13 11:20:49: Processing subject: sub-01
+2026-10-13 11:20:49: Using voxel scaling factor: 20
+2026-10-13 11:20:50: Completed voxel scaling for: sub-01_task-rest_run-02_bold.nii
+2026-10-13 11:20:50: Completed voxel scaling for: sub-01_task-rest_run-03_bold.nii
+2026-10-13 11:20:50: Voxel scaling completed: 2 files processed, 0 files skipped
+2026-10-13 11:20:50: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+2026-10-13 11:20:50: === Step 1: completed (2.40 s) ===
+2026-10-13 11:20:50: All selected steps completed.
+2026-10-13 11:21:00: Run directory: C:\Users\Administrator\AppData\Local\Temp\tpd8bf210b_e35a_4e13_b5a8_0e45ca0430f2\derivatives\MIKey\logs\tp14e737b6_9d79_4bfd_ab03_36e6fe38a130
+2026-10-13 11:21:00: === Starting Step 11 ===
+2026-10-13 11:21:00: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-13 11:21:00: Starting Group Level Noise Estimation
+2026-10-13 11:21:00: Excluded short BOLD (T=5 < N=10): C:\Users\Administrator\AppData\Local\Temp\tpd8bf210b_e35a_4e13_b5a8_0e45ca0430f2\sub-01\func\sub-01_task-rest_run-01_bold.nii.gz
+2026-10-13 11:21:00: Starting group level noise estimation...
+2026-10-13 11:21:01: Comparing shared PC counts: 0  1
+2026-10-13 11:21:01: Found optimal strategy at the minimum point of absolute value decreasing trend
+2026-10-13 11:21:01: Group level analysis completed. Total runs: 2
+2026-10-13 11:21:01: Best regression strategy: 12rp
+2026-10-13 11:21:01: Original mean correlation: 0.325
+2026-10-13 11:21:01: Absolute mean correlation: 0.325
+[警告: MATLAB 已通过改用 OpenGL 软件禁用了某些高级的图形渲染功能。欲了解有关详细信息，请点击<a href="matlab:opengl('problems')">此处</a>。] 
+2026-10-13 11:21:40: Group level noise estimation completed. Results saved to: C:\Users\Administrator\AppData\Local\Temp\tpd8bf210b_e35a_4e13_b5a8_0e45ca0430f2\derivatives\MIKey\group_analysis\selection-1b4fc1d0909429f7
+2026-10-13 11:21:40: Best strategy saved for advanced regression: 12rp
+2026-10-13 11:21:40: === Step 11: completed (40.08 s) ===
+2026-10-13 11:21:40: All selected steps completed.
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tpd8bf210b_e35a_4e13_b5a8_0e45ca0430f2'
+
+MIKEY_TIMEPOINT_FILTER_PASS

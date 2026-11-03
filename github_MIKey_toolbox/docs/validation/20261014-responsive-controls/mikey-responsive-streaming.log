@@ -1,0 +1,13 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+[警告: 未找到文件或者权限被拒绝] 
+[> In MIKey_copy_nifti>removePartial (line 41)
+  In MIKey_copy_nifti>@()removePartial(temporary) (line 15)
+  In onCleanup/delete (line 60)
+  In MIKey_copy_nifti>copyWithCheckpoints (line 13)
+  In MIKey_copy_nifti (line 4)
+  In test_mikey_streaming_scaling (line 37)] 
+错误使用 test_mikey_streaming_scaling (line 43)
+断言失败。

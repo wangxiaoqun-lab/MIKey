@@ -1,0 +1,82 @@
+[
+  {
+    "file": "share_temp/AMCP_temp/AMCP_1184prior_13net.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/AMCP_temp/AMCP_214prior_11net.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/AMCP_temp/AMCP_428prior_11net.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/AMCP_temp/AMCP_428prior_17net.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/AMCP_temp/AMCP_604prior_12net.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/AMCP_temp/AMCP_GMWM_mask.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/AMCP_temp/AMCP_TPM.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/AMCP_temp/AMCP_ventricle_mask.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/brainmask_Mouse_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/Label_Mouse_1184_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/Label_Mouse_214_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/Label_Mouse_296_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/Label_Mouse_428_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/Label_Mouse_592_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/Label_Mouse_604_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  },
+  {
+    "file": "share_temp/Template_Mouse_v38.nii",
+    "voxelPayloadUnchanged": true,
+    "headerMatchesTarget": true
+  }
+]

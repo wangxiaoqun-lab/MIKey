@@ -1,0 +1,966 @@
+--- before/MIKey_config.m
++++ after/MIKey_config.m
+@@ -1,4 +1,4 @@
+-function cfg = MIKey_config(input)
++function [cfg, active] = MIKey_config(input)
+ %MIKEY_CONFIG Merge/validate struct, saved GUI MAT, or JSON config.
+ if nargin == 0
+     input = struct();
+@@ -39,126 +39,132 @@
+     end
+     cfg.(names{i}) = input.(names{i});
+ end
+-textFields = {'bidsPath', 'spmPath', 'templatePath', 'codePath', ...
+-    'subjectFilter', 'sessionFilter', 'taskFilter', 'runFilter', ...
+-    'sliceTimingOrder', 'customTemplatePath', ...
+-    'fcLabel', 'fcCustomPath', 'parcNetwork', 'networkCustomPath', ...
+-    'labelCustomPath', 'groupNetworkPath', 'parcellationMode', 'logDir'};
+-for i = 1:numel(textFields)
+-    name = textFields{i};
+-    if isstring(cfg.(name)) && isscalar(cfg.(name))
+-        cfg.(name) = char(cfg.(name));
+-    end
+-    if ~ischar(cfg.(name)) || size(cfg.(name), 1) > 1
+-        error('MIKey:Parameter', '%s must be a character vector.', name);
+-    end
+-end
+-paths = {'bidsPath', 'spmPath', 'templatePath', 'codePath', ...
+-    'customTemplatePath', 'fcCustomPath', 'networkCustomPath', ...
+-    'labelCustomPath', 'groupNetworkPath', 'logDir'};
+-for i = 1:numel(paths)
+-    name = paths{i};
+-    value = cfg.(name);
+-    if ~isempty(value) && isempty(regexp(value, '^(/|[A-Za-z]:[\\/]|\\\\)', 'once'))
+-        cfg.(name) = fullfile(pwd, value);
+-    end
+-end
+-if isempty(regexp(cfg.subjectFilter, '^sub-[^/\\]+$', 'once'))
+-    error('MIKey:Parameter', 'subjectFilter must be a sub-* name/pattern without directory separators.');
+-end
++% Determine usage before touching stage-specific values. Inactive values
++% are preserved, including []/false/text from saved configurations.
+ cfg.steps = parseSteps(cfg.steps);
+-for name = {'sessionFilter','taskFilter','runFilter'}
+-    value = strrep(cfg.(name{1}), ' ', '');
+-    if isempty(regexp(value, '^[A-Za-z0-9*?\-]+(,[A-Za-z0-9*?\-]+)*$', 'once'))
+-        error('MIKey:Parameter', '%s requires an entity value/pattern or comma-separated values; use * for all, none for absent.', name{1});
+-    end
+-    cfg.(name{1}) = value;
+-end
+-cfg.smoothFWHM = numericList(cfg.smoothFWHM, 'smoothFWHM');
+-if isscalar(cfg.smoothFWHM)
+-    cfg.smoothFWHM = repmat(cfg.smoothFWHM, 1, 3);
+-end
+-if numel(cfg.smoothFWHM) ~= 3 || any(cfg.smoothFWHM < 0)
+-    error('MIKey:Parameter', 'smoothFWHM requires one or three nonnegative values.');
+-end
+-cfg.clustROINums = numericList(cfg.clustROINums, 'clustROINums');
+-flags = {'useDefaultTemplate', 'useDefaultPCStrategy', 'detrendFlag', 'filterFlag', ...
+-    'advRegressionPCOnly', 'advRegressionPCCSF', 'advRegressionPCGS', ...
+-    'advRegressionPCCSFGS', 'useCustomParc', 'useTSNR', ...
+-    'useInterSubjectVar', 'parcellationUseParallel', 'dryRun', 'failFast', 'strictWarnings'};
+-for i = 1:numel(flags)
+-    value = cfg.(flags{i});
+-    if ~(islogical(value) || isnumeric(value)) || ~isscalar(value) || ~ismember(value, [0 1])
+-        error('MIKey:Parameter', '%s must be true or false.', flags{i});
+-    end
+-    cfg.(flags{i}) = logical(value);
+-end
+-if islogical(cfg.customPCCounts)
+-    error('MIKey:Parameter', ['customPCCounts is a PC-count list, not a true/false switch. ' ...
+-        'For the default strategy set useDefaultPCStrategy=true and customPCCounts=[]; ' ...
+-        'for custom candidates set useDefaultPCStrategy=false and customPCCounts=[0 5 10 20].']);
+-end
+-if cfg.useDefaultPCStrategy && emptyPCList(cfg.customPCCounts)
+-    cfg.customPCCounts = []; % Unused custom candidates may be blank in default mode.
+-else
+-    cfg.customPCCounts = numericList(cfg.customPCCounts, 'customPCCounts');
+-end
+-if any(cfg.customPCCounts < 0 | cfg.customPCCounts ~= fix(cfg.customPCCounts)) || numel(unique(cfg.customPCCounts)) ~= numel(cfg.customPCCounts)
+-    error('MIKey:Parameter', 'customPCCounts must contain distinct nonnegative integers.');
+-end
+-cfg.customPCCounts = sort(cfg.customPCCounts);
+-if any(cfg.clustROINums < 1 | cfg.clustROINums ~= fix(cfg.clustROINums))
+-    error('MIKey:Parameter', 'clustROINums must contain positive integers.');
+-end
+-positive = {'voxelScaleFactor', 'sliceTimingTR', 'sliceTimingNSlices', ...
+-    'voxelDownsampleFactor', 'maxIter', 'confThr'};
+-nonnegative = {'changeThr', 'lowFreq', 'highFreq', 'minTimepoints'};
+-for i = 1:numel(positive)
+-    checkScalar(cfg.(positive{i}), positive{i}, true);
+-end
+-for i = 1:numel(nonnegative)
+-    checkScalar(cfg.(nonnegative{i}), nonnegative{i}, false);
+-end
+-integers = {'sliceTimingNSlices', 'voxelDownsampleFactor', 'maxIter', ...
+-    'coregInterp', 'normInterp', 'minTimepoints'};
+-for i = 1:numel(integers)
+-    name = integers{i};
+-    checkScalar(cfg.(name), name, false);
+-    if cfg.(name) ~= fix(cfg.(name))
+-        error('MIKey:Parameter', '%s must be an integer.', name);
+-    end
+-end
+-if cfg.coregInterp > 7 || cfg.normInterp > 7
+-    error('MIKey:Parameter', 'Interpolation must be an integer from 0 to 7.');
+-end
+-checkScalar(cfg.percentTop, 'percentTop', true);
+-if cfg.percentTop > 1
+-    error('MIKey:Parameter', 'percentTop must be in (0, 1].');
+-end
+-if cfg.filterFlag && (cfg.lowFreq >= cfg.highFreq || cfg.highFreq >= 1/(2*cfg.sliceTimingTR))
+-    error('MIKey:Parameter', 'Require 0 <= lowFreq < highFreq < 1/(2*sliceTimingTR). Check each run''s actual TR too.');
+-end
+-% Unselected stages must not be blocked by unused choice values. Keep values
+-% unchanged so selecting those stages later still triggers their validation.
+-if ismember(4, cfg.steps)
+-    choices(cfg.sliceTimingOrder, {'Auto-detect','ascending','descending','interleaved'}, 'sliceTimingOrder (Step 4)');
+-end
+-if ismember(13, cfg.steps)
+-    choices(cfg.fcLabel, {'214','428','604','1184','Custom...'}, 'fcLabel (Step 13)');
+-end
+-if any(ismember(cfg.steps, 14:16))
+-    choices(cfg.parcNetwork, {'214rois','428rois','604rois','1184rois'}, 'parcNetwork (Steps 14-16)');
+-    choices(cfg.parcellationMode, {'individual','concatenated'}, 'parcellationMode (Steps 14-16)');
+-end
+-if any(ismember(cfg.steps, 12:16)) && ~any([cfg.advRegressionPCOnly cfg.advRegressionPCCSF cfg.advRegressionPCGS cfg.advRegressionPCCSFGS])
+-    error('MIKey:Parameter', 'Select at least one advanced regression strategy for steps 12-16.');
+-end
+-end
+-
+-function empty = emptyPCList(value)
+-empty = isnumeric(value) && isempty(value);
+-if ischar(value) || (isstring(value) && isscalar(value))
+-    empty = isempty(strtrim(char(value)));
++active = MIKey_parameter_scope(cfg);
++valid = active;
++issues = {};
++flags = {'useDefaultTemplate','useDefaultPCStrategy','detrendFlag','filterFlag', ...
++    'advRegressionPCOnly','advRegressionPCCSF','advRegressionPCGS', ...
++    'advRegressionPCCSFGS','useCustomParc','useTSNR','useInterSubjectVar', ...
++    'parcellationUseParallel','dryRun','failFast','strictWarnings'};
++for i=1:numel(flags)
++    name=flags{i};if ~active.(name),continue;end
++    value=cfg.(name);
++    if ~(islogical(value) || isnumeric(value)) || ~isreal(value) || ...
++            ~isscalar(value) || ~isfinite(value) || ~ismember(value,[0 1])
++        issues{end+1}=[name ' must be true or false.'];valid.(name)=false; %#ok<AGROW>
++    else
++        cfg.(name)=logical(value);
++    end
++end
++textFields = {'bidsPath','spmPath','templatePath','codePath','subjectFilter', ...
++    'sessionFilter','taskFilter','runFilter','sliceTimingOrder','customTemplatePath', ...
++    'fcLabel','fcCustomPath','parcNetwork','networkCustomPath','labelCustomPath', ...
++    'groupNetworkPath','parcellationMode','logDir'};
++paths = {'bidsPath','spmPath','templatePath','codePath','customTemplatePath', ...
++    'fcCustomPath','networkCustomPath','labelCustomPath','groupNetworkPath','logDir'};
++for i=1:numel(textFields)
++    name=textFields{i};if ~active.(name),continue;end
++    value=cfg.(name);
++    if isstring(value) && isscalar(value),value=char(value);end
++    if ~ischar(value) || size(value,1)>1
++        issues{end+1}=[name ' must be a character vector.'];valid.(name)=false; %#ok<AGROW>
++        continue;
++    end
++    if ismember(name,paths) && ~isempty(value) && isempty(regexp(value,'^(/|[A-Za-z]:[\\/]|\\\\)','once'))
++        value=fullfile(pwd,value);
++    end
++    cfg.(name)=value;
++end
++if valid.subjectFilter && isempty(regexp(cfg.subjectFilter,'^sub-[^/\\]+$','once'))
++    issues{end+1}='subjectFilter must be a sub-* name/pattern without directory separators.';
++    valid.subjectFilter=false;
++end
++for names={'sessionFilter','taskFilter','runFilter'}
++    name=names{1};if ~valid.(name),continue;end
++    value=strrep(cfg.(name),' ','');
++    if isempty(regexp(value,'^[A-Za-z0-9*?\-]+(,[A-Za-z0-9*?\-]+)*$','once'))
++        issues{end+1}=[name ' requires an entity pattern or comma-separated values; use * for all, none for absent.']; %#ok<AGROW>
++        valid.(name)=false;
++    else,cfg.(name)=value;
++    end
++end
++lists={'smoothFWHM','clustROINums','customPCCounts'};
++for i=1:numel(lists)
++    name=lists{i};if ~active.(name),continue;end
++    try
++        if strcmp(name,'customPCCounts') && islogical(cfg.(name))
++            error('MIKey:Parameter','customPCCounts is a PC-count list, not a true/false switch. Use a numeric list such as [0 5 10 20].');
++        end
++        value=numericList(cfg.(name),name);
++        switch name
++            case 'smoothFWHM'
++                if isscalar(value),value=repmat(value,1,3);end
++                if numel(value)~=3 || any(value<0)
++                    error('MIKey:Parameter','smoothFWHM requires one or three nonnegative values.');
++                end
++            case 'clustROINums'
++                if any(value<1 | value~=fix(value))
++                    error('MIKey:Parameter','clustROINums must contain positive integers.');
++                end
++            case 'customPCCounts'
++                if any(value<0 | value~=fix(value)) || numel(unique(value))~=numel(value)
++                    error('MIKey:Parameter','customPCCounts must contain distinct nonnegative integers.');
++                end
++                value=sort(value);
++        end
++        cfg.(name)=value;
++    catch ME
++        issues{end+1}=ME.message;valid.(name)=false; %#ok<AGROW>
++    end
++end
++positive={'voxelScaleFactor','sliceTimingTR','sliceTimingNSlices', ...
++    'voxelDownsampleFactor','maxIter','confThr','percentTop'};
++nonnegative={'changeThr','lowFreq','highFreq','minTimepoints','coregInterp','normInterp'};
++integers={'sliceTimingNSlices','voxelDownsampleFactor','maxIter','coregInterp','normInterp','minTimepoints'};
++for names=[positive nonnegative]
++    name=names{1};if ~active.(name),continue;end
++    try
++        checkScalar(cfg.(name),name,ismember(name,positive));
++        value=double(cfg.(name));
++        if ismember(name,integers) && value~=fix(value)
++            error('MIKey:Parameter','%s must be an integer.',name);
++        end
++        if ismember(name,{'coregInterp','normInterp'}) && value>7
++            error('MIKey:Parameter','%s interpolation must be an integer from 0 to 7.',name);
++        end
++        if strcmp(name,'percentTop') && value>1
++            error('MIKey:Parameter','percentTop must be in (0, 1].');
++        end
++        cfg.(name)=value;
++    catch ME
++        issues{end+1}=ME.message;valid.(name)=false; %#ok<AGROW>
++    end
++end
++options={ ...
++    'sliceTimingOrder',{'Auto-detect','ascending','descending','interleaved'}; ...
++    'fcLabel',{'214','428','604','1184','Custom...'}; ...
++    'parcNetwork',{'214rois','428rois','604rois','1184rois'}; ...
++    'parcellationMode',{'individual','concatenated'}};
++for i=1:size(options,1)
++    name=options{i,1};if ~active.(name) || ~valid.(name),continue;end
++    try,choices(cfg.(name),options{i,2},name);
++    catch ME,issues{end+1}=ME.message;valid.(name)=false;end %#ok<AGROW>
++end
++if active.highFreq && valid.lowFreq && valid.highFreq && valid.sliceTimingTR && ...
++        (cfg.lowFreq>=cfg.highFreq || cfg.highFreq>=1/(2*cfg.sliceTimingTR))
++    issues{end+1}='Require 0 <= lowFreq < highFreq < 1/(2*sliceTimingTR) for Step 12 filtering. Check each run''s actual TR too.';
++end
++strategy={'advRegressionPCOnly','advRegressionPCCSF','advRegressionPCGS','advRegressionPCCSFGS'};
++if active.advRegressionPCOnly && all(cellfun(@(n)valid.(n),strategy)) && ...
++        ~any(cellfun(@(n)cfg.(n),strategy))
++    issues{end+1}='Select at least one advanced regression strategy for steps 12-16.';
++end
++if ~isempty(issues)
++    error('MIKey:Parameter','Invalid parameters for selected steps %s:\n - %s', ...
++        mat2str(cfg.steps),strjoin(issues,sprintf('\n - ')));
+ end
+ end
+ 
+--- before/MIKeyBatchState.m
++++ after/MIKeyBatchState.m
+@@ -9,17 +9,9 @@
+     end
+     methods
+         function obj = MIKeyBatchState(cfg, fid)
+-            obj.Config = cfg;
++            obj.Config = MIKey_config(cfg);
+             obj.LogFile = fid;
+-            map = MIKey_parameter_map();
+-            obj.UserData.bidsPath = cfg.bidsPath;
+-            for i = 1:size(map, 1)
+-                value = cfg.(map{i, 1});
+-                if any(strcmp(map{i, 1}, {'customPCCounts', 'steps'}))
+-                    value = strtrim(sprintf('%g ', value));
+-                end
+-                obj.UserData.(map{i, 2}) = struct('Value', value);
+-            end
++            obj.UserData = MIKey_batch_controls(obj.Config);
+         end
+         function log(obj, message)
+             line = sprintf('%s: %s\n', datestr(now, 'yyyy-mm-dd HH:MM:SS'), message);
+--- before/MIKey_preflight.m
++++ after/MIKey_preflight.m
+@@ -1,7 +1,7 @@
+ function report = MIKey_preflight(input)
+ %MIKEY_PREFLIGHT Check configuration, installed dependencies and raw layout.
+ % Does not run a processing step or create derivatives.
+-cfg = MIKey_config(input);
++[cfg, active] = MIKey_config(input);
+ issues = {};
+ notes = {};
+ [subjects, excluded] = MIKey_subjects(cfg);
+@@ -10,7 +10,8 @@
+ elseif isempty(subjects)
+     issues{end+1} = sprintf('No scans match subject=%s, session=%s, task=%s, run=%s, minTimepoints=%d.',cfg.subjectFilter,cfg.sessionFilter,cfg.taskFilter,cfg.runFilter,cfg.minTimepoints);
+ end
+-dirs = {cfg.codePath, cfg.templatePath};
++dirs = {cfg.codePath};
++if active.templatePath, dirs{end+1} = cfg.templatePath; end
+ for i = 1:numel(dirs)
+     if ~exist(dirs{i}, 'dir'), issues{end+1} = ['Directory not found: ' dirs{i}]; end
+ end
+@@ -34,10 +35,10 @@
+ for step = cfg.steps
+     deps = [deps stageDeps{step}]; %#ok<AGROW>
+ end
+-if cfg.parcellationUseParallel && ismember(15,cfg.steps)
++if active.parcellationUseParallel && cfg.parcellationUseParallel
+     deps{end+1} = 'parpool';
+     if ~license('test','Distrib_Computing_Toolbox')
+-        issues{end+1} = 'Parallel clustering requires Parallel Computing Toolbox; set parcellationUseParallel=false for serial execution.';
++        issues{end+1} = 'Parallel parcellation requires Parallel Computing Toolbox; set parcellationUseParallel=false for serial execution.';
+     end
+ end
+ for i = 1:numel(deps)
+@@ -70,7 +71,7 @@
+     if cfg.useInterSubjectVar || any(ismember(cfg.steps, [15 16]))
+         required{end+1} = MIKey_group_network(cfg);
+     end
+-    if cfg.useInterSubjectVar
++    if active.useInterSubjectVar && cfg.useInterSubjectVar
+         required{end+1} = fullfile(cfg.templatePath, 'Template_Mouse_v38.nii');
+         required{end+1} = fullfile(cfg.templatePath, 'brainmask_Mouse_v38.nii');
+     end
+@@ -109,7 +110,7 @@
+         issues{end+1} = [subjects(i).name ': no supported BOLD or T2w input found.'];
+     end
+ end
+-if cfg.useInterSubjectVar
++if active.useInterSubjectVar && cfg.useInterSubjectVar
+     notes{end+1} = 'Inter-subject variability is a group operation; use the complete intended cohort in one job.';
+ end
+ notes{end+1} = 'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.';
+@@ -119,6 +120,7 @@
+ report.selection = struct('subjectFilter',cfg.subjectFilter, ...
+     'sessionFilter',cfg.sessionFilter,'taskFilter',cfg.taskFilter,'runFilter',cfg.runFilter, ...
+     'minTimepoints',cfg.minTimepoints);
++report.parameterScope=active;
+ report.excludedBold=excluded;
+ report.groupAnalysisPath = MIKey_group_analysis(cfg);
+ report.subjectIDs = unique({subjects.subjectID},'stable');
+--- before/MIKey_check_stage.m
++++ after/MIKey_check_stage.m
+@@ -1,15 +1,19 @@
+ function MIKey_check_stage(cfg, step)
+ % Check derivatives immediately before a step, after earlier steps have run.
+ selection = cfg; selection.steps = step;
+-subjects = MIKey_subjects(selection);
++cfg = MIKey_config(selection);
++subjects = MIKey_subjects(cfg);
+ if ismember(step, [11 12])
+     if step == 12
+         requireFile(fullfile(MIKey_group_analysis(cfg),'best_regression_strategy.mat'));
+     end
+ end
+-flags = [cfg.advRegressionPCOnly cfg.advRegressionPCCSF cfg.advRegressionPCGS cfg.advRegressionPCCSFGS];
+-strategies = {'Regressedpc','RegressedpcCSF','RegressedpcGS','RegressedpcCSFGS'};
+-strategies = strategies(flags);
++strategies = {};
++if ismember(step,12:16)
++    flags = [cfg.advRegressionPCOnly cfg.advRegressionPCCSF cfg.advRegressionPCGS cfg.advRegressionPCCSFGS];
++    strategies = {'Regressedpc','RegressedpcCSF','RegressedpcGS','RegressedpcCSFGS'};
++    strategies = strategies(flags);
++end
+ for i = 1:numel(subjects)
+     subject = fullfile(subjects(i).folder, subjects(i).name);
+     deriv = fullfile(cfg.bidsPath,'derivatives','MIKey',subjects(i).name);
+--- before/MIKey_write_derivative_metadata.m
++++ after/MIKey_write_derivative_metadata.m
+@@ -1,5 +1,6 @@
+ function MIKey_write_derivative_metadata(cfg)
+ % Describe the derivative dataset and add JSON to newly named primary images.
++[cfg, active] = MIKey_config(cfg);
+ root=fullfile(cfg.bidsPath,'derivatives','MIKey');
+ if ~exist(root,'dir'),mkdir(root);end
+ descriptionPath=fullfile(root,'dataset_description.json');description=struct();
+@@ -92,9 +93,12 @@
+                     if rawCopy && isfield(original,'SkullStripped'),metadata.SkullStripped=original.SkullStripped;end
+                 end
+             end
+-            if ~isempty(strfind(name,'_space-template_')) %#ok<STREMP>
+-                template=fullfile(cfg.templatePath,'Template_Mouse_v38.nii');
+-                if ~cfg.useDefaultTemplate && ~isempty(cfg.customTemplatePath),template=cfg.customTemplatePath;end
++            if active.useDefaultTemplate && ~isempty(strfind(name,'_space-template_')) %#ok<STREMP>
++                if cfg.useDefaultTemplate
++                    template=fullfile(cfg.templatePath,'Template_Mouse_v38.nii');
++                else
++                    template=cfg.customTemplatePath;
++                end
+                 templateFile=java.io.File(template);
+                 metadata.SpatialReference=char(templateFile.toURI().toASCIIString());
+             elseif ~isempty(strfind(name,'_space-bold_')) %#ok<STREMP>
+@@ -110,7 +114,9 @@
+                     end
+                 end
+             end
+-            metadata.MIKeyVoxelScaleFactor=cfg.voxelScaleFactor;
++            if active.voxelScaleFactor
++                metadata.MIKeyVoxelScaleFactor=cfg.voxelScaleFactor;
++            end
+             writeJSON(jsonPath,metadata);
+         end
+     end
+--- before/MIKey.m
++++ after/MIKey.m
+@@ -888,6 +888,10 @@
+ end
+ 
+ function executeStage(fig, stage)
++if isa(fig, 'MIKeyBatchState')
++    stageConfig = fig.Config; stageConfig.steps = stage;
++    fig.UserData = MIKey_batch_controls(stageConfig);
++end
+ fig.UserData.activeStage = stage;
+ if ~isfield(fig.UserData, 'bidsPath')
+     errordlg('Please select BIDS folder first', 'Error');
+@@ -904,21 +908,24 @@
+ end
+ 
+ templatePath = fig.UserData.templateEdit.Value;
+-if ~exist(templatePath, 'dir')
+-    errordlg('Template path not found', 'Error');
+-    return;
+-end
+ 
+ subjectFilter = fig.UserData.subjectsEdit.Value;
+ 
+-cfg = MIKey_defaults();
+-if isa(fig, 'MIKeyBatchState'), cfg = fig.Config; end
+-cfg.bidsPath = fig.UserData.bidsPath;
+-map = MIKey_parameter_map();
+-for parameter = 1:size(map,1)
+-    cfg.(map{parameter,1}) = fig.UserData.(map{parameter,2}).Value;
++if isa(fig, 'MIKeyBatchState')
++    cfg = fig.Config; % Retain inactive requested values; do not copy placeholders.
++else
++    cfg = MIKey_defaults();
++    cfg.bidsPath = fig.UserData.bidsPath;
++    map = MIKey_parameter_map();
++    for parameter = 1:size(map,1)
++        cfg.(map{parameter,1}) = fig.UserData.(map{parameter,2}).Value;
++    end
+ end
+ cfg.steps = stage;
++[cfg, stageScope] = MIKey_config(cfg);
++if stageScope.templatePath && ~exist(cfg.templatePath, 'dir')
++    error('MIKey:TemplatePath', 'Template path not found for Step %d: %s', stage, cfg.templatePath);
++end
+ try
+ switch stage
+     case 1
+--- before/examples/run_mikey.m
++++ after/examples/run_mikey.m
+@@ -3,13 +3,15 @@
+ toolboxRoot = fileparts(fileparts(mfilename('fullpath')));
+ addpath(toolboxRoot, '-begin');
+ addpath(fullfile(toolboxRoot, 'examples'), '-begin');
++fprintf('Configuration source: %s\n', which('mikey_config_example'));
+ cfg = mikey_config_example();
+ 
+-cfg = MIKey_config(cfg);
+-if ismember(1, cfg.steps) && numel(cfg.steps) > 1
++selection = MIKey_config(struct('steps', cfg.steps));
++if ismember(1, selection.steps) && numel(selection.steps) > 1
+     error('MIKey:MaskPreparationRequired', ...
+         'Run Step 1 alone, prepare the functional/anatomical masks on scaled images, then edit cfg.steps and rerun.');
+ end
++cfg = MIKey_config(cfg);
+ if isempty(cfg.spmPath)
+     spmEntry = which('spm');
+     if isempty(spmEntry)
+--- before/README.md
++++ after/README.md
+@@ -166,7 +166,7 @@
+ 
+ `MIKey_config` validates fields and values and supplies defaults. Unknown fields are rejected. Relative paths resolve against the calling MATLAB working directory; use absolute paths for cluster jobs. Steps accept numeric vectors or strings such as `'2,4:10'`, without evaluating MATLAB expressions. Execution preserves the supplied order and rejects duplicate steps.
+ 
+-Edit parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m), then run [examples/run_mikey.m](examples/run_mikey.m). The execution script loads this configuration and does not define a second parameter block. Processing stages are selected with `cfg.steps`; atlas/network values are not enable/disable switches. For example, keep `cfg.fcLabel='428'` and omit Step 13 to skip FC. Choice membership is validated only for its selected stage: slice order for Step 4, FC atlas for Step 13, and parcellation network/mode for Steps 14-16. Unused choices remain unchanged and are checked if those stages are selected later. Field types and other general parameter constraints still apply. This example uses the explicit settings in the configuration function; it does not load the saved GUI MAT file. Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
++Edit parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m), then run [examples/run_mikey.m](examples/run_mikey.m). The execution script loads this configuration and does not define a second parameter block. Processing stages are selected with `cfg.steps`; atlas/network values are not enable/disable switches. For example, keep `cfg.fcLabel='428'` and omit Step 13 to skip FC. Validation follows the selected steps for every stage-specific parameter, including types, numeric bounds, lists, switches, paths and choice membership. Unused values remain unchanged and are checked when their stages are selected later. For example, `fcLabel`, parcellation settings and Step 12 filter settings cannot block Steps 1 or 2-10. Invalid active parameters are listed together in one error; unknown field names and invalid step selections are always rejected. This example uses the explicit settings in the configuration function; it does not load the saved GUI MAT file. Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
+ 
+ ## Processing steps and prerequisites
+ 
+@@ -198,7 +198,7 @@
+ 
+ Step 10 defaults to candidate PC counts `0,20,40,...` up to the number available and `T-1`. Uncheck **Use default PC counts** to enter custom counts such as `0 5 10 20`, separated by spaces or commas.
+ 
+-`useDefaultPCStrategy=true` selects the default candidates; `false` selects the custom list. `customPCCounts` contains numeric counts, not a boolean switch: do not set it to `false`. With the default strategy it may be `[]` (or blank GUI text). With the custom strategy it must be a nonempty list of distinct nonnegative integers. Numeric `0` is a valid count (motion-only regression); logical `false` is a different type and is rejected with a specific explanation.
++`useDefaultPCStrategy=true` selects the default candidates; `false` selects the custom list. `customPCCounts` is used only when Step 10 is selected and `useDefaultPCStrategy=false`; it must then be a nonempty list of distinct nonnegative integers. Numeric `0` is a valid count (motion-only regression). Logical `false` is a switch rather than a count list and is rejected only when the custom list is actually used. With the default strategy, this unused field is preserved without validation (including old `false` or blank values).
+ 
+ ```matlab
+ cfg.useDefaultPCStrategy = true;
+@@ -224,6 +224,29 @@
+ An explicit Group Network path takes precedence. Otherwise MIKey uses the custom network when selected, then the AMCP network corresponding to the Network dropdown. Step 14's custom prior uses both `networkCustomPath` and `labelCustomPath`. Network/label images must be suitable integer-label maps in the analysis space. Preflight requires only the selected template. The shipped templates and processing derivatives use uncompressed `.nii` paths.
+ 
+ ## Configuration reference
++
++The shared usage map is `MIKey_parameter_scope`. The same scope is used by configuration validation, preflight and nonvisual batch controls. Batch controls use safe placeholders for unused settings; these do not overwrite the requested configuration or get recorded as used processing parameters.
++
++| Parameter group | When validated/required |
++| --- | --- |
++| BIDS/SPM/code/log paths, subject/session/task/run selection, minimum time points, steps and execution flags | All runs |
++| Voxel scale | Step 1 |
++| Slice timing count/order | Step 4 |
++| TR fallback | Step 4; Step 12 with filtering enabled |
++| Coregistration / normalization interpolation | Steps 6 / 7 respectively |
++| Default/custom normalization template switch | Step 7; custom path only with the custom switch |
++| Template root | Steps 3, 10, 12-17; Step 7 only with the default template |
++| Smoothing FWHM | Step 8 |
++| Default PC strategy switch / custom count list | Step 10 / Step 10 with default strategy disabled |
++| Detrending/filtering switches; filter cutoffs | Step 12; cutoffs only with filtering enabled |
++| Regression output strategies | Steps 12-16 |
++| FC atlas; custom atlas path | Step 13; path only for `Custom...` |
++| Parcellation iteration/threshold/correction/mode/parallel options | Steps 14-16 |
++| ROI counts / voxel downsampling | Steps 15 / 16 respectively |
++| Prior network and custom prior paths | Step 14, or group-network fallback for Steps 14-16; custom paths only in custom mode |
++| Explicit group network | Steps 15-16; Step 14 with inter-subject variability enabled |
++
++File existence and installed dependencies are checked in preflight for selected steps. Step 1 does not require a template directory. Existing data/template/SPM prerequisites for the steps you select still apply. Use `cfg.steps=1`, prepare the masks manually, then change only `cfg.steps=2:10` in the same configuration function. Changing to a later step revalidates its previously unused values; a non-built-in atlas such as `296` must then use a supported custom-atlas configuration.
+ 
+ `MIKey_defaults()` is the complete parameter source. All GUI controls map to these fields:
+ 
+@@ -252,7 +275,7 @@
+ | `dryRun`, `failFast`, `strictWarnings` | `false`, `true`, `true`. |
+ | `logDir` | Empty: defaults to `derivatives/MIKey/logs`. |
+ 
+-Use `0 <= lowFreq < highFreq < 1/(2*TR)` for the actual acquisition TR. Defaults are not universal mouse-MRI acquisition settings. Several legacy processing stages skip existing outputs by filename without checking parameter provenance. Use a fresh working/output dataset after changing processing settings; Step 10 specifically checks its PC candidate list.
++With Step 12 filtering enabled, use `0 <= lowFreq < highFreq < 1/(2*TR)` for the actual acquisition TR. Defaults are not universal mouse-MRI acquisition settings. Several legacy processing stages skip existing outputs by filename without checking parameter provenance. Use a fresh working/output dataset after changing processing settings; Step 10 specifically checks its PC candidate list.
+ 
+ ## Compute-node jobs
+ 
+@@ -349,3 +372,18 @@
+ The routing fixture uses COPY-ONLY SPM jobs with real NIfTI I/O; it does not estimate scientific registration quality. It fixes and restores its random state, verifies legacy input fallbacks, and prints a begin/completion marker and duration for each stage. Steps 6/7 also log the input paths before QC, grid checks and SPM estimation, so the last started operation is visible.
+ 
+ For automated R2018a Code Analyzer gates, inspect all `checkcode(...,'-id')` message IDs; syntax diagnostics include `SYNER` and `EOLPAR`, not just `PARSE`. Validate the gate with deliberately malformed temporary code. The completed legacy replay, GUI-to-legacy replay and 38-file native analysis are recorded in `docs/validation/20261016-legacy-routing/` and `docs/tasks/20261016-legacy-routing.md`.
++
++
++## Selected-step configuration regression checks
++
++After updating the complete set of runtime files, these checks need MATLAB but do not run SPM processing or read research images:
++
++```matlab
++addpath(fullfile(toolboxRoot, 'tests'));
++test_mikey_config_scopes;
++test_mikey_pc_config;
++test_mikey_config_choices;
++test_mikey_config_flow;
++```
++
++They check Steps 1 and 2-10 with invalid unused values of several types, all 17 single-step validation routes, active validation of every public field, conditional defaults/custom settings, MAT/JSON import, batch adaptation and metadata writing on an isolated temporary dataset. GUI layout construction is unchanged. See `runs/20261019-scoped-validation/RUN_REPORT.md` for this revision's executed checks and limits.
+--- before/tests/test_mikey_pc_config.m
++++ after/tests/test_mikey_pc_config.m
+@@ -4,31 +4,33 @@
+ cleanup=onCleanup(@()path(oldPath));addpath(root);
+ blank={[], '', '   ', string('')};
+ for k=1:numel(blank)
+-    input=struct('useDefaultPCStrategy',true);input.customPCCounts=blank{k};
+-    cfg=MIKey_config(input);assert(isnumeric(cfg.customPCCounts) && isempty(cfg.customPCCounts));
+-    state=MIKeyBatchState(cfg,-1);assert(isempty(state.UserData.customPCCountsEdit.Value));
++    input=struct('steps',10,'useDefaultPCStrategy',true);input.customPCCounts=blank{k};
++    cfg=MIKey_config(input);assert(isequaln(cfg.customPCCounts,blank{k}));
++    state=MIKeyBatchState(cfg,-1);assert(ischar(state.UserData.customPCCountsEdit.Value));
+     assert(isequal(MIKey_pc_counts(true,cfg.customPCCounts,101,85),[0 20 40 60 80]));
+     input.useDefaultPCStrategy=false;expectError(input);
+ end
+ % Numeric zero is a valid PC count; logical false is not a PC-count list.
+ for default=[true false]
+-    input=struct('useDefaultPCStrategy',default,'customPCCounts',0);
++    input=struct('steps',10,'useDefaultPCStrategy',default,'customPCCounts',0);
+     cfg=MIKey_config(input);assert(isequal(cfg.customPCCounts,0));
+-    input.customPCCounts=false;expectError(input,'not a true/false switch');
+-    input.customPCCounts=true;expectError(input,'not a true/false switch');
++    input.customPCCounts=false;
++    if default,MIKey_config(input);else,expectError(input,'not a true/false switch');end
++    input.customPCCounts=true;
++    if default,MIKey_config(input);else,expectError(input,'not a true/false switch');end
+ end
+-cfg=MIKey_config(struct('useDefaultPCStrategy',false,'customPCCounts',[20 0 5]));
++cfg=MIKey_config(struct('steps',10,'useDefaultPCStrategy',false,'customPCCounts',[20 0 5]));
+ assert(isequal(cfg.customPCCounts,[0 5 20]));
+-cfg=MIKey_config(struct('useDefaultPCStrategy',false,'customPCCounts','0,5,20'));
++cfg=MIKey_config(struct('steps',10,'useDefaultPCStrategy',false,'customPCCounts','0,5,20'));
+ assert(isequal(cfg.customPCCounts,[0 5 20]));
+ invalid={[0 2 2],[-1 5],[0 .5],[0 NaN],[0 Inf],1+1i,{0 5},'false','0;disp(1)'};
+ for default=[true false]
+     for k=1:numel(invalid)
+-        input=struct('useDefaultPCStrategy',default);input.customPCCounts=invalid{k};
+-        expectError(input);
++        input=struct('steps',10,'useDefaultPCStrategy',default);input.customPCCounts=invalid{k};
++        if default,MIKey_config(input);else,expectError(input);end
+     end
+ end
+-expectError(struct('useDefaultPCStrategy',2,'customPCCounts',[]));
++expectError(struct('steps',10,'useDefaultPCStrategy',2,'customPCCounts',[]));
+ disp('MIKEY_PC_CONFIG_PASS');
+ end
+ 
+--- before/tests/test_mikey_config_choices.m
++++ after/tests/test_mikey_config_choices.m
+@@ -7,21 +7,21 @@
+ cfg=MIKey_config(input);
+ assert(strcmp(cfg.fcLabel,'unused') && strcmp(cfg.parcNetwork,'unused'));
+ assert(strcmp(cfg.parcellationMode,'unused') && strcmp(cfg.sliceTimingOrder,'unused'));
+-state=MIKeyBatchState(cfg,-1);assert(strcmp(state.UserData.fcLabelDropdown.Value,'unused'));
++state=MIKeyBatchState(cfg,-1);assert(strcmp(state.UserData.fcLabelDropdown.Value,'428'));
+ % Preprocessing 2:10 uses slice order, but not FC/parcellation choices.
+ input.steps=2:10;input.sliceTimingOrder='Auto-detect';
+ MIKey_config(input);
+ % Selecting an additional stage must revalidate its preserved value.
+-cfg.steps=13;expectError(cfg,'fcLabel (Step 13)');
++cfg.steps=13;expectError(cfg,'fcLabel');
+ for steps={4,[1 4],2:10}
+-    expectError(struct('steps',steps{1},'sliceTimingOrder','unused'),'sliceTimingOrder (Step 4)');
++    expectError(struct('steps',steps{1},'sliceTimingOrder','unused'),'sliceTimingOrder');
+ end
+ for steps={13,[10 13]}
+-    expectError(struct('steps',steps{1},'fcLabel','unused'),'fcLabel (Step 13)');
++    expectError(struct('steps',steps{1},'fcLabel','unused'),'fcLabel');
+ end
+ for stage=14:16
+-    expectError(struct('steps',stage,'parcNetwork','unused'),'parcNetwork (Steps 14-16)');
+-    expectError(struct('steps',stage,'parcellationMode','unused'),'parcellationMode (Steps 14-16)');
++    expectError(struct('steps',stage,'parcNetwork','unused'),'parcNetwork');
++    expectError(struct('steps',stage,'parcellationMode','unused'),'parcellationMode');
+ end
+ for label={'214','428','604','1184','Custom...'}
+     cfg=MIKey_config(struct('steps',13,'fcLabel',label{1}));assert(strcmp(cfg.fcLabel,label{1}));
+@@ -32,8 +32,9 @@
+ for mode={'individual','concatenated'}
+     MIKey_config(struct('steps',16,'parcellationMode',mode{1}));
+ end
+-% Skipping choice membership does not waive field types or typo checks.
+-expectError(struct('steps',1,'fcLabel',false),'fcLabel must be a character vector');
++% Inactive types are preserved; selected-stage types and typos are strict.
++MIKey_config(struct('steps',1,'fcLabel',false));
++expectError(struct('steps',13,'fcLabel',false),'fcLabel must be a character vector');
+ expectError(struct('steps',1,'unknownLabel','428'),'Unknown parameter','MIKey:UnknownParameter');
+ disp('MIKEY_CONFIG_CHOICES_PASS');
+ end
+--- before/tests/test_mikey_batch.m
++++ after/tests/test_mikey_batch.m
+@@ -81,8 +81,8 @@
+ loaded=MIKey_config(fullfile(work,'config.json')); assert(strcmp(loaded.subjectFilter,'sub-*'));
+ expectError(@() MIKey_config(struct('steps','1;system(''bad'')')), 'MIKey:Steps');
+ expectError(@() MIKey_config(struct('smoothFWHN',1)), 'MIKey:UnknownParameter');
+-expectError(@() MIKey_config(struct('percentTop',2)), 'MIKey:Parameter');
+-expectError(@() MIKey_config(struct('highFreq',0.6)), 'MIKey:Parameter');
++expectError(@() MIKey_config(struct('steps',15,'percentTop',2)), 'MIKey:Parameter');
++expectError(@() MIKey_config(struct('steps',12,'highFreq',0.6)), 'MIKey:Parameter');
+ % A missing prerequisite and malformed input must fail, with a saved report.
+ cfg.steps=4;
+ delete(MIKey_bids_path(df,[base '_desc-masked.nii']));
+--- before/tests/test_mikey_pc_strategies.m
++++ after/tests/test_mikey_pc_strategies.m
+@@ -27,7 +27,7 @@
+ assert(isequal(MIKey_pc_counts(true,[],101,85),[0 20 40 60 80]));
+ expectError(@() MIKey_pc_counts(false,[0 7],80,6),'MIKey:PCCounts');
+ expectError(@() MIKey_pc_counts(false,'0;disp(1)',80,6),'MIKey:PCCounts');
+-expectError(@() MIKey_config(struct('customPCCounts',[0 2 2])),'MIKey:Parameter');
++expectError(@() MIKey_config(struct('steps',10,'useDefaultPCStrategy',false,'customPCCounts',[0 2 2])),'MIKey:Parameter');
+ first=MIKey_run(cfg);assert(strcmp(first.status,'completed'));
+ for run=1:2
+     file=fullfile(df,sprintf('sub-01_task-rest_run-%02d_bold_desc-regressionResults.mat',run));
+@@ -47,7 +47,7 @@
+ best=load(fullfile(MIKey_group_analysis(cfg),'best_regression_strategy.mat'));
+ assert(ismember(best.best_strategy_info.pc_count,[0 3]));
+ cfg.steps=12;final=MIKey_run(cfg);assert(strcmp(final.status,'completed'));
+-assert(numel(dir(fullfile(df,'*_space-template_desc-Regressedpc.nii')))==2);
++assert(numel(dir(fullfile(df,'*_space-template_desc-Regressedpc_bold.nii')))==2);
+ cfg.customPCCounts=[0 1 3];config=cfg;save(fullfile(work,'config.mat'),'config');
+ loaded=MIKey_config(fullfile(work,'config.mat'));assert(~loaded.useDefaultPCStrategy && isequal(loaded.customPCCounts,[0 1 3]));
+ legacy=fullfile(work,'legacy.mat');corr0=.8;corr1=.3;corr2=.4;extraMetadata=ones(1,17); %#ok<NASGU>
+--- before/tests/test_mikey_ui_layout.m
++++ after/tests/test_mikey_ui_layout.m
+@@ -15,6 +15,7 @@
+ ui.customPCCountsEdit.Value='0 3 7';
+ cfg=MIKey_defaults(); map=MIKey_parameter_map();
+ for i=1:size(map,1),cfg.(map{i,1})=ui.(map{i,2}).Value;end
++cfg.steps=[10 15]; % Validate the PC/ROI controls under their selected stages.
+ cfg=MIKey_config(cfg);assert(~cfg.useDefaultPCStrategy && isequal(cfg.customPCCounts,[0 3 7]));
+ state=MIKeyBatchState(cfg,-1);assert(isnumeric(state.UserData.clustROIEdit.Value));
+ assert(isequal(MIKey_pc_counts(state.UserData.defaultPCStrategyCheckbox.Value,state.UserData.customPCCountsEdit.Value,40,10),[0 3 7]));
+--- before/tests/test_mikey_gui_filters.m
++++ after/tests/test_mikey_gui_filters.m
+@@ -19,6 +19,7 @@
+ fig.UserData.groupNetworkEdit.Value=fullfile(root,'share_temp','AMCP_temp','AMCP_428prior_17net.nii');
+ cfg=MIKey_defaults(); map=MIKey_parameter_map();
+ for i=1:size(map,1), cfg.(map{i,1})=fig.UserData.(map{i,2}).Value; end
++cfg.steps=15; % Explicit group network is used by clustering.
+ cfg=MIKey_config(cfg);
+ assert(strcmp(cfg.sessionFilter,'01,02') && strcmp(cfg.taskFilter,'rest') && strcmp(cfg.runFilter,'01'));
+ state=MIKeyBatchState(cfg,-1);
+--- /dev/null
++++ after/MIKey_parameter_scope.m
+@@ -0,0 +1,63 @@
++function active = MIKey_parameter_scope(cfg)
++% Single usage map for validation, preflight and batch control adaptation.
++% cfg.steps must already be parsed. Invalid active switches are rejected by
++% MIKey_config; predicates here never evaluate arbitrary inactive values.
++names=fieldnames(MIKey_defaults());active=struct();
++for i=1:numel(names),active.(names{i})=false;end
++s=cfg.steps;
++active=mark(active,{'bidsPath','spmPath','codePath','subjectFilter', ...
++    'sessionFilter','taskFilter','runFilter','minTimepoints','steps', ...
++    'dryRun','failFast','strictWarnings','logDir'},true);
++active=mark(active,{'voxelScaleFactor'},ismember(1,s));
++active=mark(active,{'sliceTimingTR'},ismember(4,s) || (ismember(12,s) && on(cfg.filterFlag)));
++active=mark(active,{'sliceTimingNSlices','sliceTimingOrder'},ismember(4,s));
++active=mark(active,{'coregInterp'},ismember(6,s));
++active=mark(active,{'normInterp','useDefaultTemplate'},ismember(7,s));
++active=mark(active,{'customTemplatePath'},ismember(7,s) && ~on(cfg.useDefaultTemplate));
++active=mark(active,{'smoothFWHM'},ismember(8,s));
++active=mark(active,{'useDefaultPCStrategy'},ismember(10,s));
++active=mark(active,{'customPCCounts'},ismember(10,s) && ~on(cfg.useDefaultPCStrategy));
++active=mark(active,{'detrendFlag','filterFlag'},ismember(12,s));
++active=mark(active,{'lowFreq','highFreq'},ismember(12,s) && on(cfg.filterFlag));
++active=mark(active,{'advRegressionPCOnly','advRegressionPCCSF', ...
++    'advRegressionPCGS','advRegressionPCCSFGS'},any(ismember(s,12:16)));
++active=mark(active,{'fcLabel'},ismember(13,s));
++active=mark(active,{'fcCustomPath'},ismember(13,s) && textIs(cfg.fcLabel,'Custom...'));
++parc=any(ismember(s,14:16));
++active=mark(active,{'percentTop','maxIter','changeThr','confThr','useTSNR', ...
++    'useInterSubjectVar','parcellationUseParallel','parcellationMode'},parc);
++active=mark(active,{'clustROINums'},ismember(15,s));
++active=mark(active,{'voxelDownsampleFactor'},ismember(16,s));
++group=any(ismember(s,[15 16])) || (ismember(14,s) && on(cfg.useInterSubjectVar));
++active=mark(active,{'groupNetworkPath'},group);
++groupFallback=group && ~hasText(cfg.groupNetworkPath);
++active=mark(active,{'useCustomParc'},ismember(14,s) || groupFallback);
++active=mark(active,{'parcNetwork'}, ...
++    (ismember(14,s) || groupFallback) && ~on(cfg.useCustomParc));
++active=mark(active,{'networkCustomPath'}, ...
++    (ismember(14,s) || groupFallback) && on(cfg.useCustomParc));
++active=mark(active,{'labelCustomPath'},ismember(14,s) && on(cfg.useCustomParc));
++active=mark(active,{'templatePath'},any(ismember(s,[3 10 12 13 14 15 16 17])) || ...
++    (ismember(7,s) && on(cfg.useDefaultTemplate)));
++end
++
++function active=mark(active,names,used)
++if used
++    for i=1:numel(names),active.(names{i})=true;end
++end
++end
++
++function value=on(value)
++value=(islogical(value) || isnumeric(value)) && isreal(value) && ...
++    isscalar(value) && isfinite(value) && value==1;
++end
++
++function value=textIs(value,expected)
++value=(ischar(value) && size(value,1)<=1 || isstring(value) && isscalar(value)) && ...
++    strcmp(value,expected);
++end
++
++function value=hasText(value)
++value=(ischar(value) && size(value,1)<=1 || isstring(value) && isscalar(value)) && ...
++    ~isempty(strtrim(char(value)));
++end
+--- /dev/null
++++ after/MIKey_batch_controls.m
+@@ -0,0 +1,14 @@
++function controls = MIKey_batch_controls(input)
++% Safe nonvisual control values for the selected stages only.
++% Defaults are placeholders for unused controls, not changes to user config.
++[cfg,active]=MIKey_config(input);defaults=MIKey_defaults();
++controls=struct('bidsPath',cfg.bidsPath);map=MIKey_parameter_map();
++for i=1:size(map,1)
++    name=map{i,1};
++    if active.(name),value=cfg.(name);else,value=defaults.(name);end
++    if any(strcmp(name,{'customPCCounts','steps'}))
++        value=strtrim(sprintf('%g ',value));
++    end
++    controls.(map{i,2})=struct('Value',value);
++end
++end
+--- /dev/null
++++ after/tests/test_mikey_config_scopes.m
+@@ -0,0 +1,126 @@
++function result = test_mikey_config_scopes
++% Exhaustive inactive-field/type sweep and active-field rejection, no SPM.
++root=fileparts(fileparts(mfilename('fullpath')));oldPath=path;
++cleanup=onCleanup(@()path(oldPath));addpath(root);
++d=MIKey_defaults();names=fieldnames(d);checks=0;
++common={'bidsPath','spmPath','codePath','subjectFilter','sessionFilter', ...
++    'taskFilter','runFilter','minTimepoints','steps','dryRun','failFast', ...
++    'strictWarnings','logDir'};
++phaseFields={ [common {'voxelScaleFactor'}], ...
++    [common {'templatePath','sliceTimingTR','sliceTimingNSlices','sliceTimingOrder', ...
++    'coregInterp','normInterp','useDefaultTemplate','smoothFWHM','useDefaultPCStrategy'}] };
++phases={1,2:10};poison={false,[],NaN,Inf,'disabled',struct('unused',1),{false,'unused'}};
++for phase=1:2
++    input=d;input.steps=phases{phase};[cfg,active]=MIKey_config(input);
++    actual=names(cellfun(@(n)active.(n),names));
++    assert(isequal(sort(actual(:)),sort(phaseFields{phase}(:))));
++    % Every unused field is tested alone against multiple wrong types, then
++    % all unused fields are poisoned together through serialization/preflight.
++    inactive=setdiff(names,phaseFields{phase});
++    for i=1:numel(inactive)
++        for k=1:numel(poison)
++            changed=input;changed.(inactive{i})=poison{k};
++            out=MIKey_config(changed);assert(isequaln(out.(inactive{i}),poison{k}));
++            controls=MIKey_batch_controls(out);assert(isstruct(controls));
++            checks=checks+1;
++        end
++        input.(inactive{i})=poison{mod(i-1,numel(poison))+1};
++    end
++    cfg=MIKey_config(input);state=MIKeyBatchState(cfg,-1);assert(isstruct(state.UserData));
++    MIKey_check_stage(cfg,phases{phase}(1));
++    % Preflight may report absent data/SPM, but no unused-field type, atlas,
++    % group-network lookup or template-directory exception may escape it.
++    report=MIKey_preflight(cfg);assert(isstruct(report) && isfield(report,'parameterScope'));
++    if phase==1
++        assert(isempty(report.requiredImages));
++        assert(~any(contains(report.issues,'share_temp')));
++    end
++end
++% Audit all 17 single-stage routes with every inactive field invalid at once.
++% No images or GUI are created by these dependency/control checks.
++for stage=1:17
++    input=d;input.steps=stage;[~,scope]=MIKey_config(input);
++    inactive=names(~cellfun(@(n)scope.(n),names));
++    for i=1:numel(inactive)
++        input.(inactive{i})=poison{mod(i-1,numel(poison))+1};
++    end
++    cfg=MIKey_config(input);MIKey_batch_controls(cfg);
++    try
++        MIKey_check_stage(cfg,stage);
++    catch ME
++        % Empty data intentionally lack Step 12's group strategy result.
++        assert(strcmp(ME.identifier,'MIKey:Prerequisite'),ME.message);
++    end
++    MIKey_preflight(cfg);checks=checks+1;
++end
++% Every parameter has an active scenario and rejects an invalid type there.
++% Conditional custom paths need separate scenarios from built-in selections.
++scenarios={d};scenarios{1}.steps=1:17;
++c=d;c.steps=7;c.useDefaultTemplate=false;scenarios{end+1}=c;
++c=d;c.steps=10;c.useDefaultPCStrategy=false;scenarios{end+1}=c;
++c=d;c.steps=13;c.fcLabel='Custom...';scenarios{end+1}=c;
++c=d;c.steps=14;c.useCustomParc=true;scenarios{end+1}=c;
++covered=struct();
++for k=1:numel(scenarios)
++    input=scenarios{k};[~,scope]=MIKey_config(input);
++    for i=1:numel(names)
++        name=names{i};if ~scope.(name) || isfield(covered,name),continue;end
++        changed=input;changed.(name)=struct('invalid',1);
++        if strcmp(name,'steps')
++            expectError(changed,{'steps'});
++        else
++            expectError(changed,{name});
++        end
++        covered.(name)=true;checks=checks+1;
++    end
++end
++assert(isequal(sort(fieldnames(covered)),sort(names)));
++% Active input validation remains strict and reports multiple bad fields at once.
++bad=struct('steps',2:10,'sliceTimingTR',0,'sliceTimingNSlices',2.5, ...
++    'sliceTimingOrder','bad','coregInterp',9,'normInterp',-1, ...
++    'smoothFWHM',[-1 2],'useDefaultPCStrategy','bad');
++expectError(bad,{'sliceTimingTR','sliceTimingNSlices','sliceTimingOrder', ...
++    'coregInterp','normInterp','smoothFWHM','useDefaultPCStrategy'});checks=checks+7;
++expectError(struct('steps',1,'voxelScaleFactor',0),{'voxelScaleFactor'});
++expectError(struct('steps',1,'minTimepoints',-1),{'minTimepoints'});
++expectError(struct('steps',1,'subjectFilter','../sub-01'),{'subjectFilter'});
++% Conditional dependencies, including those not used by Steps 1 / 2:10.
++cfg=d;cfg.steps=10;cfg.customPCCounts=false;out=MIKey_config(cfg);
++assert(isequal(out.customPCCounts,false));
++cfg.useDefaultPCStrategy=false;expectError(cfg,{'customPCCounts'});
++cfg.customPCCounts=[20 0 5];out=MIKey_config(cfg);assert(isequal(out.customPCCounts,[0 5 20]));
++cfg=d;cfg.steps=12;cfg.filterFlag=false;cfg.lowFreq=struct('unused',1);
++cfg.highFreq=false;cfg.sliceTimingTR=NaN;MIKey_config(cfg);
++cfg.filterFlag=true;expectError(cfg,{'lowFreq','sliceTimingTR'});
++cfg=d;cfg.steps=13;cfg.fcLabel=false;expectError(cfg,{'fcLabel'});
++cfg=d;cfg.steps=15;cfg.clustROINums=[];cfg.maxIter=0;cfg.percentTop=2;
++expectError(cfg,{'clustROINums','maxIter','percentTop'});
++cfg=d;cfg.steps=16;cfg.voxelDownsampleFactor=0;expectError(cfg,{'voxelDownsampleFactor'});
++cfg=d;cfg.steps=7;cfg.useDefaultTemplate=false;cfg.customTemplatePath='custom.nii';
++cfg.templatePath=struct('unused',1);[cfg,active]=MIKey_config(cfg);assert(~active.templatePath);
++cfg=d;cfg.steps=14;cfg.useCustomParc=true;cfg.parcNetwork=false;
++cfg.networkCustomPath='network.nii';cfg.labelCustomPath='labels.nii';MIKey_config(cfg);
++cfg=d;cfg.steps=15;cfg.groupNetworkPath='group.nii';cfg.useCustomParc=struct('unused',1);
++cfg.parcNetwork=struct('unused',1);MIKey_config(cfg);
++cfg=d;cfg.steps=13;cfg.fcLabel='Custom...';cfg.fcCustomPath=false;expectError(cfg,{'fcCustomPath'});
++cfg=d;cfg.steps=1;cfg.fcLabel='296';cfg.parcNetwork='296rois';cfg=MIKey_config(cfg);
++assert(strcmp(cfg.fcLabel,'296') && strcmp(cfg.parcNetwork,'296rois'));
++cfg.steps=13;expectError(cfg,{'fcLabel'});
++% The public parameter schema has no unaccounted fields and catches typos.
++active=MIKey_parameter_scope(d);assert(isequal(sort(fieldnames(active)),sort(names)));
++expectError(struct('steps',1,'misspelledParameter',1),{'Unknown parameter'},'MIKey:UnknownParameter');
++result=struct('status','passed','inactiveTypeChecks',checks,'phases',{{'1','2:10'}});
++disp(result);disp('MIKEY_CONFIG_SCOPES_PASS');
++end
++
++function expectError(input,messages,id)
++if nargin<3,id='MIKey:Parameter';end
++try
++    MIKey_config(input);
++catch ME
++    assert(strcmp(ME.identifier,id),ME.message);
++    for i=1:numel(messages),assert(contains(ME.message,messages{i}),ME.message);end
++    return;
++end
++error('MIKey:Test','Expected selected-stage parameters to be rejected.');
++end
+--- /dev/null
++++ after/tests/test_mikey_config_flow.m
+@@ -0,0 +1,59 @@
++function test_mikey_config_flow
++% Validation/dispatch/metadata flow using an empty temporary BIDS dataset.
++% Placeholder files below test provenance writing only, never SPM image I/O.
++root=fileparts(fileparts(mfilename('fullpath')));oldPath=path;oldDirectory=pwd;
++work=tempname;mkdir(work);cleanup=onCleanup(@()restore(oldPath,oldDirectory,work));
++addpath(root);addpath(fullfile(root,'scripts'));
++raw=fullfile(work,'sub-test','func');mkdir(raw);
++cfg=MIKey_defaults();cfg.steps=1;cfg.bidsPath=work;cfg.subjectFilter='sub-test';
++cfg.templatePath=struct('unused',1);cfg.useDefaultTemplate=struct('unused',1);
++cfg.customPCCounts={false,'unused'};cfg.useDefaultPCStrategy=struct('unused',1);
++cfg.advRegressionPCOnly=struct('unused',1);cfg.fcLabel=false;
++cfg.parcNetwork='296rois';cfg.percentTop=NaN;cfg.maxIter=[];
++cfg=MIKey_config(cfg);
++% MAT/JSON import follows the same scope as direct structs.
++config=cfg;save(fullfile(work,'config.mat'),'config');
++loaded=MIKey_config(fullfile(work,'config.mat'));assert(isequaln(loaded.fcLabel,false));
++fid=fopen(fullfile(work,'config.json'),'w');assert(fid>=0);
++fprintf(fid,'%s',jsonencode(cfg));fclose(fid);
++loaded=MIKey_config(fullfile(work,'config.json'));assert(strcmp(loaded.parcNetwork,'296rois'));
++before=pwd;
++state=MIKeyBatchState(cfg,-1);MIKey_check_stage(cfg,1);MIKey('batch',state,1);
++assert(strcmp(pwd,before)); % Step 1 needs no template and has no images to read.
++assert(exist(fullfile(work,'derivatives','MIKey','dataset_description.json'),'file')==2);
++assert(isequaln(state.Config.customPCCounts,{false,'unused'}));
++% Metadata must not interpret inactive template settings for an old normalized
++% result. The zero-byte .nii files are never read by SPM or header validation.
++base='sub-test_task-rest_bold';touch(fullfile(raw,[base '.nii']));
++derived=fullfile(work,'derivatives','MIKey','sub-test','func');mkdir(derived);
++image=fullfile(derived,'sub-test_task-rest_space-template_desc-normalized_bold.nii');touch(image);
++MIKey_write_derivative_metadata(cfg);metadata=jsondecode(fileread([image(1:end-4) '.json']));
++assert(~isfield(metadata,'SpatialReference') && metadata.MIKeyVoxelScaleFactor==20);
++% A later phase uses no scale parameter; do not stamp an arbitrary value from
++% an unused field or substitute a default into provenance.
++cfg.steps=2:10;cfg.templatePath=work;cfg.useDefaultTemplate=true;
++cfg.useDefaultPCStrategy=true;cfg.voxelScaleFactor=struct('unused',1);
++cfg=MIKey_config(cfg);delete([image(1:end-4) '.json']);
++MIKey_write_derivative_metadata(cfg);metadata=jsondecode(fileread([image(1:end-4) '.json']));
++assert(~isfield(metadata,'MIKeyVoxelScaleFactor'));
++report=MIKey_preflight(cfg);assert(isstruct(report) && ~report.ok);
++assert(~any(contains(report.issues,'296')) && ~any(contains(report.issues,'group network')));
++% A new selection reuses the requested value, not an earlier placeholder.
++cfg=MIKey_defaults();cfg.steps=1;cfg.sliceTimingNSlices=7;
++state=MIKeyBatchState(cfg,-1);assert(state.UserData.sliceTimingNSlices.Value==30);
++cfg=state.Config;cfg.steps=4;controls=MIKey_batch_controls(cfg);
++assert(controls.sliceTimingNSlices.Value==7);
++disp('MIKEY_CONFIG_FLOW_PASS');
++end
++
++function touch(name)
++fid=fopen(name,'w');assert(fid>=0);fclose(fid);
++end
++
++function restore(oldPath,oldDirectory,work)
++cd(oldDirectory);path(oldPath);
++% work was created by this test under tempdir, never a caller-supplied path.
++target=char(java.io.File(work).getCanonicalPath());parent=char(java.io.File(tempdir).getCanonicalPath());
++assert(strcmpi(fileparts(target),parent));
++if exist(target,'dir'),rmdir(target,'s');end
++end

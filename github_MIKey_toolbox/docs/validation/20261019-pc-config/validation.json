@@ -1,0 +1,13 @@
+{
+  "status": "static_checks_passed",
+  "files": [
+    "MIKey_config.m",
+    "examples/mikey_config_example.m",
+    "tests/test_mikey_pc_config.m"
+  ],
+  "parser": "MISS_HIT MATLAB 2018a: passed",
+  "nativeAnalyzer": "R2018a: no syntax errors, new test has string-style/suppression notes",
+  "matlabTest": "not executed locally",
+  "serverEvidence": "useDefaultPCStrategy displays 1; customPCCounts displays 0; class output was suppressed by semicolon. Logical false is a likely explanation, not yet type-confirmed.",
+  "behavior": "Default strategy permits genuinely empty numeric/text custom lists; custom strategy requires valid numeric candidates. Logical true/false rejected with an explicit switch-vs-list explanation. Numeric zero remains valid."
+}

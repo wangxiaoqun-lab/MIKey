@@ -1,0 +1,48 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+2026-10-12 11:40:33: Run directory: C:\Users\Administrator\AppData\Local\Temp\tpc74aa851_e3b0_4e37_8cc0_741d3f018058\failure-report-tests\tpa69e056e_225a_4ce2_bc92_c6fb039e1a4a
+2026-10-12 11:40:33: === Starting Step 4 ===
+错误使用 MIKey_check_stage>requireAny (line 107)
+None of the alternative inputs exist: C:\Users\Administrator\AppData\Local\Temp\tpc74aa851_e3b0_4e37_8cc0_741d3f018058\derivatives\MIKey\sub-01\func\sub-01_task-rest_bold_desc-fieldmap.nii, C:\Users\Administrator\AppData\Local\Temp\tpc74aa851_e3b0_4e37_8cc0_741d3f018058\derivatives\MIKey\sub-01\func\sub-01_task-rest_bold_desc-masked.nii
+
+出错 MIKey_check_stage (line 39)
+                    requireAny({image('_desc-fieldmap'),image('_desc-masked')});
+
+出错 MIKey_run (line 59)
+            MIKey_check_stage(cfg, step);
+
+出错 test_mikey_failure_reports>runFailure (line 22)
+    MIKey_run(cfg);
+
+出错 test_mikey_failure_reports (line 12)
+runFailure(cfg);
+2026-10-12 11:40:33: === Step 4: failed (0.04 s) ===
+2026-10-12 11:40:41: Run directory: C:\Users\Administrator\AppData\Local\Temp\tpc74aa851_e3b0_4e37_8cc0_741d3f018058\failure-report-tests\tpa5086249_452b_46e1_9ce6_845dc078698d
+2026-10-12 11:40:41: === Starting Step 4 ===
+错误使用 MIKey_check_stage>requireAny (line 107)
+None of the alternative inputs exist: C:\Users\Administrator\AppData\Local\Temp\tpc74aa851_e3b0_4e37_8cc0_741d3f018058\derivatives\MIKey\sub-01\func\sub-01_task-rest_bold_desc-fieldmap.nii, C:\Users\Administrator\AppData\Local\Temp\tpc74aa851_e3b0_4e37_8cc0_741d3f018058\derivatives\MIKey\sub-01\func\sub-01_task-rest_bold_desc-masked.nii
+
+出错 MIKey_check_stage (line 39)
+                    requireAny({image('_desc-fieldmap'),image('_desc-masked')});
+
+出错 MIKey_run (line 59)
+            MIKey_check_stage(cfg, step);
+
+出错 test_mikey_failure_reports>runFailure (line 22)
+    MIKey_run(cfg);
+
+出错 test_mikey_failure_reports (line 14)
+runFailure(cfg);
+2026-10-12 11:40:41: === Step 4: failed (0.02 s) ===
+2026-10-12 11:40:41: === Starting Step 13 ===
+2026-10-12 11:40:42: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 11:40:42: Starting Functional Connectivity
+2026-10-12 11:40:42: Using label file: C:\Users\Administrator\AppData\Local\Temp\tpc74aa851_e3b0_4e37_8cc0_741d3f018058\templates\labels.nii with 3 regions
+2026-10-12 11:40:42: FC will be computed for strategies: Regressedpc
+2026-10-12 11:40:42: Functional connectivity for: sub-01
+2026-10-12 11:40:42: Skipping - FC already computed for: sub-01_task-rest_bold.nii with pc
+2026-10-12 11:40:42: Functional connectivity completed: 0 files processed, 1 files skipped
+2026-10-12 11:40:42: === Step 13: completed (0.93 s) ===
+MIKEY_FAILURE_REPORTS_PASS

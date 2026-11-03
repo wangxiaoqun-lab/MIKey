@@ -1,0 +1,90 @@
+--- before/MIKey_config.m
++++ updated/MIKey_config.m
+@@ -138,10 +138,18 @@
+ if cfg.filterFlag && (cfg.lowFreq >= cfg.highFreq || cfg.highFreq >= 1/(2*cfg.sliceTimingTR))
+     error('MIKey:Parameter', 'Require 0 <= lowFreq < highFreq < 1/(2*sliceTimingTR). Check each run''s actual TR too.');
+ end
+-choices(cfg.sliceTimingOrder, {'Auto-detect','ascending','descending','interleaved'}, 'sliceTimingOrder');
+-choices(cfg.fcLabel, {'214','428','604','1184','Custom...'}, 'fcLabel');
+-choices(cfg.parcNetwork, {'214rois','428rois','604rois','1184rois'}, 'parcNetwork');
+-choices(cfg.parcellationMode, {'individual','concatenated'}, 'parcellationMode');
++% Unselected stages must not be blocked by unused choice values. Keep values
++% unchanged so selecting those stages later still triggers their validation.
++if ismember(4, cfg.steps)
++    choices(cfg.sliceTimingOrder, {'Auto-detect','ascending','descending','interleaved'}, 'sliceTimingOrder (Step 4)');
++end
++if ismember(13, cfg.steps)
++    choices(cfg.fcLabel, {'214','428','604','1184','Custom...'}, 'fcLabel (Step 13)');
++end
++if any(ismember(cfg.steps, 14:16))
++    choices(cfg.parcNetwork, {'214rois','428rois','604rois','1184rois'}, 'parcNetwork (Steps 14-16)');
++    choices(cfg.parcellationMode, {'individual','concatenated'}, 'parcellationMode (Steps 14-16)');
++end
+ if any(ismember(cfg.steps, 12:16)) && ~any([cfg.advRegressionPCOnly cfg.advRegressionPCCSF cfg.advRegressionPCGS cfg.advRegressionPCCSFGS])
+     error('MIKey:Parameter', 'Select at least one advanced regression strategy for steps 12-16.');
+ end
+--- /dev/null
++++ updated/tests/test_mikey_config_choices.m
+@@ -0,0 +1,51 @@
++function test_mikey_config_choices
++% Pure stage-choice validation; does not run SPM or touch subject images.
++root=fileparts(fileparts(mfilename('fullpath')));oldPath=path;
++cleanup=onCleanup(@()path(oldPath));addpath(root);
++input=struct('steps',1,'fcLabel','unused','parcNetwork','unused', ...
++    'parcellationMode','unused','sliceTimingOrder','unused');
++cfg=MIKey_config(input);
++assert(strcmp(cfg.fcLabel,'unused') && strcmp(cfg.parcNetwork,'unused'));
++assert(strcmp(cfg.parcellationMode,'unused') && strcmp(cfg.sliceTimingOrder,'unused'));
++state=MIKeyBatchState(cfg,-1);assert(strcmp(state.UserData.fcLabelDropdown.Value,'unused'));
++% Preprocessing 2:10 uses slice order, but not FC/parcellation choices.
++input.steps=2:10;input.sliceTimingOrder='Auto-detect';
++MIKey_config(input);
++% Selecting an additional stage must revalidate its preserved value.
++cfg.steps=13;expectError(cfg,'fcLabel (Step 13)');
++for steps={4,[1 4],2:10}
++    expectError(struct('steps',steps{1},'sliceTimingOrder','unused'),'sliceTimingOrder (Step 4)');
++end
++for steps={13,[10 13]}
++    expectError(struct('steps',steps{1},'fcLabel','unused'),'fcLabel (Step 13)');
++end
++for stage=14:16
++    expectError(struct('steps',stage,'parcNetwork','unused'),'parcNetwork (Steps 14-16)');
++    expectError(struct('steps',stage,'parcellationMode','unused'),'parcellationMode (Steps 14-16)');
++end
++for label={'214','428','604','1184','Custom...'}
++    cfg=MIKey_config(struct('steps',13,'fcLabel',label{1}));assert(strcmp(cfg.fcLabel,label{1}));
++end
++for network={'214rois','428rois','604rois','1184rois'}
++    MIKey_config(struct('steps',14,'parcNetwork',network{1}));
++end
++for mode={'individual','concatenated'}
++    MIKey_config(struct('steps',16,'parcellationMode',mode{1}));
++end
++% Skipping choice membership does not waive field types or typo checks.
++expectError(struct('steps',1,'fcLabel',false),'fcLabel must be a character vector');
++expectError(struct('steps',1,'unknownLabel','428'),'Unknown parameter','MIKey:UnknownParameter');
++disp('MIKEY_CONFIG_CHOICES_PASS');
++end
++
++function expectError(input,message,id)
++if nargin<3,id='MIKey:Parameter';end
++try
++    MIKey_config(input);
++catch ME
++    assert(strcmp(ME.identifier,id),ME.message);
++    assert(contains(ME.message,message),ME.message);
++    return;
++end
++error('MIKey:Test','Expected invalid selected-stage choice to be rejected.');
++end
+--- before/README.md
++++ updated/README.md
+@@ -166,7 +166,7 @@
+ 
+ `MIKey_config` validates fields and values and supplies defaults. Unknown fields are rejected. Relative paths resolve against the calling MATLAB working directory; use absolute paths for cluster jobs. Steps accept numeric vectors or strings such as `'2,4:10'`, without evaluating MATLAB expressions. Execution preserves the supplied order and rejects duplicate steps.
+ 
+-Edit parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m), then run [examples/run_mikey.m](examples/run_mikey.m). The execution script loads this configuration and does not define a second parameter block. This example uses the explicit settings in the configuration function; it does not load the saved GUI MAT file. Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
++Edit parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m), then run [examples/run_mikey.m](examples/run_mikey.m). The execution script loads this configuration and does not define a second parameter block. Processing stages are selected with `cfg.steps`; atlas/network values are not enable/disable switches. For example, keep `cfg.fcLabel='428'` and omit Step 13 to skip FC. Choice membership is validated only for its selected stage: slice order for Step 4, FC atlas for Step 13, and parcellation network/mode for Steps 14-16. Unused choices remain unchanged and are checked if those stages are selected later. Field types and other general parameter constraints still apply. This example uses the explicit settings in the configuration function; it does not load the saved GUI MAT file. Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
+ 
+ ## Processing steps and prerequisites
+ 

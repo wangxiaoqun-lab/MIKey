@@ -1,0 +1,82 @@
+{
+  "MIKey_config.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "MIKeyBatchState.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "MIKey_preflight.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "MIKey_check_stage.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "MIKey_write_derivative_metadata.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "MIKey.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "examples/run_mikey.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_pc_config.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_config_choices.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_batch.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_pc_strategies.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_ui_layout.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_gui_filters.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "MIKey_parameter_scope.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "MIKey_batch_controls.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_config_scopes.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "tests/test_mikey_config_flow.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "examples/mikey_config_example.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "docs/validation/20261019-scoped-validation/run_scope_checks.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  },
+  "docs/validation/20261019-scoped-validation/run_scope_recheck.m": {
+    "syntaxDiagnostics": [],
+    "returnCode": 0
+  }
+}

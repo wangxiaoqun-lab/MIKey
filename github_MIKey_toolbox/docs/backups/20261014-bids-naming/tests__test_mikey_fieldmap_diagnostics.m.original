@@ -1,0 +1,69 @@
+function test_mikey_fieldmap_diagnostics()
+% Exercise the actual Step 3 GUI callback without processing research images.
+root = fileparts(fileparts(mfilename('fullpath'))); addpath(root);
+work = tempname; mkdir(work);
+cleanupWork = onCleanup(@() rmdir(work,'s')); %#ok<NASGU>
+func = fullfile(work,'sub-01','func'); mkdir(func);
+base = 'sub-001_task-rest_run-01_bold';
+touch(fullfile(func,[base '.nii']));
+old = get(groot,'DefaultFigureVisible');
+cleanupVisibility = onCleanup(@() set(groot,'DefaultFigureVisible',old)); %#ok<NASGU>
+set(groot,'DefaultFigureVisible','off'); before = findall(groot,'Type','figure');
+MIKey;
+created = findall(groot,'Type','figure'); created = created(~ismember(created,before));
+assert(numel(created)==1); fig=created(1);
+cleanupFigure = onCleanup(@() delete(fig)); %#ok<NASGU>
+fig.UserData.bidsPath = work;
+fig.UserData.subjectsEdit.Value = 'sub-001';
+runStep(fig,2);
+assertLog(fig,'Available raw subject directories: sub-01');
+assertLog(fig,'Mask application not started: no matching scans.');
+runStep(fig);
+assertLog(fig,'Available raw subject directories: sub-01');
+assertLog(fig,'Fieldmap correction not started: no matching scans.');
+fig.UserData.subjectsEdit.Value = 'sub-01';
+runStep(fig,2);
+assertLog(fig,'BOLD brain mask not found');
+assertLog(fig,'Mask application not completed:');
+runStep(fig);
+assertLog(fig,'Missing scaled fieldmap directory:');
+assertLog(fig,'Fieldmap correction not completed:');
+fmap = fullfile(work,'derivatives','MIKey','sub-01','fmap'); mkdir(fmap);
+for part = {'magnitude1','phase1','magnitude2','phase2'}
+    touch(fullfile(fmap,['sub-001_' part{1} '_desc-scaled.nii']));
+end
+runStep(fig);
+assertLog(fig,'Missing masked BOLD input:');
+assertLog(fig,'Apply the brain mask in Step 2 before Step 3.');
+assertLog(fig,'Fieldmap correction not completed:');
+deriv = fullfile(work,'derivatives','MIKey','sub-01','func'); mkdir(deriv);
+touch(fullfile(deriv,[base '_desc-fieldmap.nii']));
+runStep(fig);
+assertLog(fig,'Fieldmap correction completed: 0 files processed, 1 files skipped');
+touch(fullfile(deriv,[base '_desc-masked.nii']));
+runStep(fig,2);
+assertLog(fig,'Mask application completed: 0 files processed, 1 files skipped');
+disp('MIKEY_FIELDMAP_DIAGNOSTICS_PASS');
+disp('MIKEY_MASK_DIAGNOSTICS_PASS');
+end
+
+function runStep(fig,stage)
+if nargin<2,stage=3;end
+fig.UserData.statusText.Value = {''};
+if stage==2
+    button=fig.UserData.maskButton;
+else
+    button=fig.UserData.fieldmapButton;
+end
+button.ButtonPushedFcn(button,[]);
+end
+
+function assertLog(fig,expected)
+log = strjoin(fig.UserData.statusText.Value,sprintf('\n'));
+assert(~isempty(strfind(log,expected)),log); %#ok<STREMP>
+assert(isempty(strfind(log,'completed: 0 files processed, 0 files skipped'))); %#ok<STREMP>
+end
+
+function touch(file)
+fid=fopen(file,'w'); assert(fid>=0); fclose(fid);
+end

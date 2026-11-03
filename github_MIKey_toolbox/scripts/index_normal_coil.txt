@@ -1,0 +1,35 @@
+Animal_path{01} = 'D:\HUASHAN\20191023_104054_20191023_tcj_czy_elec_forepaw_mouse00_1_1\'; % wild type
+Animal_path{02} = 'D:\HUASHAN\20191023_160518_20191023_tcj_czy_elec_forepaw_mouse02_1_1\'; % tbi(+)cc7(-)
+Animal_path{03} = 'D:\HUASHAN\20191030_094200_20191030_tcj_czy_elec_forepaw_mouse03_1_1\'; % wild type
+Animal_path{04} = 'D:\HUASHAN\20191030_120435_20191030_tcj_czy_elec_forepaw_mouse04_1_1\'; % wild type
+Animal_path{05} = 'D:\HUASHAN\20191030_181537_20191030_tcj_czy_elec_forepaw_mouse06_1_1\'; % tbi(+)cc7(-)
+
+Animal_path{06} = 'D:\HUASHAN\20191103_100340_20191103_tcj_czy_elec_forepaw_mouse01_1_1\'; % tbi(+)cc7(-)
+Animal_path{07} = 'D:\HUASHAN\20191103_134627_20191103_tcj_czy_elec_forepaw_mouse05_1_1\'; % tbi(+)cc7(-)
+Animal_path{08} = 'D:\HUASHAN\20191103_172941_20191103_tcj_czy_elec_forepaw_mouseA23_1_1\'; % tbi(+)cc7(+)
+Animal_path{09} = 'D:\HUASHAN\20191104_093150_20191104_tcj_czy_elec_forepaw_mouseA24_1_1\'; % tbi(+)cc7(+)
+Animal_path{10} = 'D:\HUASHAN\20191104_121142_20191104_tcj_czy_elec_forepaw_mouseA25_1_1\'; % tbi(+)cc7(+)
+Animal_path{11} = 'D:\HUASHAN\20191104_145118_20191104_tcj_czy_elec_forepaw_mouse07_1_1\'; % wild type
+
+%Animal_path{12} = 'D:\HUASHAN\20191106_100101_20191106_tcj_czy_elec_forepaw_mouseA33_1_1\'; % tbi(+)cc7(+)
+%Animal_path{13} = 'D:\HUASHAN\20191106_122528_20191106_tcj_czy_elec_forepaw_mouseA30_1_1\'; % tbi(+)cc7(+)
+%Animal_path{14} = 'D:\HUASHAN\20191106_145613_20191106_tcj_czy_elec_forepaw_mouse05_1_1\'; % wild type
+
+Animal_EPI_folder{01} = {  [14 15 18],     [12 16 17],       [19]};
+Animal_EPI_folder{02} = {  [08 10 11],     [06 07 09],       [12]};
+Animal_EPI_folder{03} = {  [10 11 12],     [08 09 13],       [14]};
+Animal_EPI_folder{04} = {  [16 17 18],     [19 21 22],       [23]};
+Animal_EPI_folder{05} = {  [07 08 12],     [09 10 11],       [13]};
+Animal_EPI_folder{06} = {  [17 18 19],     [20 22 23],       [21]};
+Animal_EPI_folder{07} = {  [10 11 15],     [12 13 14],       [16]};
+Animal_EPI_folder{08} = {  [06 09 10],     [07 08 11],       [12]};
+Animal_EPI_folder{09} = {  [09 10 14],     [11 12 13],       [15]};
+Animal_EPI_folder{10} = {  [08 09 11],     [07 12 13],       [14]};
+Animal_EPI_folder{11} = {  [11 12 13],     [09 10 14],       [15]};
+%Animal_EPI_folder{12} = {  [06 07 11],     [08 09 10],       [12]};
+%Animal_EPI_folder{13} = {  [07 08 09],     [11 12 13],       [14]};
+%Animal_EPI_folder{14} = {  [07 08 12],     [09 10 11],       [13]};
+
+
+Animal_T2RARE = {05 03 05 12 04 04 05 03 07 03 06 03 04 04};% 
+Animal_B0map  = {06 04 06 14 05 08 06 04 04 04 07 04 05 05};% 

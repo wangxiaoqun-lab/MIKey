@@ -1,0 +1,29 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+[警告: MATLAB Connector 未运行。] 
+[> In message/subscribe
+  In matlab.uiautomation.internal.WebDispatcher/subscribe (line 102)
+  In matlab.uiautomation.internal.WebDispatcher/dispatchEventAndWait (line 36)
+  In matlab.uiautomation.internal.DispatchDecorator/dispatchEventAndWait (line 17)
+  In matlab.uiautomation.internal.ErrorInHGCallbacks/dispatchEventAndWait (line 16)
+  In matlab.uiautomation.internal.DispatchDecorator/dispatchEventAndWait (line 17)
+  In matlab.uiautomation.internal.ThrowableDispatchDecorator/dispatchEventAndWait (line 20)
+  In matlab.uiautomation.internal.interactors.ButtonInteractor/uipress (line 16)
+  In matlab.ui.internal.Driver/doGesture (line 45)
+  In matlab.ui.internal.Driver/press (line 8)
+  In matlab.uitest.TestCase/press (line 101)
+  In test_mikey_run_controls/press (line 44)
+  In test_mikey_run_controls (line 19)] 
+错误使用 matlab.ui.internal.Driver/press (line 8)
+调用 "message/subscribe" 时，未对输出参数 "subscriptionId" (可能还包括其他参数)赋值。
+
+出错 matlab.uitest.TestCase/press (line 101)
+            testCase.Driver.press(H, varargin{:});
+
+出错 test_mikey_run_controls/press (line 44)
+            driver.press(button);
+
+出错 test_mikey_run_controls (line 19)
+start(watcher);press(ui.scalingButton);stop(watcher);

@@ -1,0 +1,22 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+CHECK MIKey.m
+CHECK MIKeyBatchState.m
+CHECK MIKey_config.m
+CHECK MIKey_defaults.m
+CHECK MIKey_parameter_map.m
+CHECK MIKey_preflight.m
+CHECK MIKey_run.m
+CHECK MIKey_setup.m
+                ok: 1
+            issues: {0x1 cell}
+             notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+          subjects: {'sub-01'}
+         rawCounts: [10 1]
+             steps: 1
+    requiredImages: {}
+         functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+
+MIKEY_SOURCE_PASS

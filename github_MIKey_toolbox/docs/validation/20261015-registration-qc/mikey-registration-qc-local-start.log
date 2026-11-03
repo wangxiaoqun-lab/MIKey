@@ -1,0 +1,15 @@
+ 
+有关在线文档，请参阅 http://www.mathworks.com/support
+有关产品信息，请访问 www.mathworks.com。
+ 
+[警告: QFORM0 representation has been rounded.] 
+[> In encode_qform0 (line 27)
+  In nifti/subsasgn>fun (line 109)
+  In nifti/subsasgn (line 20)
+  In spm_create_vol>create_vol (line 81)
+  In spm_create_vol (line 13)
+  In spm_write_vol (line 83)
+  In test_mikey_registration_qc>write (line 83)
+  In test_mikey_registration_qc (line 52)] 
+MIKEY_REGISTRATION_QC_PASS
+MIKEY_REGISTRATION_GEOMETRY_PASS

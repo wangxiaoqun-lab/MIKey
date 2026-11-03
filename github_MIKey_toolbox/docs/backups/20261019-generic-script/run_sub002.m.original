@@ -1,0 +1,45 @@
+function report = run_sub002(steps, spmPath, dryRun)
+% Two-phase sub-002 processing using the saved GUI configuration.
+% run_sub002(1,'/absolute/path/spm12')       % Scale, then STOP for manual masks.
+% run_sub002(2:10,'/absolute/path/spm12')    % Only after both masks are ready.
+% run_sub002(2:10,'/absolute/path/spm12',true) % Preflight only, no processing.
+% A single invocation cannot combine Step 1 with subsequent steps.
+root=fileparts(mfilename('fullpath'));
+oldPath=path;cleanup=onCleanup(@()path(oldPath));
+addpath(root,'-begin');
+configFile=fullfile(root,'MIKey_BIDS_config.mat');
+assert(exist(configFile,'file')==2,'MIKey:ConfigMissing', ...
+    'Copy the saved MIKey_BIDS_config.mat beside this function: %s',configFile);
+cfg=MIKey_config(configFile);
+if nargin<1 || isempty(steps),steps=1;end
+if nargin<2 || isempty(spmPath),spmPath=cfg.spmPath;end
+if isempty(spmPath)
+    installed=which('spm');
+    if isempty(installed)
+        error('MIKey:MissingSPM','Pass the server SPM12 root: run_sub002(1,''/absolute/path/spm12'').');
+    end
+    spmPath=fileparts(installed);
+end
+if nargin<3,dryRun=false;end
+cfg.subjectFilter='sub-002';
+cfg.steps=steps;
+cfg.spmPath=spmPath;
+cfg.codePath=fullfile(root,'scripts');
+cfg.failFast=true;
+cfg.dryRun=dryRun;
+cfg.logDir=fullfile(cfg.bidsPath,'derivatives','MIKey','logs','sub-002');
+cfg=MIKey_config(cfg);
+if ismember(1,cfg.steps) && numel(cfg.steps)>1
+    error('MIKey:MaskPreparationRequired', ...
+        'Run Step 1 alone, prepare sub-002 functional/anatomical masks on scaled images, then call run_sub002(2:10,spmPath).');
+end
+assert(exist(fullfile(cfg.bidsPath,'sub-002'),'dir')==7,'MIKey:SubjectMissing', ...
+    'Raw subject directory not found: %s. Check the saved BIDS root.',fullfile(cfg.bidsPath,'sub-002'));
+fprintf('Configuration: %s\nBIDS root: %s\nSubject: %s; steps: %s; minTimepoints: %d\n', ...
+    configFile,cfg.bidsPath,cfg.subjectFilter,mat2str(cfg.steps),cfg.minTimepoints);
+report=MIKey_run(cfg);
+if isequal(cfg.steps,1) && ~cfg.dryRun
+    fprintf('Step 1 finished. Prepare sub-002 functional/anatomical masks on scaled images before running Steps 2:10.\n');
+end
+if isfield(report,'runDirectory'),fprintf('Run report and log: %s\n',report.runDirectory);end
+end

@@ -1,0 +1,140 @@
+--- before/MIKey_config.m
++++ updated/MIKey_config.m
+@@ -82,7 +82,27 @@
+     error('MIKey:Parameter', 'smoothFWHM requires one or three nonnegative values.');
+ end
+ cfg.clustROINums = numericList(cfg.clustROINums, 'clustROINums');
+-cfg.customPCCounts = numericList(cfg.customPCCounts, 'customPCCounts');
++flags = {'useDefaultTemplate', 'useDefaultPCStrategy', 'detrendFlag', 'filterFlag', ...
++    'advRegressionPCOnly', 'advRegressionPCCSF', 'advRegressionPCGS', ...
++    'advRegressionPCCSFGS', 'useCustomParc', 'useTSNR', ...
++    'useInterSubjectVar', 'parcellationUseParallel', 'dryRun', 'failFast', 'strictWarnings'};
++for i = 1:numel(flags)
++    value = cfg.(flags{i});
++    if ~(islogical(value) || isnumeric(value)) || ~isscalar(value) || ~ismember(value, [0 1])
++        error('MIKey:Parameter', '%s must be true or false.', flags{i});
++    end
++    cfg.(flags{i}) = logical(value);
++end
++if islogical(cfg.customPCCounts)
++    error('MIKey:Parameter', ['customPCCounts is a PC-count list, not a true/false switch. ' ...
++        'For the default strategy set useDefaultPCStrategy=true and customPCCounts=[]; ' ...
++        'for custom candidates set useDefaultPCStrategy=false and customPCCounts=[0 5 10 20].']);
++end
++if cfg.useDefaultPCStrategy && emptyPCList(cfg.customPCCounts)
++    cfg.customPCCounts = []; % Unused custom candidates may be blank in default mode.
++else
++    cfg.customPCCounts = numericList(cfg.customPCCounts, 'customPCCounts');
++end
+ if any(cfg.customPCCounts < 0 | cfg.customPCCounts ~= fix(cfg.customPCCounts)) || numel(unique(cfg.customPCCounts)) ~= numel(cfg.customPCCounts)
+     error('MIKey:Parameter', 'customPCCounts must contain distinct nonnegative integers.');
+ end
+@@ -115,17 +135,6 @@
+ if cfg.percentTop > 1
+     error('MIKey:Parameter', 'percentTop must be in (0, 1].');
+ end
+-flags = {'useDefaultTemplate', 'useDefaultPCStrategy', 'detrendFlag', 'filterFlag', ...
+-    'advRegressionPCOnly', 'advRegressionPCCSF', 'advRegressionPCGS', ...
+-    'advRegressionPCCSFGS', 'useCustomParc', 'useTSNR', ...
+-    'useInterSubjectVar', 'parcellationUseParallel', 'dryRun', 'failFast', 'strictWarnings'};
+-for i = 1:numel(flags)
+-    value = cfg.(flags{i});
+-    if ~(islogical(value) || isnumeric(value)) || ~isscalar(value) || ~ismember(value, [0 1])
+-        error('MIKey:Parameter', '%s must be true or false.', flags{i});
+-    end
+-    cfg.(flags{i}) = logical(value);
+-end
+ if cfg.filterFlag && (cfg.lowFreq >= cfg.highFreq || cfg.highFreq >= 1/(2*cfg.sliceTimingTR))
+     error('MIKey:Parameter', 'Require 0 <= lowFreq < highFreq < 1/(2*sliceTimingTR). Check each run''s actual TR too.');
+ end
+@@ -135,6 +144,13 @@
+ choices(cfg.parcellationMode, {'individual','concatenated'}, 'parcellationMode');
+ if any(ismember(cfg.steps, 12:16)) && ~any([cfg.advRegressionPCOnly cfg.advRegressionPCCSF cfg.advRegressionPCGS cfg.advRegressionPCCSFGS])
+     error('MIKey:Parameter', 'Select at least one advanced regression strategy for steps 12-16.');
++end
++end
++
++function empty = emptyPCList(value)
++empty = isnumeric(value) && isempty(value);
++if ischar(value) || (isstring(value) && isscalar(value))
++    empty = isempty(strtrim(char(value)));
+ end
+ end
+ 
+--- before/examples/mikey_config_example.m
++++ updated/examples/mikey_config_example.m
+@@ -26,8 +26,8 @@
+ cfg.filterFlag = true;
+ cfg.lowFreq = 0.01;
+ cfg.highFreq = 0.1;
+-cfg.useDefaultPCStrategy = true; % step 10: 0,20,40,... up to available PCs
+-cfg.customPCCounts = [0 5 10 20]; % used when useDefaultPCStrategy=false
++cfg.useDefaultPCStrategy = true; % true: default 0,20,40,...; false: custom list below.
++cfg.customPCCounts = [0 5 10 20]; % Numeric counts, NOT true/false. May be [] in default mode.
+ cfg.advRegressionPCOnly = true;
+ cfg.advRegressionPCCSF = true;
+ cfg.advRegressionPCGS = true;
+--- /dev/null
++++ updated/tests/test_mikey_pc_config.m
+@@ -0,0 +1,45 @@
++function test_mikey_pc_config
++% Pure configuration/count selection checks; no SPM, GUI or image processing.
++root=fileparts(fileparts(mfilename('fullpath')));oldPath=path;
++cleanup=onCleanup(@()path(oldPath));addpath(root);
++blank={[], '', '   ', string('')};
++for k=1:numel(blank)
++    input=struct('useDefaultPCStrategy',true);input.customPCCounts=blank{k};
++    cfg=MIKey_config(input);assert(isnumeric(cfg.customPCCounts) && isempty(cfg.customPCCounts));
++    state=MIKeyBatchState(cfg,-1);assert(isempty(state.UserData.customPCCountsEdit.Value));
++    assert(isequal(MIKey_pc_counts(true,cfg.customPCCounts,101,85),[0 20 40 60 80]));
++    input.useDefaultPCStrategy=false;expectError(input);
++end
++% Numeric zero is a valid PC count; logical false is not a PC-count list.
++for default=[true false]
++    input=struct('useDefaultPCStrategy',default,'customPCCounts',0);
++    cfg=MIKey_config(input);assert(isequal(cfg.customPCCounts,0));
++    input.customPCCounts=false;expectError(input,'not a true/false switch');
++    input.customPCCounts=true;expectError(input,'not a true/false switch');
++end
++cfg=MIKey_config(struct('useDefaultPCStrategy',false,'customPCCounts',[20 0 5]));
++assert(isequal(cfg.customPCCounts,[0 5 20]));
++cfg=MIKey_config(struct('useDefaultPCStrategy',false,'customPCCounts','0,5,20'));
++assert(isequal(cfg.customPCCounts,[0 5 20]));
++invalid={[0 2 2],[-1 5],[0 .5],[0 NaN],[0 Inf],1+1i,{0 5},'false','0;disp(1)'};
++for default=[true false]
++    for k=1:numel(invalid)
++        input=struct('useDefaultPCStrategy',default);input.customPCCounts=invalid{k};
++        expectError(input);
++    end
++end
++expectError(struct('useDefaultPCStrategy',2,'customPCCounts',[]));
++disp('MIKEY_PC_CONFIG_PASS');
++end
++
++function expectError(input,message)
++if nargin<2,message='';end
++try
++    MIKey_config(input);
++catch ME
++    assert(strcmp(ME.identifier,'MIKey:Parameter'),ME.message);
++    if ~isempty(message),assert(~isempty(strfind(ME.message,message)));end %#ok<STREMP>
++    return;
++end
++error('MIKey:Test','Expected invalid PC configuration to be rejected.');
++end
+--- before/README.md
++++ updated/README.md
+@@ -197,6 +197,13 @@
+ ### PC strategy candidates
+ 
+ Step 10 defaults to candidate PC counts `0,20,40,...` up to the number available and `T-1`. Uncheck **Use default PC counts** to enter custom counts such as `0 5 10 20`, separated by spaces or commas.
++
++`useDefaultPCStrategy=true` selects the default candidates; `false` selects the custom list. `customPCCounts` contains numeric counts, not a boolean switch: do not set it to `false`. With the default strategy it may be `[]` (or blank GUI text). With the custom strategy it must be a nonempty list of distinct nonnegative integers. Numeric `0` is a valid count (motion-only regression); logical `false` is a different type and is rejected with a specific explanation.
++
++```matlab
++cfg.useDefaultPCStrategy = true;
++cfg.customPCCounts = []; % Unused under the default strategy.
++```
+ 
+ ```matlab
+ cfg.useDefaultPCStrategy = false;

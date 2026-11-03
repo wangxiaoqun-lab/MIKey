@@ -1,0 +1,55 @@
+function test_mikey_bids_spm_routing(spmPath)
+% Actual MIKey dispatch + real NIfTI I/O; SPM transforms are COPY-ONLY stubs.
+oldRng=rng;rngCleanup=onCleanup(@()rng(oldRng)); %#ok<NASGU>
+rng(0);
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);addpath(fullfile(root,'scripts'));addpath(fullfile(root,'scripts'));addpath(spmPath);
+spm('defaults','fmri');spm_get_defaults('cmdline',true);
+work=tempname;mkdir(work);func=fullfile(work,'sub-01','func');mkdir(func);
+anat=fullfile(work,'sub-01','anat');mkdir(anat);
+df=fullfile(work,'derivatives','MIKey','sub-01','func');mkdir(df);
+da=fullfile(work,'derivatives','MIKey','sub-01','anat');mkdir(da);
+base='sub-01_task-rest_run-01_bold';t2base='sub-01_T2w';matrix=diag([2 2 2 1]);data=100+randn(5,6,4,8);
+writeNifti(fullfile(func,[base '.nii']),data,matrix);
+fid=fopen(fullfile(func,[base '.json']),'w');fprintf(fid,'{"RepetitionTime":2,"SliceTiming":[0,0.5,1,1.5]}');fclose(fid);
+writeNifti(fullfile(anat,[t2base '.nii']),data(:,:,:,1),matrix);
+% Deliberately old names: subsequent new outputs must still be routed correctly.
+writeNifti(fullfile(df,[base '_desc-masked.nii']),data,matrix);
+writeNifti(fullfile(da,[t2base '_desc-masked.nii']),data(:,:,:,1),matrix);
+cfg=MIKey_defaults();cfg.bidsPath=work;cfg.sliceTimingNSlices=4;cfg.sliceTimingOrder='ascending';
+cfg.useDefaultTemplate=false;cfg.customTemplatePath=fullfile(anat,[t2base '.nii']);
+state=MIKeyBatchState(cfg,-1);
+oldPath=path;restore=onCleanup(@()restoreSPM(oldPath)); %#ok<NASGU>
+mock=fullfile(work,'spm_naming_stub');mkdir(mock);
+copyfile(fullfile(root,'tests','fixtures','spm_naming_stub','spm_jobman.m.fixture'),fullfile(mock,'spm_jobman.m'));
+addpath(mock,'-begin');clear spm_jobman;
+assert(strcmp(MIKey_bids_path(df,[base '_desc-masked.nii'],'input'),fullfile(df,[base '_desc-masked.nii'])));
+assert(strcmp(MIKey_bids_path(da,[t2base '_desc-masked.nii'],'input'),fullfile(da,[t2base '_desc-masked.nii'])));
+for step=[4 5 6 7]
+    assert(strcmp(which('spm_jobman'),fullfile(mock,'spm_jobman.m')),'Naming test must use its COPY-ONLY fixture.');
+    fprintf('MIKEY_BIDS_ROUTING_STAGE_%d_BEGIN\n',step);stageTimer=tic;
+    MIKey('batch',state,step);
+    fprintf('MIKEY_BIDS_ROUTING_STAGE_%d_PASS %.3f seconds\n',step,toc(stageTimer));
+end
+assert(exist(MIKey_bids_path(df,[base '_desc-slicetimed.nii']),'file')==2);
+assert(exist(MIKey_bids_path(df,[base '_desc-realign.nii']),'file')==2);
+motion=MIKey_motion_files(df,base);assert(numel(motion)==1);
+assert(~isempty(strfind(motion.name,'_desc-slicetimed_bold'))); %#ok<STREMP>
+coreg=MIKey_bids_path(df,[base '_desc-T2coreg.nii']);
+normalizedT2=MIKey_bids_path(df,[base '_space-template_desc-T2normalized.nii']);
+assert(exist(coreg,'file')==2 && exist(normalizedT2,'file')==2);
+assert(strcmp(fileparts(coreg),da) && ~isempty(regexp(coreg,'_T2w\.nii$','once')));
+assert(exist(MIKey_bids_path(df,[base '_space-template_desc-normalized.nii']),'file')==2);
+disp('MIKEY_BIDS_SPM_ROUTING_PASS');
+end
+
+function writeNifti(path,data,matrix)
+for i=1:size(data,4)
+    v=struct('fname',path,'dim',[size(data,1) size(data,2) size(data,3)],'dt',[16 0], ...
+        'mat',matrix,'pinfo',[1;0;0],'n',[i 1],'descrip','MIKey naming route fixture');
+    spm_write_vol(v,data(:,:,:,i));
+end
+end
+
+function restoreSPM(oldPath)
+path(oldPath);clear spm_jobman;
+end

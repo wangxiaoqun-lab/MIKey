@@ -1,0 +1,24 @@
+function spm_jobman(action,batch)
+% Test-only COPY stub; never installed as .m inside the toolbox tree.
+if strcmp(action,'initcfg'),return;end
+assert(strcmp(action,'run'));
+job=batch{1}.spm;
+if isfield(job,'spatial') && isfield(job.spatial,'coreg')
+    stage=6;inputs=job.spatial.coreg.estwrite.source;prefix='coreg';
+elseif isfield(job,'tools') && isfield(job.tools,'oldnorm')
+    stage=7;inputs=job.tools.oldnorm.estwrite.subj.resample;prefix='norm';
+else
+    error('MIKey:Test','Unexpected test job.');
+end
+calls=getappdata(0,'MIKeyRegistrationCalls');setappdata(0,'MIKeyRegistrationCalls',[calls stage]);
+mode=getappdata(0,'MIKeyRegistrationFixtureMode');
+if strcmp(mode,'crash'),error('SPM:TestFailure','Synthetic SPM estimator failure.');end
+inputs=unique(regexprep(inputs,',\d+$',''));
+for i=1:numel(inputs)
+    output=MIKey_prefixed_file(prefix,inputs{i});copyfile(inputs{i},output);
+    if strcmp(mode,sprintf('blank%d',stage))
+        v=spm_vol(output);
+        for k=1:numel(v),spm_write_vol(v(k),zeros(v(k).dim));end
+    end
+end
+end

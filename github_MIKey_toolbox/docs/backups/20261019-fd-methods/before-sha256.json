@@ -1,0 +1,15 @@
+{
+  "MIKey.m": "a08547dd4086920e872517ec81fa5e80eda84ebb1b5e8021c6a7f1e0af21ecf1",
+  "MIKey_defaults.m": "c389e0f416863e99f326ac8552ae42134ab8e56c536450c3b19c0b250a7cce29",
+  "MIKey_parameter_map.m": "9dad395e177e2575963206977858d8a41f6823b54e61bf27ea686bcd01687756",
+  "MIKey_parameter_scope.m": "239b52073771832b45dda1f11dc48cd5d9279966452f1ff7e0a28538d5c14786",
+  "MIKey_config.m": "09518420c271e87339c3ed472ce1767626b5e9d605687bcf923b7b1f6e9d5363",
+  "MIKey_noise_result.m": "40e33698b3bf4deb4e890faf33015346943aa0add53faea759de7e042cd706e8",
+  "examples/mikey_config_example.m": "fe7c52eb7a761dcb0b6e51c8bd9000f676245045f0f3c1a7ffdd375f7a8dabf1",
+  "scripts/MY_headmotion_regression_estimate.m": "2f2b35bfd5adcbc5d962d651df3efdc7518dc4bb0ac430857ad00802ac0a0783",
+  "tests/test_mikey_config_scopes.m": "7bd04632299537aaf92d0f270420c5f457dd1bcdaaafa354094d2ffc21ca4ea1",
+  "tests/test_mikey_pc_strategies.m": "79c3a3b6288e14fa101790b464e302e1215f31b2a228f6789d28d8e690a7a974",
+  "README.md": "7c6ae40b730681402fb48ce25c93b57b7778f41bb4bfa257609b3647af22218b",
+  "docs/CHANGES.patch": "2c9299844c6b69130577f9981aa8071140f8ad674fb05b9a134ac1e213f66403",
+  "docs/SOURCE_SHA256.json": "a39dd22d68545028e4a135eb874b98d63a1a0592b3b1c919416f67091267526c"
+}

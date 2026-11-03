@@ -1,0 +1,27 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+
+2026-10-14 19:02:50: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 19:03:18: Starting Voxel Scaling
+2026-10-14 19:03:19: Processing subject: sub-01
+2026-10-14 19:03:19: Using voxel scaling factor: 2
+2026-10-14 19:03:20: Scaling BOLD volume 1 of 8: sub-01_task-rest_run-01_bold.nii
+2026-10-14 19:03:20: Pause requested. Waiting for a checkpoint; an active SPM/MEX operation must return first.
+2026-10-14 19:03:20: Resumed processing.
+2026-10-14 19:03:21: Scaling BOLD volume 8 of 8: sub-01_task-rest_run-01_bold.nii
+2026-10-14 19:03:21: Completed voxel scaling for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 19:03:21: Scaling BOLD volume 1 of 8: sub-01_task-rest_run-02_bold.nii
+2026-10-14 19:03:21: Scaling BOLD volume 8 of 8: sub-01_task-rest_run-02_bold.nii
+2026-10-14 19:03:21: Completed voxel scaling for: sub-01_task-rest_run-02_bold.nii
+2026-10-14 19:03:21: Scaling BOLD volume 1 of 8: sub-01_task-rest_run-03_bold.nii
+2026-10-14 19:03:22: Scaling BOLD volume 8 of 8: sub-01_task-rest_run-03_bold.nii
+2026-10-14 19:03:22: Completed voxel scaling for: sub-01_task-rest_run-03_bold.nii
+2026-10-14 19:03:22: Voxel scaling completed: 3 files processed, 0 files skipped
+2026-10-14 19:03:22: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tp7eee1880_94d1_455d_953e_788e1cb3292c'
+
+MIKEY_RUN_CONTROLS_PASS
+MIKEY_RESPONSIVE_GUI_PASS

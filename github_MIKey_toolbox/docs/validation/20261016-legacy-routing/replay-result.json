@@ -1,0 +1,1 @@
+{"status":"passed","stages":[{"name":"legacy_routing_without_breakpoints","seconds":2.7462094},{"name":"registration_dispatch_with_GUI","seconds":17.9436206},{"name":"legacy_routing_after_GUI","seconds":4.9802629}],"seconds":26.6994308,"updated":"20261016T092234"}

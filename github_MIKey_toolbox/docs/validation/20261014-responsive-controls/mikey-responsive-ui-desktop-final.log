@@ -1,0 +1,24 @@
+
+2026-10-14 19:11:48: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 19:11:49: Starting Voxel Scaling
+2026-10-14 19:11:49: Processing subject: sub-01
+2026-10-14 19:11:49: Using voxel scaling factor: 2
+2026-10-14 19:11:51: Scaling BOLD volume 1 of 8: sub-01_task-rest_run-01_bold.nii
+2026-10-14 19:11:51: Pause requested. Waiting for a checkpoint; an active SPM/MEX operation must return first.
+2026-10-14 19:11:51: Resumed processing.
+2026-10-14 19:11:51: Scaling BOLD volume 8 of 8: sub-01_task-rest_run-01_bold.nii
+2026-10-14 19:11:51: Completed voxel scaling for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 19:11:51: Scaling BOLD volume 1 of 8: sub-01_task-rest_run-02_bold.nii
+2026-10-14 19:11:51: Scaling BOLD volume 8 of 8: sub-01_task-rest_run-02_bold.nii
+2026-10-14 19:11:51: Completed voxel scaling for: sub-01_task-rest_run-02_bold.nii
+2026-10-14 19:11:52: Scaling BOLD volume 1 of 8: sub-01_task-rest_run-03_bold.nii
+2026-10-14 19:11:52: Scaling BOLD volume 8 of 8: sub-01_task-rest_run-03_bold.nii
+2026-10-14 19:11:52: Completed voxel scaling for: sub-01_task-rest_run-03_bold.nii
+2026-10-14 19:11:52: Voxel scaling completed: 3 files processed, 0 files skipped
+2026-10-14 19:11:52: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tp5f8b642d_acf3_42c0_b87e_5f707b1c522a'
+
+MIKEY_RUN_CONTROLS_PASS
+MIKEY_RESPONSIVE_UI_DESKTOP_PASS
+MIKEY_RESPONSIVE_CODE_ANALYZER_PASS

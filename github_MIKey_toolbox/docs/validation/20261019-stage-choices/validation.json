@@ -1,0 +1,26 @@
+{
+  "status": "static_checks_passed",
+  "parser": "MISS_HIT MATLAB 2018a: all three MATLAB files passed",
+  "nativeCodeAnalyzer": "R2018a: no diagnostics for the three files",
+  "matlabRegressions": "NOT RUN locally",
+  "rules": {
+    "sliceTimingOrder": [
+      4
+    ],
+    "fcLabel": [
+      13
+    ],
+    "parcNetwork": [
+      14,
+      15,
+      16
+    ],
+    "parcellationMode": [
+      14,
+      15,
+      16
+    ]
+  },
+  "unchangedBehavior": "All field types/general constraints remain validated. Inactive choice strings are preserved; selecting a stage later revalidates them.",
+  "serverValue": "Not observed; local fcLabel is valid text 428. No claim that the particular server value is known."
+}

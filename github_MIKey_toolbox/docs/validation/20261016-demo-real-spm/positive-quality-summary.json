@@ -1,0 +1,51 @@
+[
+  {
+    "file": "sub-001_task-rest_run-01_boldCheck_desc-step7postQC.json",
+    "status": "passed",
+    "referenceCoverage": 0.8468753438222026,
+    "movingCoverage": 0.9031945788964182,
+    "supportOverlap": 0.8741287529278159,
+    "normalizedMutualInformation": 1.0146012401482107,
+    "centerDistanceInBrainSpans": 0.015158306027295086
+  },
+  {
+    "file": "sub-001_task-rest_run-01_desc-step6gridQC.json",
+    "status": "passed"
+  },
+  {
+    "file": "sub-001_task-rest_run-01_desc-step6postQC.json",
+    "status": "passed",
+    "referenceCoverage": 0.936760861446533,
+    "movingCoverage": 0.8667357751670122,
+    "supportOverlap": 0.9003888722704159,
+    "normalizedMutualInformation": 1.0984254816710959,
+    "centerDistanceInBrainSpans": 0.009954756180039628
+  },
+  {
+    "file": "sub-001_task-rest_run-01_desc-step6preQC.json",
+    "status": "passed",
+    "centerDistanceInBrainSpans": 0.003848306689061048
+  },
+  {
+    "file": "sub-001_task-rest_run-01_desc-step7gridQC.json",
+    "status": "passed"
+  },
+  {
+    "file": "sub-001_task-rest_run-01_desc-step7postQC.json",
+    "status": "passed",
+    "referenceCoverage": 0.9737869952690065,
+    "movingCoverage": 0.9077226808881595,
+    "supportOverlap": 0.9395949998673,
+    "normalizedMutualInformation": 1.0210358019310803,
+    "centerDistanceInBrainSpans": 0.01377374025451017
+  },
+  {
+    "file": "sub-001_task-rest_run-01_desc-step7preQC.json",
+    "status": "passed",
+    "centerDistanceInBrainSpans": 0.009384498803408544
+  },
+  {
+    "file": "sub-001_task-rest_run-01_meanCheck_desc-step6gridQC.json",
+    "status": "passed"
+  }
+]

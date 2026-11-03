@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "stage": 6,
+  "phase": "post",
+  "reference": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\tpd971571d_c3d1_4766_b0e0_92ea6863ab65\\bad6\\derivatives\\MIKey\\sub-01\\func\\sub-01_task-rest_run-01_desc-mean_boldref.nii",
+  "moving": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\tp4bb152dc_0280_47a1_bebe_101fed2f5f80\\coregsource_T2w.nii",
+  "status": "failed",
+  "limits": {
+    "maxSizeRatio": 2,
+    "maxInitialCenterDistance": 1,
+    "maxInitialAxisAngle": 75,
+    "minAxisAnisotropy": 1.4,
+    "minCoverage": 0.2,
+    "minSupportOverlap": 0.3,
+    "maxFinalCenterDistance": 0.45,
+    "maxFinalAxisAngle": 60,
+    "maxFinalSizeRatio": 1.8
+  },
+  "metrics": {
+    "referenceHeader": {
+      "dimensions": [
+        20,
+        28,
+        16
+      ],
+      "affine": [
+        [
+          1,
+          0,
+          0,
+          -10.5
+        ],
+        [
+          0,
+          1,
+          0,
+          -14.5
+        ],
+        [
+          0,
+          0,
+          1,
+          -8.5
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "voxelSizes": [
+        1,
+        1,
+        1
+      ],
+      "volumes": 1
+    },
+    "movingHeader": {
+      "dimensions": [
+        20,
+        28,
+        16
+      ],
+      "affine": [
+        [
+          1,
+          0,
+          0,
+          -10.5
+        ],
+        [
+          0,
+          1,
+          0,
+          -14.5
+        ],
+        [
+          0,
+          0,
+          1,
+          -8.5
+        ],
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "voxelSizes": [
+        1,
+        1,
+        1
+      ],
+      "volumes": 1
+    }
+  },
+  "reasons": [
+    "QC could not validate the image: Blank/constant image or insufficient intensity contrast."
+  ],
+  "interpretation": "Heuristic safety screen; a pass does not certify alignment or exclude left/right errors.",
+  "created": "20261015T192826",
+  "reviewImage": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\tpd971571d_c3d1_4766_b0e0_92ea6863ab65\\bad6\\derivatives\\MIKey\\sub-01\\func\\registration_qc\\failed_candidates\\sub-01_task-rest_run-01_desc-step6postQC_T2w.nii"
+}

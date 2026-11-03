@@ -1,0 +1,17 @@
+{
+  "MIKey_config.m": "6ed9d560c98cd427d2f5250ad4317abf796b2f8e648e3583dd8fa265144f84c9",
+  "MIKeyBatchState.m": "4d8cb482dbac9ed7876470dd0cd52a28b48877c877e47786021e7fd9f634096b",
+  "MIKey_preflight.m": "0991302400cf751af79f278475300a2003e187b71d412db28b523b32a442c779",
+  "MIKey_check_stage.m": "901f9fb1167b0213f2aea58c6adce260989f529a49f18b3eae4b446a3b0ac988",
+  "MIKey_write_derivative_metadata.m": "b926e16550fcf995e1236eb3200739119f255b51bdd15e7775eb160b4df8676f",
+  "MIKey.m": "42dc9e36994a0207184295aa9be79bd623803c6a0a14e4798e8a71caee14b0c9",
+  "examples/run_mikey.m": "5fe27d1a656ad457390b69e0cd154c0b28fa3bae4493b178909bb7f3f8b10e0f",
+  "examples/mikey_config_example.m": "fe7c52eb7a761dcb0b6e51c8bd9000f676245045f0f3c1a7ffdd375f7a8dabf1",
+  "README.md": "6732176ef257c69c66536a89d0b38b43729588c44209ec8c1cd34dc6d9de543c",
+  "tests/test_mikey_pc_config.m": "10ac5d482bb45fec9120cf61bbdda19b7439d42093a2ddea6eefdf6d3d4584c0",
+  "tests/test_mikey_config_choices.m": "6e9e0c4d8ddacead0ef0fbf215e017f448e22a976ef641c534815bacfead747b",
+  "tests/test_mikey_batch.m": "165d9c28434f78b0b65a9fe6bf7ae778a645c5c4ce96074fb28cc02b3efafd16",
+  "tests/test_mikey_pc_strategies.m": "94e04fcb5efdbfc277c50e724ac72a131a3a984b6542ec9b967f49f3c774c8c0",
+  "tests/test_mikey_ui_layout.m": "99cdc49b550544bbad60df4cb4c7cdbabb64d451f00ac3c44b25b405ccc1f0eb",
+  "tests/test_mikey_gui_filters.m": "a3e71ca1d2a2d7f61758a37afdd41aac71690c4fd5f7e1924246f954da1c8ed3"
+}

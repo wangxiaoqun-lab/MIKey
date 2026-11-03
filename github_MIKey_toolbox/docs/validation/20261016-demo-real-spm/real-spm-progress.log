@@ -1,0 +1,30 @@
+20261016T100100 START baseline real SPM Steps 6/7
+20261016T100658 错误使用 MIKey_run (line 90)
+Run failed; full error, effective config and stage results: C:\MIKeyRealSPM\20261016-958dc7c6\logs\baseline\tp9316e9d5_a068_4a10_bf26_00899759516f
+
+出错 run_real_demo_pipeline (line 22)
+    report=MIKey_run(cfg);
+
+出错 run_baseline_in_session (line 2)
+    run_real_demo_pipeline('baseline');
+
+出错 run (line 91)
+evalin('caller', strcat(script, ';'));
+20261016T100659 END baseline failed 358.278 seconds
+20261016T101920 START guarded-original real SPM Steps 6/7
+20261016T101955 错误使用 MIKey_run (line 90)
+Run failed; full error, effective config and stage results: C:\MIKeyRealSPM\20261016-958dc7c6\logs\guarded-original\tpa6da0a49_c817_43d1_8eed_f8421b9b36b6
+
+出错 run_real_demo_pipeline (line 23)
+    report=MIKey_run(cfg);
+
+出错 run_guard_and_success_in_session (line 4)
+    run_real_demo_pipeline('guarded-original','01');
+
+出错 run (line 91)
+evalin('caller', strcat(script, ';'));
+20261016T101955 END guarded-original failed 35.226 seconds
+20261016T102059 START initialized-run01 real SPM Steps 6/7
+20261016T103306 END initialized-run01 completed 726.830 seconds
+20261016T104005 START restored-cache-run01 real SPM Steps 6/7
+20261016T104027 END restored-cache-run01 completed 21.850 seconds

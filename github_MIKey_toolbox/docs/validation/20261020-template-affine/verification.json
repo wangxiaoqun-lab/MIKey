@@ -1,0 +1,184 @@
+{
+  "status": "complete",
+  "date": "2026-10-20",
+  "images": [
+    {
+      "file": "share_temp/AMCP_temp/AMCP_1184prior_13net.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "e24e8b518eb8de64a167692f4a1e3c8d2b8ec9a2dd65b81c8229edef0f27f66f"
+    },
+    {
+      "file": "share_temp/AMCP_temp/AMCP_214prior_11net.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "23458a7eca6c3435056aa3de2397a4596216be1732082359b2dca4d269f1c0cc"
+    },
+    {
+      "file": "share_temp/AMCP_temp/AMCP_428prior_11net.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "00f0d12d20c139e3f7df8830856d86981a82b92fd6d0a84c2a55ddb5189430c5"
+    },
+    {
+      "file": "share_temp/AMCP_temp/AMCP_428prior_17net.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "a6e3f7308b729386968a285a2039ab29e5c729bb1b6a93ccc271bf9ca953e3bb"
+    },
+    {
+      "file": "share_temp/AMCP_temp/AMCP_604prior_12net.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "e86f6a3f5ee96f8d45625a1842b6937019a27405925ce7ea5a15664e09a51d85"
+    },
+    {
+      "file": "share_temp/AMCP_temp/AMCP_GMWM_mask.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "b4a6e6bfe061598b7f14910154958e810aa79176f409552c0ecada40bd0f9c5b"
+    },
+    {
+      "file": "share_temp/AMCP_temp/AMCP_TPM.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38,
+        5
+      ],
+      "sha256": "0167d65e92b9ff9e0292369591f6d731eb51e710fda09a010a07789c8dc81fef"
+    },
+    {
+      "file": "share_temp/AMCP_temp/AMCP_ventricle_mask.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "46e78f5c1047f09939cea325bd124cd43fcc305d5771e6f1282703b3a5a3b1a1"
+    },
+    {
+      "file": "share_temp/brainmask_Mouse_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "de402c32d441397691f5ace80b6dcb63c1ab953430c3f2cdb9177ab64281bbeb"
+    },
+    {
+      "file": "share_temp/Label_Mouse_1184_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "c0cf233e7941adb1453bc3fd6865cce5a85a30b14a3b917f96fda4cc0fea235c"
+    },
+    {
+      "file": "share_temp/Label_Mouse_214_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "c9f48fe54567ef041cf78d2ce2b6e913b82625bb43b6d02190db2858362398e1"
+    },
+    {
+      "file": "share_temp/Label_Mouse_296_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "8d2ab206dbab0dbbccd51b535c05e0dbf331f82b5252b2475d4d9ceddfe05b2a"
+    },
+    {
+      "file": "share_temp/Label_Mouse_428_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "71e620f8a4630cbde21a0237f2e8769a14c2548667b683f5b7f925cf98ae9aa7"
+    },
+    {
+      "file": "share_temp/Label_Mouse_592_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "159f897c9ea360bba598845ef41832a8f9ac1cc91a8d16f8ef0e540947e60f22"
+    },
+    {
+      "file": "share_temp/Label_Mouse_604_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "42b3727ffe033bd9f123d1988c909dcd8959ae09c042732cbf4c69a058b04b78"
+    },
+    {
+      "file": "share_temp/Template_Mouse_v38.nii",
+      "payloadUnchanged": true,
+      "affineMatchesDatabase": true,
+      "dimensions": [
+        114,
+        80,
+        38
+      ],
+      "sha256": "b70face814f49990d97b1e9534c42339bcbba81a78176419bfd868b5e4d53bb5"
+    }
+  ],
+  "NoMATLABLaunched": true
+}

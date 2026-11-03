@@ -1,0 +1,51 @@
+function test_mikey_group_selection(spmPath, work)
+% Verify selected group inputs and that sessions are not biological subjects.
+root=fileparts(fileparts(mfilename('fullpath'))); addpath(root);addpath(fullfile(root,'scripts'));
+MIKey_setup(spmPath);
+cfg=MIKey_defaults(); cfg.bidsPath=work; cfg.spmPath=spmPath;
+cfg.templatePath=fullfile(work,'templates');
+cfg.sessionFilter='baseline,followup'; cfg.taskFilter='rest'; cfg.runFilter='02';
+cfg.steps=11;
+scopes=MIKey_subjects(cfg); assert(numel(scopes)==4);
+for i=1:numel(scopes)
+    func=fullfile(work,scopes(i).name,'func');
+    df=fullfile(work,'derivatives','MIKey',scopes(i).name,'func');
+    if ~exist(df,'dir'),mkdir(df);end
+    files=dir(fullfile(func,'*_bold.nii'));
+    for j=1:numel(files)
+        [~,base]=fileparts(files(j).name);
+        corr0=0.8; corr1=0.3; corr2=0.4; a=0; b=0; c=0; d=0; %#ok<NASGU>
+        save(fullfile(df,[base '_desc-regressionResults.mat']),'corr0','corr1','corr2','a','b','c','d');
+        if ~isempty(strfind(base,'task-rest_run-02'))
+            v=spm_vol(fullfile(func,files(j).name)); data=spm_read_vols(v);
+            matrix=diag([0.4 0.4 0.4 1]);
+            writeNifti(MIKey_bids_path(df,[base '_space-template_desc-Regressedpc.nii']),data,matrix);
+        end
+    end
+end
+group=MIKey_run(cfg); assert(strcmp(group.status,'completed'));
+path=MIKey_group_analysis(cfg);
+loaded=load(fullfile(path,'group_level_noise_estimation.mat'));
+assert(isequal(size(loaded.all_corr_data),[4 3])); % not all 16 task/run results
+assert(~exist(fullfile(work,'derivatives','MIKey','group_analysis','group_level_noise_estimation.mat'),'file'));
+cfg.groupNetworkPath=fullfile(work,'user_network.nii');
+maskPath=fullfile(cfg.templatePath,'AMCP_temp','AMCP_GMWM_mask.nii');
+copyfile(maskPath,fullfile(cfg.templatePath,'brainmask_Mouse_v38.nii'));
+copyfile(maskPath,fullfile(cfg.templatePath,'Template_Mouse_v38.nii'));
+cfg.steps=16; cfg.maxIter=1; cfg.voxelDownsampleFactor=2;
+cfg.useInterSubjectVar=true;
+cfg.advRegressionPCCSF=false; cfg.advRegressionPCGS=false; cfg.advRegressionPCCSFGS=false;
+report=MIKey_run(cfg); assert(strcmp(report.status,'completed'));
+info=load(fullfile(path,'InterSubjectVariability_info_Regressedpc.mat'));
+assert(info.var_info.n_subjects==2); % four sessions belong to two subjects
+assert(isequal(sort(info.var_info.valid_subjects),{'sub-01','sub-02'}));
+disp('MIKEY_GROUP_SELECTION_PASS');
+end
+
+function writeNifti(filename,data,matrix)
+for i=1:size(data,4)
+    v=struct('fname',filename,'dim',[size(data,1) size(data,2) size(data,3)], ...
+        'dt',[16 0],'mat',matrix,'pinfo',[1;0;0],'n',[i 1],'descrip','MIKey synthetic group-selection test');
+    spm_write_vol(v,data(:,:,:,i));
+end
+end

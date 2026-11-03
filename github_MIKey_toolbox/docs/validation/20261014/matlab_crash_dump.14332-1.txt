@@ -1,0 +1,53 @@
+
+--------------------------------------------------------------------------------
+         Access violation detected at 周三 10月 14 03:57:23 2026 +0800
+--------------------------------------------------------------------------------
+
+Configuration:
+  Crash Decoding           : Disabled - No sandbox or build area path
+  Crash Mode               : continue (default)
+  Default Encoding         : GBK
+  Deployed                 : false
+  Graphics Driver          : Unknown software 
+  Graphics card 1          : Shanghai Best Oray Information Technology Co., Ltd. ( 0x0 ) OrayIddDriver Device Version 17.50.19.949 (2025-6-11)
+  Graphics card 2          : Intel Corporation ( 0x8086 ) Intel(R) HD Graphics Version 9.17.10.4459 (2016-5-19)
+  Java Version             : Java 1.8.0_144-b01 with Oracle Corporation Java HotSpot(TM) 64-Bit Server VM mixed mode
+  MATLAB Architecture      : win64
+  MATLAB Entitlement ID    : 6257193
+  MATLAB Root              : D:\Program Files\MATLAB\R2018a
+  MATLAB Version           : 9.4.0.813654 (R2018a)
+  OpenGL                   : software
+  Operating System         : Microsoft Windows 10 教育版
+  Process ID               : 14332
+  Processor ID             : x86 Family 6 Model 42 Stepping 7, GenuineIntel
+  Session Key              : 851742f4-f31e-4bb4-97cb-8be20d0f10fa
+  Window System            : Version 10.0 (Build 19045)
+
+Fault Count: 1
+
+
+Abnormal termination
+
+Register State (from fault):
+  RAX = 00007ffdfaa94ea4  RBX = 00000000f73d1040
+  RCX = 000000000002fae8  RDX = ffffffffffffffff
+  RSP = 00000000043f0fc8  RBP = 00000000043f1050
+  RSI = 00000000f73d1070  RDI = 00000000f72b9c00
+ 
+   R8 = 00000000f73d1070   R9 = 0000000000000000
+  R10 = 0000000000000000  R11 = 0000000000000246
+  R12 = ffffffffffffffff  R13 = 00000000003b6000
+  R14 = 000000007ffe0300  R15 = 0000000000800000
+ 
+  RIP = 00007ffdfaa94ea4  EFL = 00010286
+ 
+   CS = 0033   FS = 0053   GS = 002b
+
+Stack Trace (from fault):
+[  0] 0x00007ffdfaa94ea4                                   <unknown-module>+00000000
+[  1] 0x00007ffe3c724d42                      C:\Windows\SYSTEM32\ntdll.dll+00085314
+[  2] 0x00000000f73d1040                                   <unknown-module>+00000000
+[  3] 0x00000000f72b9c00                                   <unknown-module>+00000000
+[  4] 0x00000000f72b9c00                                   <unknown-module>+00000000
+[  5] 0x0000000000170cf0                                   <unknown-module>+00000000
+

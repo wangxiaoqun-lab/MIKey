@@ -1,0 +1,191 @@
+MATLAB 9.4.0.813654 (R2018a)
+SYNTAX_PASS MIKey.m
+SYNTAX_PASS MIKey_framewise_displacement.m
+SYNTAX_PASS MIKey_check_fd_scale.m
+SYNTAX_PASS MIKey_noise_result.m
+SYNTAX_PASS MIKey_parameter_scope.m
+SYNTAX_PASS MIKey_write_derivative_metadata.m
+SYNTAX_PASS tests/test_mikey_fd_scaling.m
+SYNTAX_PASS tests/test_mikey_pc_strategies.m
+SYNTAX_PASS tests/test_mikey_config_flow.m
+SYNTAX_PASS tests/test_mikey_config_scopes.m
+MIKEY_FD_PASS
+MIKEY_FD_SCALING_PASS
+2026-10-19 18:01:07: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:01:07: Starting Voxel Scaling
+2026-10-19 18:01:07: Voxel scaling completed: 0 files processed, 0 files skipped
+2026-10-19 18:01:07: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+MIKEY_CONFIG_FLOW_PASS
+                status: 'passed'
+    inactiveTypeChecks: 531
+                phases: {'1'  '2:10'}
+
+MIKEY_CONFIG_SCOPES_PASS
+MIKEY_SUBJECT_SELECTION_PASS
+2026-10-19 18:01:58: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp63ee4ec5_ad21_4367_b6a2_ff1060798091
+2026-10-19 18:01:58: === Starting Step 10 ===
+2026-10-19 18:01:58: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:01:58: Starting Noise Regression Strategy Estimation
+2026-10-19 18:01:58: FD method: euclidean; output: physical mm; voxel scale: 20; rotation radius: 100 scaled units (5 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:01:58: Motion regression for: sub-01
+2026-10-19 18:01:59: Estimating PC counts: 0  1  3
+2026-10-19 18:01:59: Completed motion regression for: sub-01_task-rest_run-01_bold.nii
+2026-10-19 18:01:59: Estimating PC counts: 0  1  3
+2026-10-19 18:01:59: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:01:59: Motion regression completed: 2 files processed, 0 files skipped
+2026-10-19 18:02:00: === Step 10: completed (1.70 s) ===
+2026-10-19 18:02:00: All selected steps completed.
+2026-10-19 18:02:08: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp59cfe5ca_1547_4588_badf_a50c9981f90c
+2026-10-19 18:02:08: === Starting Step 10 ===
+2026-10-19 18:02:08: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:08: Starting Noise Regression Strategy Estimation
+2026-10-19 18:02:08: FD method: euclidean; output: physical mm; voxel scale: 20; rotation radius: 100 scaled units (5 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:02:08: Motion regression for: sub-01
+2026-10-19 18:02:08: PC counts, FD definition or motion changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:09: Estimating PC counts: 0  2  3
+2026-10-19 18:02:09: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:09: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 18:02:09: === Step 10: completed (0.69 s) ===
+2026-10-19 18:02:09: All selected steps completed.
+2026-10-19 18:02:16: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tpe9ea31fd_22c1_4ed6_b6c7_a873794f63dc
+2026-10-19 18:02:16: === Starting Step 10 ===
+2026-10-19 18:02:17: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:17: Starting Noise Regression Strategy Estimation
+2026-10-19 18:02:17: FD method: euclidean; output: physical mm; voxel scale: 20; rotation radius: 100 scaled units (5 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:02:17: Motion regression for: sub-01
+2026-10-19 18:02:17: Skipping - strategy estimates already match PC counts, FD definition and motion for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:17: Motion regression completed: 0 files processed, 1 files skipped
+2026-10-19 18:02:17: === Step 10: completed (0.50 s) ===
+2026-10-19 18:02:17: All selected steps completed.
+2026-10-19 18:02:27: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp9cc01155_0a27_4ae4_9c7b_bf6e18952098
+2026-10-19 18:02:27: === Starting Step 10 ===
+2026-10-19 18:02:27: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:27: Starting Noise Regression Strategy Estimation
+2026-10-19 18:02:27: FD method: power; output: physical mm; voxel scale: 20; rotation radius: 100 scaled units (5 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:02:27: Motion regression for: sub-01
+2026-10-19 18:02:28: PC counts, FD definition or motion changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:28: Estimating PC counts: 0  2  3
+2026-10-19 18:02:28: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:28: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 18:02:28: === Step 10: completed (0.70 s) ===
+2026-10-19 18:02:28: All selected steps completed.
+2026-10-19 18:02:28: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:28: Starting Group Level Noise Estimation
+2026-10-19 18:02:28: Starting group level noise estimation...
+2026-10-19 18:02:36: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp397579e7_9c2e_4116_913c_ec4d432ed02a
+2026-10-19 18:02:36: === Starting Step 10 ===
+2026-10-19 18:02:36: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:36: Starting Noise Regression Strategy Estimation
+2026-10-19 18:02:36: FD method: power; output: physical mm; voxel scale: 20; rotation radius: 80 scaled units (4 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:02:36: Motion regression for: sub-01
+2026-10-19 18:02:36: PC counts, FD definition or motion changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:36: Estimating PC counts: 0  2  3
+2026-10-19 18:02:36: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:36: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 18:02:36: === Step 10: completed (0.69 s) ===
+2026-10-19 18:02:36: All selected steps completed.
+2026-10-19 18:02:44: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp1c2120d3_99f0_4a5e_bf1b_17a5d03dee6f
+2026-10-19 18:02:44: === Starting Step 10 ===
+2026-10-19 18:02:44: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:44: Starting Noise Regression Strategy Estimation
+2026-10-19 18:02:44: FD method: power; output: physical mm; voxel scale: 10; rotation radius: 80 scaled units (8 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:02:44: Motion regression for: sub-01
+2026-10-19 18:02:44: PC counts, FD definition or motion changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:44: Estimating PC counts: 0  2  3
+2026-10-19 18:02:45: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:45: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 18:02:45: === Step 10: completed (0.66 s) ===
+2026-10-19 18:02:45: All selected steps completed.
+2026-10-19 18:02:45: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:45: Starting Group Level Noise Estimation
+2026-10-19 18:02:45: Starting group level noise estimation...
+2026-10-19 18:02:53: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp497b9822_a591_456a_b332_20a0cb08c24a
+2026-10-19 18:02:53: === Starting Step 10 ===
+2026-10-19 18:02:53: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:02:53: Starting Noise Regression Strategy Estimation
+2026-10-19 18:02:53: FD method: power; output: physical mm; voxel scale: 20; rotation radius: 80 scaled units (4 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:02:53: Motion regression for: sub-01
+2026-10-19 18:02:53: PC counts, FD definition or motion changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:53: Estimating PC counts: 0  2  3
+2026-10-19 18:02:53: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:02:53: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 18:02:53: === Step 10: completed (0.63 s) ===
+2026-10-19 18:02:53: All selected steps completed.
+2026-10-19 18:03:01: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp4404dd3b_6947_4a6d_b6d6_b3cdb338f954
+2026-10-19 18:03:01: === Starting Step 10 ===
+2026-10-19 18:03:02: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:03:02: Starting Noise Regression Strategy Estimation
+2026-10-19 18:03:02: FD method: power; output: physical mm; voxel scale: 20; rotation radius: 80 scaled units (4 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:03:02: Motion regression for: sub-01
+2026-10-19 18:03:02: Recomputing invalid strategy cache: Invalid FD metadata in C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\sub-01\func\sub-01_task-rest_run-02_bold_desc-regressionResults.mat; recompute Step 10.
+2026-10-19 18:03:02: PC counts, FD definition or motion changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:03:02: Estimating PC counts: 0  2  3
+2026-10-19 18:03:02: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:03:02: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 18:03:02: === Step 10: completed (0.65 s) ===
+2026-10-19 18:03:02: All selected steps completed.
+2026-10-19 18:03:02: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:03:02: Starting Group Level Noise Estimation
+2026-10-19 18:03:02: Starting group level noise estimation...
+2026-10-19 18:03:10: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp5c843f1b_8577_439d_8500_bc552d606a0f
+2026-10-19 18:03:10: === Starting Step 10 ===
+2026-10-19 18:03:10: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:03:10: Starting Noise Regression Strategy Estimation
+2026-10-19 18:03:10: FD method: euclidean; output: physical mm; voxel scale: 20; rotation radius: 100 scaled units (5 physical mm); backward differences; Pearson frames 2:end.
+2026-10-19 18:03:10: Motion regression for: sub-01
+2026-10-19 18:03:10: PC counts, FD definition or motion changed; recomputing strategy estimates for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:03:11: Estimating PC counts: 0  2  3
+2026-10-19 18:03:11: Completed motion regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:03:11: Motion regression completed: 1 files processed, 0 files skipped
+2026-10-19 18:03:11: === Step 10: completed (0.63 s) ===
+2026-10-19 18:03:11: All selected steps completed.
+2026-10-19 18:03:18: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp80705621_fd03_461d_ad86_95a68aba7bec
+2026-10-19 18:03:18: === Starting Step 11 ===
+2026-10-19 18:03:19: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:03:19: Starting Group Level Noise Estimation
+2026-10-19 18:03:19: Starting group level noise estimation...
+2026-10-19 18:03:19: Aggregating FD method: euclidean; units: physical mm; voxel scale: 20; rotation radius: 100 scaled units; 2 selected runs.
+2026-10-19 18:03:19: Comparing shared PC counts: 0  3
+2026-10-19 18:03:19: Selected the global minimum of mean(abs(CC)) across all selected runs; ties use the first strategy.
+2026-10-19 18:03:19: Group level analysis completed. Total runs: 2
+2026-10-19 18:03:19: Best regression strategy: 12rp
+2026-10-19 18:03:19: Original mean correlation: -0.083459
+2026-10-19 18:03:19: Absolute mean correlation: 0.083459
+[警告: MATLAB 已通过改用 OpenGL 软件禁用了某些高级的图形渲染功能。欲了解有关详细信息，请点击<a href="matlab:opengl('problems')">此处</a>。] 
+2026-10-19 18:03:35: Group level noise estimation completed. Results saved to: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\group_analysis
+2026-10-19 18:03:35: Best strategy saved for advanced regression: 12rp
+2026-10-19 18:03:36: === Step 11: completed (17.14 s) ===
+2026-10-19 18:03:36: All selected steps completed.
+2026-10-19 18:03:44: Run directory: C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578\derivatives\MIKey\logs\tp3c79bfd9_345e_49d2_9c19_ac364887c67b
+2026-10-19 18:03:44: === Starting Step 12 ===
+2026-10-19 18:03:44: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:03:44: Starting Final Noise Regression Strategy
+2026-10-19 18:03:44: Using best regression strategy: 12rp
+2026-10-19 18:03:44: Selected regression strategies: pc
+2026-10-19 18:03:44: Head Motion Regression Parameters - Detrend: 1, Filter: 1, High Freq: 0.1, Low Freq: 0.01
+2026-10-19 18:03:44: Advanced regression for: sub-01
+Adding back intercept terms to residuals...
+Applying detrending...
+Applying filtering...
+Saving processed data...
+Processing complete with intercept added back.
+2026-10-19 18:03:47: Completed noise regression for: sub-01_task-rest_run-01_bold.nii
+Adding back intercept terms to residuals...
+Applying detrending...
+Applying filtering...
+Saving processed data...
+Processing complete with intercept added back.
+2026-10-19 18:03:48: Completed noise regression for: sub-01_task-rest_run-02_bold.nii
+2026-10-19 18:03:48: Advanced regression completed: 2 files processed, 0 files skipped
+2026-10-19 18:03:49: === Step 12: completed (4.71 s) ===
+2026-10-19 18:03:49: All selected steps completed.
+2026-10-19 18:03:49: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 18:03:49: Starting Group Level Noise Estimation
+2026-10-19 18:03:49: Starting group level noise estimation...
+                status: 'passed'
+    syntheticDirectory: 'C:\MIKeyTest\tp89ccc28f_4a69_4a81_a15a_5ce155855578'
+          testedStages: [10 11 12]
+
+MIKEY_PC_STRATEGIES_PASS
+MIKEY_FD_GUI_PASS
+MIKEY_FD_PHYSICAL_UNITS_ALL_PASS

@@ -1,0 +1,105 @@
+{
+  "status": "passed",
+  "seconds": 360.9396619796753,
+  "files": [
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-01_desc-realign_bold.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-01_desc-realign_bold.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "c62acf2449293aebad9b9eceb98190c2f05d702821cb30dc1c51b701ebff03d7",
+      "copyPayloadSha256": "c62acf2449293aebad9b9eceb98190c2f05d702821cb30dc1c51b701ebff03d7",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-01_desc-mean_boldref.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-01_desc-mean_boldref.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "dbb6ac0da2b3825c596245ca2022bbacc8c329a920c3d1c792505cf77f402d83",
+      "copyPayloadSha256": "dbb6ac0da2b3825c596245ca2022bbacc8c329a920c3d1c792505cf77f402d83",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-02_desc-realign_bold.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-02_desc-realign_bold.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "bd1f736b9e627734d1d7e9d307675ef879ba1169c8f040c6561d7037620af34b",
+      "copyPayloadSha256": "bd1f736b9e627734d1d7e9d307675ef879ba1169c8f040c6561d7037620af34b",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-02_desc-mean_boldref.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-02_desc-mean_boldref.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "d496f8817ad475c7790b02468b316925fea6054dbd5bdd7de3caa0f3cc24f924",
+      "copyPayloadSha256": "d496f8817ad475c7790b02468b316925fea6054dbd5bdd7de3caa0f3cc24f924",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-03_desc-realign_bold.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-03_desc-realign_bold.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "b6a48cf4f09b84905d2bd0d9a0c58be8d14a81da71a4ae50f18e4e1ddb79de26",
+      "copyPayloadSha256": "b6a48cf4f09b84905d2bd0d9a0c58be8d14a81da71a4ae50f18e4e1ddb79de26",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-03_desc-mean_boldref.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-03_desc-mean_boldref.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "0f1dfe9942c45194d02e2065693a4cf5a0672f62c928cde6e387081b4b9d6cf4",
+      "copyPayloadSha256": "0f1dfe9942c45194d02e2065693a4cf5a0672f62c928cde6e387081b4b9d6cf4",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-04_desc-realign_bold.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-04_desc-realign_bold.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "54f8bd1e67569e1d68799f4ff6a54301064da7ee22994a52a4bdcf16d6807e65",
+      "copyPayloadSha256": "54f8bd1e67569e1d68799f4ff6a54301064da7ee22994a52a4bdcf16d6807e65",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-04_desc-mean_boldref.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_task-rest_run-04_desc-mean_boldref.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "c7ef7c900c240c43c5d1343440207348d2d23ef74623089bd9017ad6c749b154",
+      "copyPayloadSha256": "c7ef7c900c240c43c5d1343440207348d2d23ef74623089bd9017ad6c749b154",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_desc-boldbrain_mask.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\func\\sub-001_desc-boldbrain_mask.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "28f442c74cd2050f7924d74c2355f427d5a74773e558becbf395bdbfddadfe45",
+      "copyPayloadSha256": "28f442c74cd2050f7924d74c2355f427d5a74773e558becbf395bdbfddadfe45",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\anat\\sub-001_acq-t2fsetra_run-01_desc-masked_T2w.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\anat\\sub-001_acq-t2fsetra_run-01_desc-masked_T2w.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "e315db34fc9f8b250718961dc1c76b7d1d3c641971f015ca528772b52974696a",
+      "copyPayloadSha256": "e315db34fc9f8b250718961dc1c76b7d1d3c641971f015ca528772b52974696a",
+      "voxelPayloadUnchanged": true
+    },
+    {
+      "source": "K:\\toolbox\\MIKey_toolbox_main\\MIKey_toolbox_main\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\anat\\sub-001_desc-anatbrain_mask.nii",
+      "copy": "C:\\MIKeyRealSPM\\20261016-958dc7c6\\demo_BIDS_dataset\\derivatives\\MIKey\\sub-001\\anat\\sub-001_desc-anatbrain_mask.nii",
+      "sourceOffset": 352,
+      "copyOffset": 352,
+      "sourcePayloadSha256": "15334ad17e5ade84aec65cf55430759a9eeac3eb66f8121b8f500a3d1fa13cce",
+      "copyPayloadSha256": "15334ad17e5ade84aec65cf55430759a9eeac3eb66f8121b8f500a3d1fa13cce",
+      "voxelPayloadUnchanged": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "modified": [
+    "MIKey.m",
+    "MIKey_defaults.m",
+    "MIKey_parameter_map.m",
+    "MIKey_parameter_scope.m",
+    "MIKey_config.m",
+    "MIKey_noise_result.m",
+    "examples/mikey_config_example.m",
+    "tests/test_mikey_config_scopes.m",
+    "tests/test_mikey_pc_strategies.m",
+    "README.md"
+  ],
+  "added": [
+    "MIKey_framewise_displacement.m",
+    "MIKey_fd_dvars_correlation.m",
+    "MIKey_select_noise_strategy.m",
+    "tests/test_mikey_fd.m",
+    "tests/test_mikey_fd_gui.m"
+  ]
+}

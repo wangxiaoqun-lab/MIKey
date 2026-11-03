@@ -1,0 +1,260 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+                   ok: 1
+               issues: {0x1 cell}
+                notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+             subjects: {'sub-01'}
+            rawCounts: [1 1]
+                steps: 1
+       requiredImages: {}
+            functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+            selection: [1x1 struct]
+    groupAnalysisPath: 'C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\group_analysis'
+           subjectIDs: {'sub-01'}
+               scopes: [1x1 struct]
+
+2026-10-12 17:43:42: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\logs\tp8d43466e_7d5e_472c_a2e4_842a8916d80d
+2026-10-12 17:43:42: === Starting Step 1 ===
+2026-10-12 17:43:43: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:43:43: Starting Voxel Scaling
+2026-10-12 17:43:43: Processing subject: sub-01
+2026-10-12 17:43:43: Using voxel scaling factor: 2
+2026-10-12 17:43:44: Completed voxel scaling for: sub-01_task-rest_bold.nii
+2026-10-12 17:43:44: Completed voxel scaling for: sub-01_T2w.nii
+2026-10-12 17:43:44: Voxel scaling completed: 2 files processed, 0 files skipped
+2026-10-12 17:43:44: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+2026-10-12 17:43:44: === Step 1: completed (1.87 s) ===
+2026-10-12 17:43:44: All selected steps completed.
+2026-10-12 17:43:52: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\logs\tpb4503872_b98a_4275_a447_5c71cfbf6a8e
+2026-10-12 17:43:52: === Starting Step 1 ===
+2026-10-12 17:43:52: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:43:52: Starting Voxel Scaling
+2026-10-12 17:43:52: Processing subject: sub-01
+2026-10-12 17:43:52: Using voxel scaling factor: 2
+2026-10-12 17:43:52: Skipping - voxel scaled BOLD already exists: sub-01_task-rest_bold.nii
+2026-10-12 17:43:52: Skipping - voxel scaled T2w already exists: sub-01_T2w.nii
+2026-10-12 17:43:52: Voxel scaling completed: 0 files processed, 2 files skipped
+2026-10-12 17:43:52: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+2026-10-12 17:43:52: === Step 1: completed (0.19 s) ===
+2026-10-12 17:43:52: All selected steps completed.
+2026-10-12 17:44:01: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\logs\tp24a18e74_6b55_4209_842a_df76f873919f
+2026-10-12 17:44:01: === Starting Step 2 ===
+2026-10-12 17:44:01: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:44:01: Starting Mask Generation
+2026-10-12 17:44:01: Generating whole-brain masked data for: sub-01
+2026-10-12 17:44:01: Using BOLD mask: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\sub-01\func\sub-01_brainmask.nii
+2026-10-12 17:44:03: Completed BOLD masking for: sub-01_task-rest_bold.nii
+2026-10-12 17:44:03: Using T2w mask: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\sub-01\anat\sub-01_brainmask.nii
+2026-10-12 17:44:03: Completed T2w masking for: sub-01_T2w.nii
+2026-10-12 17:44:03: Mask application completed: 2 files processed, 0 files skipped
+2026-10-12 17:44:03: Please proceed to the next step
+2026-10-12 17:44:03: === Step 2: completed (1.67 s) ===
+2026-10-12 17:44:03: All selected steps completed.
+2026-10-12 17:44:10: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\logs\tp3202de92_1b45_4888_8743_722ad59385fb
+2026-10-12 17:44:10: === Starting Step 8 ===
+2026-10-12 17:44:10: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:44:10: Starting Smoothing
+2026-10-12 17:44:10: Using user-defined smoothing FWHM: [1  2  3] mm
+2026-10-12 17:44:10: Smoothing for: sub-01
+
+
+------------------------------------------------------------------------
+Running job #1
+------------------------------------------------------------------------
+Running 'Smooth'
+Done    'Smooth'
+Done
+
+2026-10-12 17:44:14: Completed smoothing for: sub-01_task-rest_bold.nii with FWHM=[1  2  3] mm
+2026-10-12 17:44:14: Smoothing completed: 1 files processed, 0 files skipped
+2026-10-12 17:44:14: === Step 8: completed (4.66 s) ===
+2026-10-12 17:44:14: All selected steps completed.
+2026-10-12 17:44:22: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\logs\tp92045413_ee57_40d5_b465_ac32e1388a0e
+2026-10-12 17:44:22: === Starting Step 12 ===
+2026-10-12 17:44:22: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:44:22: Starting Final Noise Regression Strategy
+2026-10-12 17:44:22: Using best regression strategy: 12rp
+2026-10-12 17:44:22: Selected regression strategies: pc
+2026-10-12 17:44:22: Head Motion Regression Parameters - Detrend: 1, Filter: 1, High Freq: 0.1, Low Freq: 0.01
+2026-10-12 17:44:22: Advanced regression for: sub-01
+Adding back intercept terms to residuals...
+Applying detrending...
+Applying filtering...
+Saving processed data...
+Processing complete with intercept added back.
+2026-10-12 17:44:24: Completed noise regression for: sub-01_task-rest_bold.nii
+2026-10-12 17:44:24: Advanced regression completed: 1 files processed, 0 files skipped
+2026-10-12 17:44:24: === Step 12: completed (2.67 s) ===
+2026-10-12 17:44:24: === Starting Step 13 ===
+2026-10-12 17:44:24: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:44:24: Starting Functional Connectivity
+2026-10-12 17:44:24: Using label file: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\templates\labels.nii with 3 regions
+2026-10-12 17:44:25: FC will be computed for strategies: Regressedpc
+2026-10-12 17:44:25: Functional connectivity for: sub-01
+2026-10-12 17:44:25: Completed FC calculation for: sub-01_task-rest_bold.nii with pc using Custom labels
+2026-10-12 17:44:25: Functional connectivity completed: 1 files processed, 0 files skipped
+2026-10-12 17:44:25: === Step 13: completed (1.00 s) ===
+2026-10-12 17:44:25: All selected steps completed.
+2026-10-12 17:44:32: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\logs\tp85e66922_61e6_42a1_ab0f_67c183918b87
+2026-10-12 17:44:32: === Starting Step 4 ===
+错误使用 MIKey_check_stage>requireAny (line 108)
+None of the alternative inputs exist: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\sub-01\func\sub-01_task-rest_bold_desc-fieldmap.nii, C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\sub-01\func\sub-01_task-rest_bold_desc-masked.nii
+
+出错 MIKey_check_stage (line 40)
+                    requireAny({image('_desc-fieldmap'),image('_desc-masked')});
+
+出错 MIKey_run (line 59)
+            MIKey_check_stage(cfg, step);
+
+出错 test_mikey_batch>@()MIKey_run(cfg) (line 89)
+expectError(@() MIKey_run(cfg),'MIKey:RunFailed');
+
+出错 test_mikey_batch>expectError (line 107)
+    action();
+
+出错 test_mikey_batch (line 89)
+expectError(@() MIKey_run(cfg),'MIKey:RunFailed');
+2026-10-12 17:44:32: === Step 4: failed (0.06 s) ===
+2026-10-12 17:44:39: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\logs\tpd28e03de_4e6d_4a76_b1c2_0a16c45712b3
+2026-10-12 17:44:39: === Starting Step 1 ===
+2026-10-12 17:44:39: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:44:39: Starting Voxel Scaling
+2026-10-12 17:44:39: Processing subject: sub-bad
+2026-10-12 17:44:39: Using voxel scaling factor: 2
+[警告: Cannot recognise format. Trying Analyze.] 
+[> In read_hdr_raw (line 50)
+  In read_hdr (line 30)
+  In nifti (line 26)
+  In spm_vol_nifti (line 19)
+  In spm_vol>spm_vol_hdr (line 128)
+  In spm_vol (line 61)
+  In MIKey>processVoxelScaling_BIDS (line 826)
+  In MIKey>executeStage (line 724)
+  In MIKey (line 7)
+  In MIKey_run (line 61)
+  In test_mikey_batch>@()MIKey_run(cfg) (line 93)
+  In test_mikey_batch>expectError (line 107)
+  In test_mikey_batch (line 93)] 
+     7    10
+
+     0    18
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     8
+
+     0     4
+
+     0     8
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     8
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0    80
+
+     0    24
+
+     0     1
+
+     0     5
+
+     0    10
+
+     0    10
+
+     0    10
+
+     0    10
+
+     0    10
+
+     0     3
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+     0     1
+
+There was a problem reading the header of
+"C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737\derivatives\MIKey\sub-bad\func\sub-bad_task-rest_bold_desc-orig.nii".
+错误使用 spm_slice_vol
+Unknown datatype.
+
+出错 spm_read_vols (line 34)
+    Y(:,:,p,i) = spm_slice_vol(V(i),spm_matrix([0 0 p]),V(i).dim(1:2),0);
+
+出错 MIKey>processVoxelScaling_BIDS (line 827)
+                imgdata = spm_read_vols(imginfo);
+
+出错 MIKey>executeStage (line 724)
+        processVoxelScaling_BIDS(fig, subjectFilter, templatePath);
+
+出错 MIKey (line 7)
+    executeStage(varargin{2}, varargin{3});
+
+出错 MIKey_run (line 61)
+        MIKey('batch', state, step);
+
+出错 test_mikey_batch>@()MIKey_run(cfg) (line 93)
+cfg.subjectFilter='sub-bad'; expectError(@() MIKey_run(cfg),'MIKey:RunFailed');
+
+出错 test_mikey_batch>expectError (line 107)
+    action();
+
+出错 test_mikey_batch (line 93)
+cfg.subjectFilter='sub-bad'; expectError(@() MIKey_run(cfg),'MIKey:RunFailed');
+2026-10-12 17:44:40: === Step 1: failed (1.02 s) ===
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tp5e356895_ebc3_4fd5_baca_d6f413aa1737'
+          testedStages: [1 2 8 12 13]
+                   spm: 'SPM12'
+                matlab: '9.4.0.813654 (R2018a)'
+
+MIKEY_SMOKE_PASS
+MIKEY_LEGACY_NIFTI_ISOLATED_PASS

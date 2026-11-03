@@ -1,0 +1,191 @@
+MIKey_config.m
+L 153 (C 8): NOCOM: 不必要的额外逗号。
+
+MIKeyBatchState.m
+
+MIKey_preflight.m
+L 16 (C 32-37): AGROW: 变量 'issues' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 45 (C 33-38): AGROW: 变量 'issues' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 91 (C 9-16): AGROW: 变量 'required' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 96 (C 9-14): AGROW: 变量 'issues' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 104 (C 9-14): AGROW: 变量 'issues' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 107 (C 9-14): AGROW: 变量 'issues' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 110 (C 9-14): AGROW: 变量 'issues' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+
+MIKey_check_stage.m
+
+MIKey_write_derivative_metadata.m
+L 30 (C 9-10): ALIGN: IF 可能未与其匹配 END (行 32)对齐。
+
+MIKey.m
+L 503 (C 45-55): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+L 538 (C 21-25): AGROW: 变量 'steps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 544 (C 17-21): AGROW: 变量 'steps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 664 (C 5-10): NASGU: 赋给变量 'config' 的值可能未使用。
+L 744 (C 45-55): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+L 997 (C 55-66): INUSD: 可能未使用输入参数 'templatePath'。如果这是正常情况，请考虑将其替换为 ~。
+L 1532 (C 25-37): AGROW: 变量 'missingParams' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 1535 (C 25-37): AGROW: 变量 'missingParams' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 1538 (C 25-37): AGROW: 变量 'missingParams' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 1540 (C 21-28): AGROW: 变量 'errorMsg' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 1541 (C 21-28): AGROW: 变量 'errorMsg' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 1573 (C 19): NBRAK: 无需使用方括号 []。如果需要，可使用圆括号进行分组。
+L 1686 (C 21): NASGU: 赋给变量 'F' 的值可能未使用。
+L 1709 (C 19): NBRAK: 无需使用方括号 []。如果需要，可使用圆括号进行分组。
+L 1756 (C 25-40): ASGLU: 此处赋给 'workspaceCleanup' 的值似乎未使用。请考虑将其替换为 ~。
+L 1756 (C 70-80): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+L 1967 (C 19-25): ST2NM: 如果您要对标量值进行操作，请考虑使用 STR2DOUBLE 以提高性能。
+L 2018 (C 17-18): NASGU: 赋给变量 'PC' 的值可能未使用。
+L 2096 (C 17-25): NASGU: 赋给变量 'timepoint' 的值可能未使用。
+L 2140 (C 17-23): STRNU: 结构体的变量 'results' 已更改，但似乎未使用该值。
+L 2169 (C 1-13): NASGU: 赋给变量 'all_corr_data' 的值可能未使用。
+L 2170 (C 1-13): NASGU: 赋给变量 'config_labels' 的值可能未使用。
+L 2190 (C 9-19): AGROW: 变量 'resultFiles' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2199 (C 13-22): AGROW: 变量 'run_counts' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2200 (C 13-28): AGROW: 变量 'run_correlations' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2201 (C 13-21): AGROW: 变量 'run_files' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2289 (C 1-18): STRNU: 结构体的变量 'best_strategy_info' 已更改，但似乎未使用该值。
+L 2454 (C 17-20): LOAD: 要避免与路径中的函数冲突，请指定从文件加载变量。
+L 2463 (C 71-72): NODEF: 使用变量 'PC' 之前可能未定义该变量。
+L 2463 (C 71-72): IDISVAR: 'PC' 没有显式赋值。MATLAB 将其解释为变量，但这在以后的版本中可能会有所变化。
+L 2564 (C 1-5): NASGU: 赋给变量 'Gmask' 的值可能未使用。
+L 2642 (C 29-35): AGROW: 变量 'all_roi' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2644 (C 29-35): AGROW: 变量 'all_roi' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2653 (C 21-34): NASGU: 赋给变量 'pearson_corr_z' 的值可能未使用。
+L 2682 (C 179): COMNL: 换行符前面的逗号可能错误地说明行连续。
+L 2683 (C 179): COMNL: 换行符前面的逗号可能错误地说明行连续。
+L 2684 (C 179): COMNL: 换行符前面的逗号可能错误地说明行连续。
+L 2685 (C 183): COMNL: 换行符前面的逗号可能错误地说明行连续。
+L 2741 (C 13-28): AGROW: 变量 'selected_configs' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2839 (C 66-77): INUSL: 可能未使用输入参数 'templatePath'，尽管使用了后一个参数。请考虑将其替换为 ~。
+L 2885 (C 17-33): AGROW: 变量 'strategy_net_maps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2886 (C 17-34): AGROW: 变量 'strategy_run_names' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2918 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2919 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2920 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2921 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2925 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2926 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2929 (C 27-34): ASGLU: 此处赋给 'corr_map' 的值似乎未使用。请考虑将其替换为 ~。
+L 2929 (C 37-40): ASGLU: 此处赋给 'iter' 的值似乎未使用。请考虑将其替换为 ~。
+L 2936 (C 17-33): AGROW: 变量 'strategy_net_maps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2937 (C 17-34): AGROW: 变量 'strategy_run_names' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 2966 (C 55-63): INUSL: 可能未使用输入参数 'GMWM_mask'，尽管使用了后一个参数。请考虑将其替换为 ~。
+L 2966 (C 66-77): INUSL: 可能未使用输入参数 'templatePath'，尽管使用了后一个参数。请考虑将其替换为 ~。
+L 3030 (C 17-26): AGROW: 变量 'valid_runs' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3053 (C 35): NBRAK: 无需使用方括号 []。如果需要，可使用圆括号进行分组。
+L 3066 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3067 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3068 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3069 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3073 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3074 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3078 (C 19-26): ASGLU: 此处赋给 'corr_map' 的值似乎未使用。请考虑将其替换为 ~。
+L 3078 (C 29-32): ASGLU: 此处赋给 'iter' 的值似乎未使用。请考虑将其替换为 ~。
+L 3261 (C 17-33): AGROW: 变量 'strategy_net_maps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3262 (C 17-34): AGROW: 变量 'strategy_run_names' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3297 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3298 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3299 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3300 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3304 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3305 (C 21-35): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3308 (C 27-34): ASGLU: 此处赋给 'corr_map' 的值似乎未使用。请考虑将其替换为 ~。
+L 3308 (C 37-40): ASGLU: 此处赋给 'iter' 的值似乎未使用。请考虑将其替换为 ~。
+L 3310 (C 17-33): AGROW: 变量 'strategy_net_maps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3311 (C 17-34): AGROW: 变量 'strategy_run_names' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3346 (C 47-55): INUSL: 可能未使用输入参数 'GMWM_mask'，尽管使用了后一个参数。请考虑将其替换为 ~。
+L 3399 (C 17-26): AGROW: 变量 'valid_runs' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3425 (C 35): NBRAK: 无需使用方括号 []。如果需要，可使用圆括号进行分组。
+L 3438 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3439 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3440 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3441 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3445 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3446 (C 13-27): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3450 (C 19-26): ASGLU: 此处赋给 'corr_map' 的值似乎未使用。请考虑将其替换为 ~。
+L 3450 (C 29-32): ASGLU: 此处赋给 'iter' 的值似乎未使用。请考虑将其替换为 ~。
+L 3524 (C 9-29): NASGU: 赋给变量 'use_inter_subject_var' 的值可能未使用。
+L 3627 (C 13-29): AGROW: 变量 'strategy_net_maps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3628 (C 13-30): AGROW: 变量 'strategy_run_names' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3656 (C 17-31): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3657 (C 17-31): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3658 (C 17-31): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3659 (C 17-31): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3663 (C 17-31): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3664 (C 17-31): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3667 (C 23-30): ASGLU: 此处赋给 'corr_map' 的值似乎未使用。请考虑将其替换为 ~。
+L 3667 (C 33-36): ASGLU: 此处赋给 'iter' 的值似乎未使用。请考虑将其替换为 ~。
+L 3675 (C 13-29): AGROW: 变量 'strategy_net_maps' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3676 (C 13-30): AGROW: 变量 'strategy_run_names' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3704 (C 37-45): INUSL: 可能未使用输入参数 'GMWM_mask'，尽管使用了后一个参数。请考虑将其替换为 ~。
+L 3763 (C 13-22): AGROW: 变量 'valid_runs' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3786 (C 31): NBRAK: 无需使用方括号 []。如果需要，可使用圆括号进行分组。
+L 3795 (C 9-23): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3796 (C 9-23): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3797 (C 9-23): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3798 (C 9-23): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3802 (C 9-23): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3803 (C 9-23): AGROW: 变量 'optional_params' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3807 (C 15-22): ASGLU: 此处赋给 'corr_map' 的值似乎未使用。请考虑将其替换为 ~。
+L 3807 (C 25-28): ASGLU: 此处赋给 'iter' 的值似乎未使用。请考虑将其替换为 ~。
+L 3961 (C 13-24): AGROW: 变量 'all_sub_corr' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3962 (C 13-26): AGROW: 变量 'valid_subjects' 似乎会随迭代次数而改变。请预分配内存以获得更高的运算速度。
+L 3991 (C 5-12): STRNU: 结构体的变量 'var_info' 已更改，但似乎未使用该值。
+L 4028 (C 1-8): NASGU: 赋给变量 'ref_prob' 的值可能未使用。
+L 4169 (C 19): NBRAK: 无需使用方括号 []。如果需要，可使用圆括号进行分组。
+
+examples/run_mikey.m
+
+tests/test_mikey_pc_config.m
+L 5 (C 23-32): STRQUOT: 建议不要使用 string('')。请改用 ""。
+L 43 (C 76-87): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+
+tests/test_mikey_config_choices.m
+
+tests/test_mikey_batch.m
+L 61 (C 8-95): STREMP: 建议不要使用 '~isempty(strfind(str1, str2))'。请改用 'contains(str1, str2)'。
+L 69 (C 1-2): NASGU: 赋给变量 'PC' 的值可能未使用。
+L 70 (C 1-2): NASGU: 赋给变量 'rp' 的值可能未使用。
+L 78 (C 1-6): NASGU: 赋给变量 'config' 的值可能未使用。
+L 96 (C 38-73): STREMP: 建议不要使用 '~isempty(strfind(str1, str2))'。请改用 'contains(str1, str2)'。
+
+tests/test_mikey_pc_strategies.m
+L 4 (C 1-2): ALIGN: IF 可能未与其匹配 END (行 8)对齐。
+L 21 (C 6-7): ASGLU: 此处赋给 'PC' 的值似乎未使用。请考虑将其替换为 ~。
+L 22 (C 5-6): NASGU: 赋给变量 'rp' 的值可能未使用。
+L 38 (C 31-122): STREMP: 建议不要使用 '~isempty(strfind(str1, str2))'。请改用 'contains(str1, str2)'。
+L 41 (C 29-127): STREMP: 建议不要使用 '~isempty(strfind(str1, str2))'。请改用 'contains(str1, str2)'。
+L 51 (C 28-33): NASGU: 赋给变量 'config' 的值可能未使用。
+L 61 (C 4): NOCOM: 不必要的额外逗号。
+
+tests/test_mikey_ui_layout.m
+L 4 (C 102-112): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+L 8 (C 79-89): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+
+tests/test_mikey_gui_filters.m
+L 5 (C 63-73): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+L 11 (C 40-50): MSNU: 过去在此位置取消了代码分析器信息，不再生成该信息。
+
+MIKey_parameter_scope.m
+
+MIKey_batch_controls.m
+
+tests/test_mikey_config_scopes.m
+L 14 (C 40-42): ASGLU: 此处赋给 'cfg' 的值似乎未使用。请考虑将其替换为 ~。
+L 100 (C 38-40): ASGLU: 此处赋给 'cfg' 的值似乎未使用。请考虑将其替换为 ~。
+
+tests/test_mikey_config_flow.m
+L 15 (C 1-6): NASGU: 赋给变量 'config' 的值可能未使用。
+
+examples/mikey_config_example.m
+
+docs/validation/20261019-scoped-validation/run_scope_checks.m
+
+docs/validation/20261019-scoped-validation/run_scope_recheck.m
+L 7 (C 5-10): NASGU: 赋给变量 'result' 的值可能未使用。
+
+NEGATIVE_CONTROL
+L 1 (C 10): STOUT: 可能未设置函数返回值 'x'。
+L 1 (C 24): EOLPAR: 行结尾处的语法无效。可能缺少一个 ')'。
+L 2 (C 5): SYNER: 在 ';' 处出现解析错误: 使用的 MATLAB 语法可能无效。

@@ -1,0 +1,6 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+错误使用 test_mikey_run_controls (line 21)
+Pause/resume did not reach the first run volume loop.

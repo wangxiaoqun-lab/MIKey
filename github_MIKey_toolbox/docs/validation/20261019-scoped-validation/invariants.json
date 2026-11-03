@@ -1,0 +1,9 @@
+{
+  "GUIConstruction": "byte-identical",
+  "genericConfiguration": "byte-identical",
+  "savedGUIConfigSHA256": "cc056787f934638bb9ad0bc3f1e422e85d79afd59a55af6928b7d1d0c032eb69",
+  "nativeAnalyzedFiles": 20,
+  "syntaxDiagnostics": 0,
+  "malformedNegativeControl": "detected",
+  "MATLAB2018aParsing": "passed"
+}

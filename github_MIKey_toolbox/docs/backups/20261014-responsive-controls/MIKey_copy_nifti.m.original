@@ -1,0 +1,5 @@
+function MIKey_copy_nifti(source, destination)
+% Copy/decompress an input into the existing uncompressed processing workflow.
+[readable,cleanup] = MIKey_readable_nifti(source); %#ok<ASGLU>
+copyfile(readable,destination);
+end

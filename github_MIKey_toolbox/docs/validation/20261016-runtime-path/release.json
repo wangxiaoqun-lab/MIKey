@@ -1,0 +1,10 @@
+{
+  "file": "docs\\releases\\MIKey-source-20261016-runtime-path.zip",
+  "sha256": "b17fbc15799763c3071eb761a5e3ace189e2be493c370b35492111e492d9b2c7",
+  "bytes": 301166,
+  "sourceFiles": 223,
+  "archiveMembers": 227,
+  "sourceHashesVerifiedInZip": true,
+  "containsImagesTemplatesOrCredentials": false,
+  "matlabRegressions": "provided, NOT RUN"
+}

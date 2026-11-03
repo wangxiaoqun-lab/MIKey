@@ -1,0 +1,18 @@
+MATLAB 9.4.0.813654 (R2018a)
+SYNTAX_PASS MIKey_config.m
+SYNTAX_PASS MIKey_subjects.m
+SYNTAX_PASS tests/test_mikey_subject_selection.m
+SYNTAX_PASS tests/test_mikey_gui_filters.m
+MIKEY_SUBJECT_SELECTION_PASS
+2026-10-19 16:38:48: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-19 16:38:49: Starting Voxel Scaling
+2026-10-19 16:38:49: Voxel scaling completed: 0 files processed, 0 files skipped
+2026-10-19 16:38:49: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+MIKEY_CONFIG_FLOW_PASS
+                status: 'passed'
+    inactiveTypeChecks: 538
+                phases: {'1'  '2:10'}
+
+MIKEY_CONFIG_SCOPES_PASS
+MIKEY_GUI_FILTERS_PASS
+MIKEY_SUBJECT_LIST_ALL_PASS

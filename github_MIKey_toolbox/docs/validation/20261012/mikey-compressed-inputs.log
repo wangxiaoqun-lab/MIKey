@@ -1,0 +1,60 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+                   ok: 1
+               issues: {0x1 cell}
+                notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+             subjects: {'sub-01\ses-baseline'}
+            rawCounts: [1 1]
+                steps: 1
+       requiredImages: {}
+            functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+            selection: [1x1 struct]
+    groupAnalysisPath: 'C:\Users\Administrator\AppData\Local\Temp\tp71ec989a_98fb_455a_9b85_ac67e5a56dc2\derivatives\MIKey\group_analysis\selection-190c65dab33a2ca2'
+           subjectIDs: {'sub-01'}
+               scopes: [1x1 struct]
+
+2026-10-12 17:36:31: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp71ec989a_98fb_455a_9b85_ac67e5a56dc2\derivatives\MIKey\logs\tp980e25c0_c959_491f_b6ec_165dd64c93e8
+2026-10-12 17:36:32: === Starting Step 1 ===
+2026-10-12 17:36:32: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:36:32: Starting Voxel Scaling
+2026-10-12 17:36:32: Processing subject: sub-01\ses-baseline
+2026-10-12 17:36:32: Using voxel scaling factor: 2
+2026-10-12 17:36:34: Completed voxel scaling for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-12 17:36:34: Completed voxel scaling for: sub-01_T2w.nii
+2026-10-12 17:36:34: Completed voxel scaling for: sub-01_magnitude1.nii
+2026-10-12 17:36:34: Completed voxel scaling for: sub-01_magnitude2.nii
+2026-10-12 17:36:35: Completed voxel scaling for: sub-01_phase1.nii
+2026-10-12 17:36:35: Completed voxel scaling for: sub-01_phase2.nii
+2026-10-12 17:36:35: Voxel scaling completed: 6 files processed, 0 files skipped
+2026-10-12 17:36:35: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+2026-10-12 17:36:35: === Step 1: completed (3.28 s) ===
+2026-10-12 17:36:35: All selected steps completed.
+2026-10-12 17:36:42: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp71ec989a_98fb_455a_9b85_ac67e5a56dc2\derivatives\MIKey\logs\tpb02c8c61_d956_4c7c_ba6d_4a6d905fcaf0
+2026-10-12 17:36:42: === Starting Step 2 ===
+2026-10-12 17:36:42: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:36:43: Starting Mask Generation
+2026-10-12 17:36:43: Generating whole-brain masked data for: sub-01\ses-baseline
+2026-10-12 17:36:43: Using BOLD mask: C:\Users\Administrator\AppData\Local\Temp\tp71ec989a_98fb_455a_9b85_ac67e5a56dc2\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_desc-boldbrain_mask.nii.gz
+2026-10-12 17:36:43: Completed BOLD masking for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-12 17:36:43: Using T2w mask: C:\Users\Administrator\AppData\Local\Temp\tp71ec989a_98fb_455a_9b85_ac67e5a56dc2\derivatives\MIKey\sub-01\ses-baseline\anat\sub-01_desc-anatbrain_mask.nii
+2026-10-12 17:36:43: Completed T2w masking for: sub-01_T2w.nii
+2026-10-12 17:36:43: Mask application completed: 2 files processed, 0 files skipped
+2026-10-12 17:36:43: Please proceed to the next step
+2026-10-12 17:36:43: === Step 2: completed (0.84 s) ===
+2026-10-12 17:36:43: All selected steps completed.
+2026-10-12 17:36:52: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp71ec989a_98fb_455a_9b85_ac67e5a56dc2\derivatives\MIKey\logs\tpa337a928_6188_460c_b123_4adf2b35dee8
+2026-10-12 17:36:52: === Starting Step 9 ===
+2026-10-12 17:36:52: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:36:52: Starting Non-brain Noise PCs Estimation
+2026-10-12 17:36:52: Noise PC estimation for: sub-01\ses-baseline
+2026-10-12 17:37:09: Completed noise PC estimation for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-12 17:37:09: Noise PC estimation completed: 1 files processed, 0 files skipped
+2026-10-12 17:37:09: === Step 9: completed (17.40 s) ===
+2026-10-12 17:37:09: All selected steps completed.
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tp71ec989a_98fb_455a_9b85_ac67e5a56dc2'
+          testedStages: [1 2 9]
+
+MIKEY_COMPRESSED_INPUTS_PASS

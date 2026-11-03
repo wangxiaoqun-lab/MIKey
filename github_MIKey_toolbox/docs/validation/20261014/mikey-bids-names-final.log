@@ -1,0 +1,36 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+MIKEY_BIDS_NAMES_PASS
+2026-10-14 15:51:11: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:51:11: Starting Slice Timing
+2026-10-14 15:51:11: Slice timing for: sub-01
+2026-10-14 15:51:11: Inferred slice order from JSON: interleaved ascending
+2026-10-14 15:51:12: Completed slice timing for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:51:12: Parameters - TR: 2, Slices: 4, Order: interleaved ascending
+2026-10-14 15:51:12: Slice timing completed: 1 files processed, 0 files skipped, 0 errors
+2026-10-14 15:51:12: Please proceed to the next step
+2026-10-14 15:51:12: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:51:12: Starting Realignment
+2026-10-14 15:51:12: Realignment for: sub-01
+2026-10-14 15:51:12: Completed realignment for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:51:12: Realignment completed: 1 files processed, 0 files skipped
+2026-10-14 15:51:12: Please proceed to the next step
+2026-10-14 15:51:12: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:51:12: Starting Coregistration
+2026-10-14 15:51:12: Using coregistration interpolation method: 2 (0-Nearest neighbour; 1-Trilinear; 2-2nd Degree B-Spline; 3-3rd Degree B-Spline; 4-4th Degree B-Spline; 5-5th Degree B-Spline; 6-6th Degree B-Spline; 7-7th Degree B-Spline)
+2026-10-14 15:51:12: Coregistration for: sub-01
+2026-10-14 15:51:12: Completed coregistration for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:51:12: Coregistration completed: 1 files processed, 0 files skipped
+2026-10-14 15:51:12: Please proceed to the next step
+2026-10-14 15:51:12: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:51:12: Starting Normalization
+2026-10-14 15:51:12: Using custom template: C:\Users\Administrator\AppData\Local\Temp\tpe17278ec_6760_4718_a008_879765f041a4\sub-01\anat\sub-01_T2w.nii
+2026-10-14 15:51:12: Using normalization interpolation method: 2 (0-Nearest neighbour; 1-Trilinear; 2-2nd Degree B-Spline; 3-3rd Degree B-Spline; 4-4th Degree B-Spline; 5-5th Degree B-Spline; 6-6th Degree B-Spline; 7-7th Degree B-Spline)
+2026-10-14 15:51:12: Normalization for: sub-01
+2026-10-14 15:51:12: Completed normalization for: sub-01_task-rest_run-01_bold.nii
+2026-10-14 15:51:12: Normalization completed: 1 files processed, 0 files skipped
+2026-10-14 15:51:12: Please proceed to the next step
+MIKEY_BIDS_SPM_ROUTING_PASS
+MIKEY_BIDS_ROUTING_CHECK_PASS

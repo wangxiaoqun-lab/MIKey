@@ -1,0 +1,295 @@
+--- before/MIKey.m
++++ updated/MIKey.m
+@@ -1,5 +1,7 @@
+ function MIKey(varargin)
+ % MIKey opens the GUI; MIKey(config) runs the noninteractive interface.
++% GUI users may launch from Current Folder without first calling MIKey_setup.
++addpath(fileparts(mfilename('fullpath')), '-begin');
+ if nargin == 1
+     MIKey_run(varargin{1});
+     return;
+@@ -310,6 +312,7 @@
+ fig.UserData.resumeButton = resumeButton;
+ fig.UserData.stopButton = stopButton;
+ fig.UserData.runControl = MIKeyRunControl();
++fig.UserData.runCallbackActive = false;
+ % Permit control callbacks at the processing checkpoints when supported.
+ for item = reshape(fig.Children, 1, [])
+     if isprop(item, 'Interruptible'), item.Interruptible = 'on'; end
+@@ -761,27 +764,45 @@
+ catch ME
+     appendStatus(fig, ['Error: ' ME.message]); return;
+ end
++try
++    MIKey_check_runtime(fig.UserData.runControl);
++catch ME
++    appendStatus(fig, ['Cannot start processing: ' ME.message]); return;
++end
++fig.UserData.runOriginalDirectory = pwd;
++fig.UserData.runCallbackActive = true;
++try
+ fig.UserData.runControl.start();
+ fig.UserData.excludedTimepointFiles = {};
+ previous = cell(0,2);
++fig.UserData.runEnabledStates = previous;
+ children = fig.Children;
+ for i = 1:numel(children)
+     item = children(i);
+     if isprop(item, 'Enable') && ~isequal(item, fig.UserData.statusText) && ...
+             ~isequal(item, fig.UserData.pauseButton) && ~isequal(item, fig.UserData.resumeButton) && ~isequal(item, fig.UserData.stopButton)
+         previous(end+1,:) = {item,item.Enable}; %#ok<AGROW>
++        fig.UserData.runEnabledStates = previous;
+         item.Enable = 'off';
+     end
+ end
+ fig.UserData.runEnabledStates = previous;
+ syncRunButtons(fig);
+ started = true;
++catch ME
++    finishGUIRun(fig);
++    reportGUIRunError(fig, ME);
++end
+ end
+ 
+ function finishGUIRun(fig)
+ if ~isvalid(fig), return; end
++% Cleanup must not depend on a class method remaining on the search path.
++fig.UserData.runCallbackActive = false;
+ control = fig.UserData.runControl;
+-control.finish();
++closeRequested = control.CloseRequested;
++control.Active = false; control.PauseRequested = false; control.Paused = false;
++control.StopRequested = false; control.CloseRequested = false;
+ if isfield(fig.UserData, 'runEnabledStates')
+     previous = fig.UserData.runEnabledStates;
+     for i = 1:size(previous,1)
+@@ -789,7 +810,14 @@
+     end
+ end
+ syncRunButtons(fig);
+-if control.CloseRequested, delete(fig); end
++if isfield(fig.UserData, 'runOriginalDirectory') && exist(fig.UserData.runOriginalDirectory, 'dir')
++    try
++        cd(fig.UserData.runOriginalDirectory);
++    catch directoryException
++        appendStatus(fig, ['Could not restore working directory: ' directoryException.message]);
++    end
++end
++if closeRequested, delete(fig); end
+ end
+ 
+ function reportGUIRunError(fig, exception)
+@@ -819,6 +847,11 @@
+ function stopGUIRun(fig)
+ control = fig.UserData.runControl;
+ if ~control.Active, return; end
++if isfield(fig.UserData, 'runCallbackActive') && ~fig.UserData.runCallbackActive
++    finishGUIRun(fig);
++    if isvalid(fig), appendStatus(fig, 'Recovered idle run state; no processing callback is active.'); end
++    return;
++end
+ control.requestStop(); syncRunButtons(fig);
+ appendStatus(fig, 'Stop requested. Waiting for a checkpoint; MATLAB will remain open.');
+ end
+@@ -835,6 +868,9 @@
+ end
+ 
+ function closeGUI(fig)
++if isfield(fig.UserData, 'runCallbackActive') && ~fig.UserData.runCallbackActive
++    delete(fig); return;
++end
+ if fig.UserData.runControl.Active
+     fig.UserData.runControl.CloseRequested = true;
+     stopGUIRun(fig);
+@@ -938,7 +974,12 @@
+         processTissueSegmentation_BIDS(fig, subjectFilter);
+ end
+ catch ME
+-    MIKey_write_derivative_metadata(cfg);
++    % Preserve the original processing/checkpoint error if metadata also fails.
++    try
++        MIKey_write_derivative_metadata(cfg);
++    catch metadataException
++        ME = addCause(ME, metadataException);
++    end
+     rethrow(ME);
+ end
+ MIKey_write_derivative_metadata(cfg);
+@@ -1313,8 +1354,9 @@
+                 tempFieldmapPath = MIKey_prefixed_file('fieldmap', scaledBoldPath);
+                 if exist(tempFieldmapPath, 'file')
+                     movefile(tempFieldmapPath, fieldmapCorrectedPath);
+-                    cd(derivPath);
+-                    delete('mean*.nii');delete('u*.nii');delete('wf*nii');
++                    delete(fullfile(derivPath, 'mean*.nii'));
++                    delete(fullfile(derivPath, 'u*.nii'));
++                    delete(fullfile(derivPath, 'wf*nii'));
+                     updateStatus(fig, ['Completed fieldmap correction for: ' boldFile]);
+                     processedCount = processedCount + 1;
+                 else
+--- /dev/null
++++ updated/MIKey_check_runtime.m
+@@ -0,0 +1,25 @@
++function report = MIKey_check_runtime(control)
++% Detect incomplete installs and mixed paths before a GUI job starts.
++root=fileparts(mfilename('fullpath'));
++names={'MIKey','MIKeyRunControl','MIKey_write_derivative_metadata','MIKey_check_runtime'};
++files=struct();
++for i=1:numel(names)
++    resolved=which(names{i});expected=fullfile(root,[names{i} '.m']);
++    a=strrep(resolved,'\','/');b=strrep(expected,'\','/');
++    if ispc,match=strcmpi(a,b);else,match=strcmp(a,b);end
++    if ~match
++        error('MIKey:RuntimePath', ...
++            'Incomplete or mixed MIKey installation. Expected %s; resolved %s. Add the MIKey root to the MATLAB path, remove older copies, and restart MATLAB after updating class files.',expected,resolved);
++    end
++    files.(names{i})=resolved;
++end
++if nargin<1,control=MIKeyRunControl();end
++required={'start','checkpoint','finish','requestPause','requestStop','resume'};
++for i=1:numel(required)
++    if ~ismethod(control,required{i})
++        error('MIKey:RuntimeClass', ...
++            'Loaded MIKeyRunControl lacks method %s. Restart MATLAB after updating the complete toolbox; an old GUI/class instance cannot be refreshed safely during processing.',required{i});
++    end
++end
++report=struct('status','passed','root',root,'files',files,'controlMethods',{methods(control)},'matlab',version);
++end
+--- /dev/null
++++ updated/tests/test_mikey_runtime_path.m
+@@ -0,0 +1,57 @@
++function test_mikey_runtime_path(testGUI)
++% No SPM estimation: launch from Current Folder, change cwd, recover errors.
++if nargin<1,testGUI=usejava('desktop');end
++root=fileparts(fileparts(mfilename('fullpath')));oldPath=path;oldDirectory=pwd;
++oldVisible=get(groot,'DefaultFigureVisible');work=tempname;mkdir(work);
++cleanup=onCleanup(@()restore(oldPath,oldDirectory,oldVisible)); %#ok<NASGU>
++before=findall(groot,'Type','figure');set(groot,'DefaultFigureVisible','off');
++% Reproduce the user's launch pattern: root is cwd, not an explicit path entry.
++entries=strsplit(path,pathsep);
++if any(strcmp(entries,root)),rmpath(root);end
++cd(root);
++if ~testGUI
++    cfg=MIKey_defaults();cfg.bidsPath=work;cfg.templatePath=work;
++    cfg.subjectFilter='sub-missing';
++    state=MIKeyBatchState(cfg,-1);MIKey('batch',state,3);
++    cd(work);control=MIKeyRunControl();control.start();control.checkpoint(true);control.finish();
++    report=MIKey_check_runtime(control);assert(strcmp(report.status,'passed'));
++    MIKey_write_derivative_metadata(cfg);
++    assert(exist(fullfile(work,'derivatives','MIKey','dataset_description.json'),'file')==2);
++    disp('MIKEY_RUNTIME_PATH_HEADLESS_PASS');return;
++end
++MIKey;
++figures=findall(groot,'Type','figure');figures=figures(~ismember(figures,before));assert(numel(figures)==1);
++fig=figures(1);closeFigure=onCleanup(@()deleteValid(fig)); %#ok<NASGU>
++cd(work);report=MIKey_check_runtime(fig.UserData.runControl);assert(strcmp(report.status,'passed'));
++control=fig.UserData.runControl;control.start();control.checkpoint(true);control.finish();
++% A missing raw scope returns without SPM, but still writes metadata.
++fig.UserData.bidsPath=work;fig.UserData.subjectsEdit.Value='sub-missing';
++button=fig.UserData.fieldmapButton;button.ButtonPushedFcn(button,[]);
++assert(~control.Active && ~fig.UserData.runCallbackActive);
++assert(strcmp(fig.UserData.runStepsButton.Enable,'on'));
++assert(exist(fullfile(work,'derivatives','MIKey','dataset_description.json'),'file')==2);
++assert(strcmp(pwd,work));
++% An unexpected processing error must clear state and restore cwd/buttons.
++fig.UserData.useDefaultTemplateCheckbox.Value=false;
++fig.UserData.templateCustomEdit.Value=fullfile(work,'missing-template.nii');
++fid=fopen(fullfile(work,'derivatives','MIKey','dataset_description.json'),'w');fprintf(fid,'{');fclose(fid);
++button=fig.UserData.normButton;button.ButtonPushedFcn(button,[]);
++log=strjoin(fig.UserData.statusText.Value,sprintf('\n'));
++assert(~isempty(strfind(log,'Processing stopped: Step 7 template is missing'))); %#ok<STREMP>
++assert(~control.Active && ~fig.UserData.runCallbackActive);
++assert(strcmp(fig.UserData.runStepsButton.Enable,'on') && strcmp(pwd,work));
++% Recover an orphaned flag; never force-close a genuinely executing callback.
++control.Active=true;fig.UserData.runCallbackActive=false;
++stop=fig.UserData.stopButton;stop.ButtonPushedFcn(stop,[]);
++assert(~control.Active);
++control.Active=true;fig.CloseRequestFcn(fig,[]);assert(~isvalid(fig));
++disp('MIKEY_RUNTIME_PATH_AND_RECOVERY_PASS');
++end
++
++function deleteValid(fig)
++if isvalid(fig),delete(fig);end
++end
++
++function restore(oldPath,oldDirectory,oldVisible)
++cd(oldDirectory);path(oldPath);set(groot,'DefaultFigureVisible',oldVisible);
++end
+--- before/README.md
++++ updated/README.md
+@@ -30,6 +30,20 @@
+ ```
+ 
+ Select the BIDS working directory and configure Template, Code Path, Subject Filter, Ses, Task, Run, Min Time Points (N), and Steps. **Save Config** writes the GUI parameters; **Load Config** accepts current and legacy nested configuration MAT files. Copy the complete updated toolbox to a server, including its helper files. Replace Windows paths with server paths before running a saved configuration there.
++
++## Server updates and recovery from stale GUI state
++
++Launch MIKey with its **root on the MATLAB path**, not only as the Current Folder. Current MIKey pins its own root on entry, checks key helper/class definitions before GUI processing, restores the launch directory after a job, and clears running state without calling class cleanup methods. Copy the complete source package to the server, including `MIKeyRunControl.m`, `MIKey_check_runtime.m` and `MIKey_write_derivative_metadata.m`. Restart MATLAB after replacing class files; an already open GUI can retain old definitions.
++
++A `Completed fieldmap correction` message followed by an undefined `checkpoint` method and metadata function can result from losing the MIKey root after a working-directory change. It does not establish that the corrected image itself is valid or invalid. Check the output image and frame count before reuse. Metadata failures no longer replace the original processing exception.
++
++If Stop keeps reporting a request after an error, first press **Ctrl+C** and wait for MATLAB's `>>` prompt. Then close only MIKey windows directly, bypassing their stale CloseRequestFcn:
++
++```matlab
++delete(findall(groot,'Type','figure','Name','MIKey - Mouse Image Key Toolbox'));
++```
++
++Do not issue this recovery command while an actual processing callback is still running. An active native SPM/MEX call must return before cooperative Pause/Stop can run. See [server update, diagnostics and smoke tests](docs/SERVER_RUNTIME_RECOVERY.md). No input or derivative files need to be deleted for this path/state repair.
+ 
+ ## Input layout and supported formats
+ 
+--- /dev/null
++++ updated/docs/SERVER_RUNTIME_RECOVERY.md
+@@ -0,0 +1,52 @@
++# Server runtime path repair — 2026-10-16
++
++The reported sequence is: one fieldmap result was produced; checkpoint method lookup then failed; metadata lookup failed too; Stop/close remained pending. This is consistent with the toolbox root being available only through Current Folder. The former Step 3 code changed cwd to the derivative folder immediately before the completion status/checkpoint. If the root was not explicitly on path, MATLAB could lose access to the run-control methods and metadata helper. Cleanup also called a class method, so that failure could leave Active=true. A partial copy, another MIKey version on path, or an old loaded class can give similar errors. Server diagnostics are needed to distinguish them.
++
++## Recover the current old window
++
++1. Press Ctrl+C once and wait for the MATLAB command prompt (`>>`). Repeated Stop clicks only set the same cooperative flag; they do not forcibly interrupt an SPM/MEX call or repair a missing method.
++2. At the idle prompt, bypass only the MIKey windows' stale close callbacks:
++
++```matlab
++delete(findall(groot,'Type','figure','Name','MIKey - Mouse Image Key Toolbox'));
++```
++
++This does not delete data or close MATLAB. Do not execute it while processing is still active. If MATLAB never returns from native code even after Ctrl+C, the path repair cannot be applied inside that blocked callback; stop that particular server job/session through your normal server controls and restart it. Preserve logs and outputs first.
++
++## Update coherently
++
++Copy/extract the complete `MIKey-source-20261016-runtime-path.zip` into the intended server toolbox root while it is idle. It contains source, documentation and tests, not MRI inputs, derivatives, templates or credentials. Preserve the existing share_temp folder or your custom template. Do not update only MIKey.m. Restart MATLAB after the update so previous class instances/definitions are gone.
++
++Use server paths, with exact filename case on Linux:
++
++```matlab
++toolboxRoot = '/absolute/server/path/MIKey_toolbox_main';
++spmPath = '/absolute/server/path/spm12';
++cd(toolboxRoot);
++addpath(toolboxRoot,'-begin');
++MIKey_setup(spmPath);
++which MIKey -all
++which MIKeyRunControl -all
++which MIKey_write_derivative_metadata -all
++MIKey_check_runtime()
++MIKey
++```
++
++The three MIKey files must resolve to that same root. Remove old toolbox copies from path (including startup.m entries) rather than combining releases. Add only the SPM root, not genpath(SPM). Each compute-node job needs its own explicit MIKey_setup call. After loading an older saved configuration, check Code Path, Template and BIDS paths again; do not leave them pointing at another installation.
++
++## Focused regressions
++
++These tests generate only temporary empty BIDS scopes/metadata and GUI state; they do not estimate fieldmaps or use research images:
++
++```matlab
++addpath(fullfile(toolboxRoot,'tests'));
++test_mikey_runtime_path(false); % standard JVM MATLAB without a GUI
++% Expected: MIKEY_RUNTIME_PATH_HEADLESS_PASS
++
++test_mikey_runtime_path(true);  % management node with GUI support
++% Expected: MIKEY_RUNTIME_PATH_AND_RECOVERY_PASS
++```
++
++Coverage: launch from Current Folder without an explicit root entry; pin root before a directory change; resolve checkpoint/metadata afterwards; handle a processing error plus a separate metadata JSON error without masking the original; clear active state and restore buttons/cwd; recover an idle orphan flag and close the GUI. The new tests were supplied but could not be executed locally: no MATLAB process is running and prior new-instance license checkout failed with Error -8. Native R2018a Code Analyzer and MATLAB-2018a parsing passed; the GUI component layout was compared against the backup and is unchanged.
++
++After updating, inspect the already created fieldmap output and its number of volumes before reuse. The logged lookup failure happened after the first completion message, so do not equate it with a proven fieldmap estimation failure. Existing outputs are skipped by Step 3; remove or replace only a confirmed invalid derivative if regeneration is needed, never raw inputs for this path issue.

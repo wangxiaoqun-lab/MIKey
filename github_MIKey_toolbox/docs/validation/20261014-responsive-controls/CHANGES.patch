@@ -1,0 +1,353 @@
+--- before/MIKey.m
++++ updated/MIKey.m
+@@ -310,6 +310,11 @@
+ fig.UserData.resumeButton = resumeButton;
+ fig.UserData.stopButton = stopButton;
+ fig.UserData.runControl = MIKeyRunControl();
++% Permit control callbacks at the processing checkpoints when supported.
++for item = reshape(fig.Children, 1, [])
++    if isprop(item, 'Interruptible'), item.Interruptible = 'on'; end
++    if isprop(item, 'BusyAction'), item.BusyAction = 'queue'; end
++end
+ pauseButton.ButtonPushedFcn = @(btn,event) pauseGUIRun(fig);
+ resumeButton.ButtonPushedFcn = @(btn,event) resumeGUIRun(fig);
+ stopButton.ButtonPushedFcn = @(btn,event) stopGUIRun(fig);
+@@ -989,18 +994,10 @@
+                 
+                 origBoldPath = fullfile(boldFiles(j).folder, boldFiles(j).sourceName);
+                 derivBoldPath = MIKey_bids_path(derivPath, [baseName '_desc-orig' ext]);
+-                MIKey_copy_nifti(origBoldPath, derivBoldPath);
+-                
+-                imginfo = spm_vol(derivBoldPath);
+-                imgdata = spm_read_vols(imginfo);
+-                for k = 1:length(imginfo)
+-                    mat = imginfo(k).mat;
+-                    mat = mat * voxelScaleFactor;
+-                    mat(4,4) = 1;
+-                    imginfo(k).mat = mat;
+-                    imginfo(k).fname = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext]);
+-                end
+-                spm_write_vol_4D(imginfo, imgdata);
++                MIKey_copy_nifti(origBoldPath, derivBoldPath, @() guiCheckpoint(fig));
++                progressClock = tic;
++                MIKey_scale_nifti(derivBoldPath, scaledBoldPath, voxelScaleFactor, ...
++                    @() guiCheckpoint(fig), @scalingProgress);
+                 
+                 updateStatus(fig, ['Completed voxel scaling for: ' boldFile]);
+                 processedCount = processedCount + 1;
+@@ -1031,7 +1028,8 @@
+                 
+                 origT2Path = fullfile(t2Files(j).folder, t2Files(j).sourceName);
+                 derivT2Path = MIKey_bids_path(derivPath, [baseName '_desc-orig' ext]);
+-                MIKey_copy_nifti(origT2Path, derivT2Path);
++                MIKey_copy_nifti(origT2Path, derivT2Path, @() guiCheckpoint(fig));
++                guiCheckpoint(fig, true);
+                 
+                 data_head = spm_vol(derivT2Path);
+                 data = spm_read_vols(data_head);
+@@ -1069,7 +1067,8 @@
+                 
+                 origfmapPath = fullfile(fmapFiles(j).folder, fmapFiles(j).sourceName);
+                 derivfmapPath = MIKey_bids_path(derivPath, [baseName '_desc-orig' ext]);
+-                MIKey_copy_nifti(origfmapPath, derivfmapPath);
++                MIKey_copy_nifti(origfmapPath, derivfmapPath, @() guiCheckpoint(fig));
++                guiCheckpoint(fig, true);
+                 
+                 data_head = spm_vol(derivfmapPath);
+                 data = spm_read_vols(data_head);
+@@ -1092,6 +1091,13 @@
+ end
+ updateStatus(fig, sprintf('Voxel scaling completed: %d files processed, %d files skipped', processedCount, skippedCount));
+ updateStatus(fig, 'Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.');
++
++    function scalingProgress(volume, total)
++        if volume == 1 || volume == total || toc(progressClock) >= 2
++            updateStatus(fig, sprintf('Scaling BOLD volume %d of %d: %s', volume, total, boldFile));
++            progressClock = tic;
++        end
++    end
+ end
+ 
+ function processMaskedData_BIDS(fig, subjectFilter)
+--- before/MIKey_copy_nifti.m
++++ updated/MIKey_copy_nifti.m
+@@ -1,5 +1,44 @@
+-function MIKey_copy_nifti(source, destination)
++function MIKey_copy_nifti(source, destination, checkpoint)
+ % Copy/decompress an input into the existing uncompressed processing workflow.
++if nargin >= 3
++    copyWithCheckpoints(source, destination, checkpoint);
++    return;
++end
+ [readable,cleanup] = MIKey_readable_nifti(source); %#ok<ASGLU>
+ copyfile(readable,destination);
+ end
++
++function copyWithCheckpoints(source, destination, checkpoint)
++% Bounded Java NIO transfers also allow cancellation during gzip extraction.
++checkpoint();
++temporary = [tempname(fileparts(destination)) '.nii'];
++input = javaObject('java.io.FileInputStream', source);
++inputCleanup = onCleanup(@() input.close()); %#ok<NASGU>
++if numel(source) >= 7 && strcmpi(source(end-6:end), '.nii.gz')
++    input = javaObject('java.util.zip.GZIPInputStream', input);
++    gzipCleanup = onCleanup(@() input.close()); %#ok<NASGU>
++end
++output = javaObject('java.io.FileOutputStream', temporary);
++transferCleanup = onCleanup(@() closeTransfer(output,input,temporary)); %#ok<NASGU>
++reader = javaMethod('newChannel', 'java.nio.channels.Channels', input);
++writer = output.getChannel();
++buffer = javaMethod('allocate', 'java.nio.ByteBuffer', 8*1024*1024);
++while true
++    checkpoint();
++    count = reader.read(buffer);
++    if count < 0, break; end
++    buffer.flip();
++    while buffer.hasRemaining(), writer.write(buffer); end
++    buffer.clear();
++end
++output.close();
++checkpoint();
++movefile(temporary, destination, 'f');
++end
++
++function closeTransfer(output,input,temporary)
++% Close before deletion, including during exception unwinding on Windows.
++output.close();
++input.close();
++if exist(temporary, 'file'), delete(temporary); end
++end
+--- before/MIKeyRunControl.m
++++ updated/MIKeyRunControl.m
+@@ -32,7 +32,7 @@
+             if nargin<2,force=false;end
+             if ~obj.Active,return;end
+             if force || obj.PauseRequested || obj.StopRequested || toc(obj.LastYield)>=0.05
+-                drawnow;obj.LastYield=tic;
++                drawnow;pause(0.001);obj.LastYield=tic;
+             end
+             while obj.Active && obj.PauseRequested && ~obj.StopRequested
+                 obj.Paused=true;pause(0.05);drawnow;
+--- before/README.md
++++ updated/README.md
+@@ -78,7 +78,7 @@
+ 
+ The top-row **Pause**, **Resume** and **Stop** buttons control the current GUI task. Parameters and other execution buttons are disabled while it runs, preventing overlapping tasks or selection changes. Pause waits at a checkpoint and Resume continues the same task. Stop leaves MATLAB open, retains completed outputs, restores controls and prevents subsequent files or selected steps from running. A new Run can then be started; existing completed outputs follow the usual skip rules.
+ 
+-Control is cooperative: file boundaries, regression/strategy loops and parcellation iterations check requests. A running native SPM/MEX call must return before its next checkpoint; these controls do not forcibly terminate that call. The status display distinguishes a requested pause/stop from task completion. Closing a running MIKey window requests Stop and closes the window after the task unwinds. Cluster/script jobs use the scheduler's cancellation mechanism rather than these GUI buttons.
++Control is cooperative: file boundaries, regression/strategy loops and parcellation iterations check requests. Step 1 also checks between bounded copy/decompression chunks and each BOLD volume read/write, so a long run does not wait until the whole 4D image has finished. It writes to temporary files and publishes only complete images; Stop discards the current partial image while keeping completed outputs. A running native SPM/MEX call must return before its next checkpoint; these controls do not forcibly terminate that call. The status display distinguishes a requested pause/stop from task completion. Closing a running MIKey window requests Stop and closes the window after the task unwinds. Cluster/script jobs use the scheduler's cancellation mechanism rather than these GUI buttons. After updating the toolbox, close and reopen the MIKey window to load the new callbacks. If an older running callback remains unresponsive, use Ctrl+C in the MATLAB Command Window to interrupt it before reopening MIKey; MATLAB itself can stay open.
+ 
+ ## Derivative image naming
+ 
+@@ -281,6 +281,10 @@
+ test_mikey_ui_layout;
+ threshold = test_mikey_timepoint_filter(spmPath);
+ controls = test_mikey_run_controls(spmPath);
++test_mikey_streaming_scaling(spmPath);
++% Optional: exercise Run/Execute through UITest in a desktop session
++% Control requests are still invoked from timer callbacks in this test.
++% test_mikey_run_controls(spmPath, true);
+ ```
+ 
+ Additional tests cover configuration import, failure reports, subject/session/task/run selection, selected group/concatenation operations and custom PC strategies. See `docs/VALIDATION.md`, task records and `docs/validation/20261012/` logs. Small synthetic tests verify execution and routing; they do not establish scientific validity, real-acquisition registration quality, or performance on a cluster. Original files are preserved in `docs/backups/`.
+--- before/tests/test_mikey_run_controls.m
++++ updated/tests/test_mikey_run_controls.m
+@@ -1,5 +1,7 @@
+-function result=test_mikey_run_controls(spmPath)
+-% Timers drive real GUI buttons while actual scaling is running.
++function result=test_mikey_run_controls(spmPath, useUIEvents)
++if nargin<2,useUIEvents=false;end
++if useUIEvents,driver=matlab.uitest.TestCase.forInteractiveUse;end
++% Timers invoke GUI callbacks during scaling; optional UITest execution-button events.
+ root=fileparts(fileparts(mfilename('fullpath')));addpath(root);MIKey_setup(spmPath);
+ work=tempname;mkdir(work);
+ pauseWork=fullfile(work,'pause');stopWork=fullfile(work,'stop');
+@@ -7,34 +9,46 @@
+ old=get(groot,'DefaultFigureVisible');restore=onCleanup(@()set(groot,'DefaultFigureVisible',old)); %#ok<NASGU>
+ set(groot,'DefaultFigureVisible','off');before=findall(groot,'Type','figure');MIKey;
+ created=findall(groot,'Type','figure');created=created(~ismember(created,before));assert(numel(created)==1);
+-fig=created(1);closeFigure=onCleanup(@()delete(fig)); %#ok<NASGU>
++fig=created(1);if useUIEvents,fig.Visible='on';drawnow;end
++closeFigure=onCleanup(@()delete(fig)); %#ok<NASGU>
+ ui=fig.UserData;assert(strcmp(ui.pauseButton.Enable,'off') && strcmp(ui.stopButton.Enable,'off'));
+ fig.UserData.bidsPath=pauseWork;fig.UserData.voxelScaleEdit.Value=2;
+ mode='pause';pauseSent=false;sawPaused=false;resumeSent=false;stopSent=false;pauseStarted=[];pausedCount=[];
+ failure=[];deadline=tic;
+ watcher=timer('ExecutionMode','fixedSpacing','Period',0.02,'BusyMode','drop','TimerFcn',@observe);
+ cleanupTimer=onCleanup(@()closeTimer(watcher)); %#ok<NASGU>
+-start(watcher);ui.scalingButton.ButtonPushedFcn(ui.scalingButton,[]);stop(watcher);
++start(watcher);press(ui.scalingButton);stop(watcher);
+ if ~isempty(failure),rethrow(failure);end
+-assert(pauseSent && sawPaused && resumeSent,'Pause/resume did not reach the live processing loop.');
++disp(strjoin(ui.statusText.Value,sprintf('\n')));
++assert(pauseSent && sawPaused && resumeSent,'Pause/resume did not reach the first run volume loop.');
+ assert(~ui.runControl.Active && countScaled(pauseWork)==3);
+ assert(strcmp(ui.scalingButton.Enable,'on') && strcmp(ui.pauseButton.Enable,'off'));
+ assert(~isempty(strfind(strjoin(ui.statusText.Value,sprintf('\n')),'Resumed processing.'))); %#ok<STREMP>
+-% Stop must halt the selected-step loop, preserve the first completed output,
++% Stop during the first run must discard its partial image,
+ % restore controls, and allow a subsequent run without restarting MATLAB.
+ mode='stop';deadline=tic;fig.UserData.bidsPath=stopWork;ui.statusText.Value={''};
+ ui.stagesEdit.Value='1,8';start(watcher);
+-ui.runStepsButton.ButtonPushedFcn(ui.runStepsButton,[]);stop(watcher);
++press(ui.runStepsButton);stop(watcher);
+ if ~isempty(failure),rethrow(failure);end
+-assert(stopSent && ~ui.runControl.Active && countScaled(stopWork)==1);
++assert(stopSent && ~ui.runControl.Active && countScaled(stopWork)==0);
+ log=strjoin(ui.statusText.Value,sprintf('\n'));
+ assert(~isempty(strfind(log,'Stopped by user.'))); %#ok<STREMP>
+ assert(isempty(strfind(log,'=== Starting Step 8 ===')) && isempty(strfind(log,'All selected steps completed!'))); %#ok<STREMP>
+ assert(strcmp(ui.runStepsButton.Enable,'on') && isvalid(fig));
+-mode='idle';ui.scalingButton.ButtonPushedFcn(ui.scalingButton,[]);
++mode='idle';press(ui.scalingButton);
+ assert(countScaled(stopWork)==3 && ~ui.runControl.Active);
+ result=struct('status','passed','syntheticDirectory',work);disp(result);
+ disp('MIKEY_RUN_CONTROLS_PASS');
++
++    function press(button, fromObserver)
++        if nargin<2,fromObserver=false;end
++        % UITest gestures cannot be nested inside an HG/timer callback.
++        if useUIEvents && ~fromObserver
++            driver.press(button);
++        else
++            button.ButtonPushedFcn(button,[]);
++        end
++    end
+ 
+     function observe(~,~)
+         try
+@@ -42,22 +56,22 @@
+         if toc(deadline)>60,error('MIKey:Test','Timed out waiting for GUI run controls.');end
+         logText=strjoin(ui.statusText.Value,sprintf('\n'));
+         if strcmp(mode,'pause')
+-            if ~pauseSent && ~isempty(strfind(logText,'Completed voxel scaling for:')) %#ok<STREMP>
+-                pauseSent=true;ui.pauseButton.ButtonPushedFcn(ui.pauseButton,[]);
++            if ~pauseSent && ~isempty(strfind(logText,'Scaling BOLD volume 1 of')) %#ok<STREMP>
++                pauseSent=true;press(ui.pauseButton,true);
+                 assert(strcmp(ui.scalingButton.Enable,'off'));
+             elseif ui.runControl.Paused && ~resumeSent
+                 sawPaused=true;
+                 if isempty(pauseStarted),pauseStarted=tic;pausedCount=countScaled(pauseWork);end
+                 assert(countScaled(pauseWork)==pausedCount,'Outputs changed while paused.');
+                 if toc(pauseStarted)>0.2
+-                    resumeSent=true;ui.resumeButton.ButtonPushedFcn(ui.resumeButton,[]);
++                    resumeSent=true;press(ui.resumeButton,true);
+                 end
+             end
+-        elseif strcmp(mode,'stop') && ~stopSent && ~isempty(strfind(logText,'Completed voxel scaling for:')) %#ok<STREMP>
+-            stopSent=true;ui.stopButton.ButtonPushedFcn(ui.stopButton,[]);
++        elseif strcmp(mode,'stop') && ~stopSent && ~isempty(strfind(logText,'Scaling BOLD volume 1 of')) %#ok<STREMP>
++            stopSent=true;press(ui.stopButton,true);
+         end
+         catch ME
+-            failure=ME;ui.stopButton.ButtonPushedFcn(ui.stopButton,[]);
++            failure=ME;ui.runControl.requestStop();
+         end
+     end
+ end
+--- /dev/null
++++ updated/MIKey_scale_nifti.m
+@@ -0,0 +1,35 @@
++function MIKey_scale_nifti(source, destination, factor, checkpoint, progress)
++% Scale voxel geometry one volume at a time; publish only a complete image.
++if nargin < 4, checkpoint = @() []; end
++if nargin < 5, progress = @(volume,total) []; end
++checkpoint();
++volumes = spm_vol(source);
++spm_check_orientations(volumes);
++temporary = [tempname(fileparts(destination)) '.nii'];
++cleanup = onCleanup(@() removePartial(temporary)); %#ok<NASGU>
++for i = 1:numel(volumes)
++    checkpoint();
++    data = spm_read_vols(volumes(i));
++    checkpoint();
++    output = volumes(i);
++    output.mat = output.mat * factor;
++    output.mat(4,4) = 1;
++    output.fname = temporary;
++    spm_write_vol(output, data);
++    progress(i, numel(volumes));
++    checkpoint();
++end
++% SPM may use a MAT sidecar for distinct per-volume affine matrices.
++sidecar = [temporary(1:end-4) '.mat'];
++if exist(sidecar, 'file')
++    movefile(sidecar, [destination(1:end-4) '.mat'], 'f');
++end
++movefile(temporary, destination, 'f');
++end
++
++function removePartial(temporary)
++% Both exact paths belong to this invocation; no directory-wide cleanup.
++if exist(temporary, 'file'), delete(temporary); end
++sidecar = [temporary(1:end-4) '.mat'];
++if exist(sidecar, 'file'), delete(sidecar); end
++end
+--- /dev/null
++++ updated/tests/test_mikey_streaming_scaling.m
+@@ -0,0 +1,65 @@
++function test_mikey_streaming_scaling(spmPath)
++% Real SPM data/geometry equality, chunked gzip copy and cancellation cleanup.
++root = fileparts(fileparts(mfilename('fullpath')));addpath(root);MIKey_setup(spmPath);
++work = tempname;mkdir(work);rng(26);
++source = fullfile(work, 'source.nii');
++data = 100 + randn(5,6,4,8);matrix = diag([0.2 0.3 0.4 1]);
++for i = 1:8
++    v = struct('fname',source,'dim',[5 6 4],'dt',[16 0], ...
++        'mat',matrix,'pinfo',[1;0;0],'n',[i 1],'descrip','Streaming test');
++    spm_write_vol(v,data(:,:,:,i));
++end
++destination = fullfile(work,'scaled.nii');
++volumes = [];
++MIKey_scale_nifti(source,destination,2,@()[],@observe);
++out = spm_vol(destination);actual = spm_read_vols(out);
++assert(numel(out)==8 && isequal(volumes,1:8));
++assert(max(abs(actual(:)-data(:))) < 1e-4);
++expected = matrix*2;expected(4,4)=1;
++assert(max(abs(out(1).mat(:)-expected(:))) < 1e-6);
++raw = bytes(source);zipped = gzip(source,work);
++calls = 0;copied = fullfile(work,'copied.nii');
++MIKey_copy_nifti(zipped{1},copied,@copyCheckpoint);
++assert(isequal(bytes(copied),raw) && calls>2);
++MIKey_copy_nifti(source,copied,@()[]);assert(isequal(bytes(copied),raw));
++before = dir(fullfile(work,'*.nii'));cancelled = fullfile(work,'cancelled.nii');
++try
++    MIKey_scale_nifti(source,cancelled,2,@()[],@cancelAtFirstVolume);
++    error('MIKey:Test','Expected cancellation.');
++catch ME
++    assert(strcmp(ME.identifier,'MIKey:Stopped'));
++end
++after = dir(fullfile(work,'*.nii'));
++assert(~exist(cancelled,'file') && isequal({before.name},{after.name}), ...
++    'An interrupted run left a partial image.');
++calls = 0;
++try
++    MIKey_copy_nifti(zipped{1},cancelled,@cancelCopy);
++    error('MIKey:Test','Expected copy cancellation.');
++catch ME
++    assert(strcmp(ME.identifier,'MIKey:Stopped'));
++end
++after = dir(fullfile(work,'*.nii'));
++assert(~exist(cancelled,'file') && isequal({before.name},{after.name}));
++assert(isequal(bytes(source),raw));
++disp('MIKEY_STREAMING_SCALING_PASS');
++
++    function observe(volume,~)
++        volumes(end+1)=volume;
++    end
++    function copyCheckpoint()
++        calls=calls+1;
++    end
++    function cancelAtFirstVolume(volume,~)
++        assert(volume==1);error('MIKey:Stopped','Synthetic mid-volume cancellation.');
++    end
++    function cancelCopy()
++        calls=calls+1;
++        if calls==3,error('MIKey:Stopped','Synthetic transfer cancellation.');end
++    end
++end
++
++function value=bytes(path)
++fid=fopen(path,'rb');cleanup=onCleanup(@()fclose(fid)); %#ok<NASGU>
++value=fread(fid,Inf,'*uint8');
++end

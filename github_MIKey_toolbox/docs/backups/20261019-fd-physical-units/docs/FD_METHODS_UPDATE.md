@@ -1,0 +1,20 @@
+# FD methods update (2026-10-19)
+
+Upload the complete current local `MIKey_toolbox_main` folder to the server while MATLAB is idle. It already includes the FD changes and all dependencies; no update archive is required. Keep server-specific parameters in `examples/mikey_config_example.m` and start a fresh MATLAB session after updating.
+
+Add these assignments only in your existing `examples/mikey_config_example.m`:
+
+```matlab
+cfg.fdMethod = 'euclidean'; % Or 'power'.
+cfg.fdRadius = 100;        % In the same spatial units as SPM translations.
+```
+
+Power is the L1 sum of absolute backward frame differences; Euclidean is their L2 norm. Rotational differences are converted from radians using the radius. The default radius preserves the old 100-unit conversion; choose the actual radius in your scaled image coordinates (e.g., physical 5 mm with scale 20 corresponds to 100). FD[1]=0 and Pearson CC uses frames 2:T. The existing regression design is retained.
+
+GUI users select method/radius through the small FD... button beside Step 10; Save/Load Config retains these settings. No pre-existing controls moved.
+
+Use `cfg.steps=10` to regenerate all intended runs' CC estimates, then `cfg.steps=11` to select the global minimum of mean(abs(CC)), then `cfg.steps=12` for final regression. Run the same `examples/run_mikey.m` each time. Steps 10-12 can also be selected together once prerequisites exist. If the Step 8 smoothed images are absent, complete Step 8 before 10. Keep subject/session/task/run/minTimepoints selection consistent across these runs. Earlier preprocessing and manually prepared masks do not need regeneration for an FD-only change.
+
+Old caches without explicit FD metadata recompute automatically in Step 10. Step 11 stops on missing selected runs or mixed/legacy definitions; it does not silently analyze a subset. Per-run MAT stores CC, DVARS, FD, raw motion and FD metadata. Group/best MAT records selection and metadata. Keep analysis MAT files and image-paired SPM affine sidecars according to their roles.
+
+See README for formulas, configuration scope, CC inspection and the single-configuration two-stage preprocessing commands. Validation: `runs/20261019-fd-methods/RUN_REPORT.md`.

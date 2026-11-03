@@ -1,0 +1,56 @@
+错误使用 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('matlab.ui.internal.Driver/press', 'D:\Program Files\MATLAB\R2018a\toolbox\matlab\testframework\uiautomation\+matlab\+ui\+internal\Driver.m', 8)" style="font-weight:bold">matlab.ui.internal.Driver/press</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\matlab\testframework\uiautomation\+matlab\+ui\+internal\Driver.m',8,0)">line 8</a>)
+不支持在图形对象回调中调用 MATLAB UI 测试手势。
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('matlab.uitest.TestCase/press', 'D:\Program Files\MATLAB\R2018a\toolbox\matlab\testframework\uitest\+matlab\+uitest\TestCase.m', 101)" style="font-weight:bold">matlab.uitest.TestCase/press</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\matlab\testframework\uitest\+matlab\+uitest\TestCase.m',101,0)">line 101</a>)
+            testCase.Driver.press(H, varargin{:});
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('test_mikey_run_controls/press', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\tests\test_mikey_run_controls.m', 45)" style="font-weight:bold">test_mikey_run_controls/press</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\tests\test_mikey_run_controls.m',45,0)">line 45</a>)
+            driver.press(button);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('test_mikey_run_controls/observe', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\tests\test_mikey_run_controls.m', 58)" style="font-weight:bold">test_mikey_run_controls/observe</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\tests\test_mikey_run_controls.m',58,0)">line 58</a>)
+                pauseSent=true;press(ui.pauseButton);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('timer/timercb', 'D:\Program Files\MATLAB\R2018a\toolbox\matlab\iofun\@timer\timercb.m', 34)" style="font-weight:bold">timer/timercb</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\matlab\iofun\@timer\timercb.m',34,0)">line 34</a>)
+            feval(val{1}, obj, eventStruct, val{2:end});
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('timercb', 'D:\Program Files\MATLAB\R2018a\toolbox\matlab\iofun\timercb.m', 24)" style="font-weight:bold">timercb</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\matlab\iofun\timercb.m',24,0)">line 24</a>)
+    timercb(obj(idxIntoTimerObject), varargin{2:end});
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('appdesservices.internal.peermodel.PeerNodeProxyView/setProperties', 'D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+peermodel\PeerNodeProxyView.m', 108)" style="font-weight:bold">appdesservices.internal.peermodel.PeerNodeProxyView/setProperties</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+peermodel\PeerNodeProxyView.m',108,0)">line 108</a>)
+            obj.PeerNode.setProperties(hashMap, obj.PeerEventMarkerObject);            
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('appdesservices.internal.interfaces.controller.AbstractController/updateProperties', 'D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+interfaces\+controller\AbstractController.m', 229)" style="font-weight:bold">appdesservices.internal.interfaces.controller.AbstractController/updateProperties</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+interfaces\+controller\AbstractController.m',229,0)">line 229</a>)
+                obj.ProxyView.setProperties(pvPairs);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('appdesservices.internal.interfaces.model.AbstractModel/flushDirtyProperties', 'D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+interfaces\+model\AbstractModel.m', 119)" style="font-weight:bold">appdesservices.internal.interfaces.model.AbstractModel/flushDirtyProperties</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+interfaces\+model\AbstractModel.m',119,0)">line 119</a>)
+                obj.getController().updateProperties(changedProperties);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('appdesservices.internal.interfaces.model.AbstractModel/markPropertiesDirty', 'D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+interfaces\+model\AbstractModel.m', 259)" style="font-weight:bold">appdesservices.internal.interfaces.model.AbstractModel/markPropertiesDirty</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\shared\appdes\services\+appdesservices\+internal\+interfaces\+model\AbstractModel.m',259,0)">line 259</a>)
+                flushDirtyProperties(obj);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('matlab.ui.control.TextArea/set.Value', 'D:\Program Files\MATLAB\R2018a\toolbox\matlab\uicomponents\uicomponents\+matlab\+ui\+control\TextArea.m', 97)" style="font-weight:bold">matlab.ui.control.TextArea/set.Value</a> (<a href="matlab: opentoline('D:\Program Files\MATLAB\R2018a\toolbox\matlab\uicomponents\uicomponents\+matlab\+ui\+control\TextArea.m',97,0)">line 97</a>)
+            markPropertiesDirty(obj, {'Value'});
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey>appendStatus', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m', 572)" style="font-weight:bold">MIKey>appendStatus</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m',572,0)">line 572</a>)
+fig.UserData.statusText.Value = newText;
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey>updateStatus', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m', 554)" style="font-weight:bold">MIKey>updateStatus</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m',554,0)">line 554</a>)
+appendStatus(fig, message);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey>processVoxelScaling_BIDS/scalingProgress', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m', 1097)" style="font-weight:bold">MIKey>processVoxelScaling_BIDS/scalingProgress</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m',1097,0)">line 1097</a>)
+            updateStatus(fig, sprintf('Scaling BOLD volume %d of %d: %s', volume, total, boldFile));
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey_scale_nifti', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey_scale_nifti.m', 18)" style="font-weight:bold">MIKey_scale_nifti</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey_scale_nifti.m',18,0)">line 18</a>)
+    progress(i, numel(volumes));
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey>processVoxelScaling_BIDS', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m', 999)" style="font-weight:bold">MIKey>processVoxelScaling_BIDS</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m',999,0)">line 999</a>)
+                MIKey_scale_nifti(derivBoldPath, scaledBoldPath, voxelScaleFactor, ...
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey>executeStage', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m', 888)" style="font-weight:bold">MIKey>executeStage</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m',888,0)">line 888</a>)
+        processVoxelScaling_BIDS(fig, subjectFilter, templatePath);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey>runGUIStage', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m', 743)" style="font-weight:bold">MIKey>runGUIStage</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m',743,0)">line 743</a>)
+    executeStage(fig, stage);
+
+出错 <a href="matlab:matlab.internal.language.introspective.errorDocCallback('MIKey>@(btn,event)runGUIStage(fig,1)', 'K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m', 325)" style="font-weight:bold">MIKey>@(btn,event)runGUIStage(fig,1)</a> (<a href="matlab: opentoline('K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\MIKey.m',325,0)">line 325</a>)
+scalingButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 1);

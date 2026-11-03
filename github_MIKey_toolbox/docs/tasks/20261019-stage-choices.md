@@ -1,0 +1,9 @@
+# Stage-scoped choice validation (2026-10-19)
+
+User reports fcLabel choice rejection at run_mikey configuration validation while testing the preprocessing stages. The local explicit label is valid '428'; the server's actual value was not supplied. Recommend keeping cfg.fcLabel='428', selecting whether FC runs with cfg.steps, and never using label values as enable/disable switches.
+
+Confirmed source issue: MIKey_config checked FC and parcellation enums for all selected stages, including preprocessing-only jobs. Those enums are not consumed by preprocessing, metadata generation or the shared scan-selection namespace. Changed only their membership validation to follow selected steps: sliceTimingOrder=4, fcLabel=13, parcNetwork/parcellationMode=14:16. All global types, scalar/list/flag checks and unknown-parameter rejection remain. Inactive choice values are not silently replaced; choosing the corresponding stage later revalidates them. GUI layout and image processing algorithms unchanged.
+
+Added pure regressions: Step 1 and Steps 2:10 tolerate unrelated invalid choice strings; active stages reject invalid values and retain accepted values; previously preserved inactive values fail when their stage is subsequently selected; type and unknown-field checks stay strict; batch-state serialization does not enforce a hidden GUI dropdown. No SPM or image work in these tests. MATLAB-2018a parsing and native R2018a Code Analyzer passed with no diagnostics. MATLAB execution not available locally; tests supplied but NOT RUN. Server can execute test_mikey_config_choices after adding the tests folder, expected MIKEY_CONFIG_CHOICES_PASS.
+
+Backups: docs/backups/20261019-stage-choices. Focused/cumulative patch and source hashes updated. GUI saved MAT, all subject images and the historical release ZIP are unchanged. Update MIKey_config.m on the server to obtain the scoped validation; cfg.fcLabel='428' is also valid with the old validator.

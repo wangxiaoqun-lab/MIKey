@@ -1,0 +1,59 @@
+function cfg = mikey_config_gui()
+% GUI-exported MIKey settings. Edit parameters in this file only.
+% Run with run_mikey('/absolute/path/to/this_file.m').
+% Run Step 1 alone, prepare masks manually, then change cfg.steps to 2:10.
+% Paths must refer to the server where processing will run.
+cfg = struct();
+cfg.bidsPath = '/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main/BIDS_demo';
+cfg.spmPath = '/newdatc/home/wanglab41/AD_mice_MRI/zyj_MRI_code/SPM';
+cfg.templatePath = '/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main/share_temp';
+cfg.codePath = '/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main/scripts';
+cfg.subjectFilter = 'sub-001,sub-002';
+cfg.sessionFilter = '*';
+cfg.taskFilter = '*';
+cfg.runFilter = '*';
+cfg.minTimepoints = double(100);
+cfg.steps = double(14);
+cfg.voxelScaleFactor = double(20);
+cfg.sliceTimingTR = double(1);
+cfg.sliceTimingNSlices = double(28);
+cfg.sliceTimingOrder = 'Auto-detect';
+cfg.smoothFWHM = '6 6 6';
+cfg.coregInterp = double(2);
+cfg.normInterp = double(2);
+cfg.useDefaultTemplate = logical(1);
+cfg.customTemplatePath = '';
+cfg.detrendFlag = logical(1);
+cfg.filterFlag = logical(1);
+cfg.highFreq = double(0.10000000000000001);
+cfg.lowFreq = double(0.01);
+cfg.advRegressionPCOnly = logical(1);
+cfg.useDefaultPCStrategy = logical(1);
+cfg.customPCCounts = '0 5 10 20';
+cfg.fdMethod = 'euclidean';
+cfg.fdRadius = double(100);
+cfg.advRegressionPCCSF = logical(1);
+cfg.advRegressionPCGS = logical(1);
+cfg.advRegressionPCCSFGS = logical(1);
+cfg.fcLabel = '214';
+cfg.fcCustomPath = '';
+cfg.parcNetwork = '214rois';
+cfg.useCustomParc = logical(0);
+cfg.networkCustomPath = '';
+cfg.labelCustomPath = '';
+cfg.groupNetworkPath = '/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main/share_temp/AMCP_temp/AMCP_214prior_11net.nii';
+cfg.clustROINums = double(100);
+cfg.voxelDownsampleFactor = double(2);
+cfg.percentTop = double(0.80000000000000004);
+cfg.maxIter = double(30);
+cfg.changeThr = double(0.001);
+cfg.confThr = double(2.5);
+cfg.useTSNR = logical(1);
+cfg.useInterSubjectVar = logical(1);
+cfg.parcellationUseParallel = logical(1);
+cfg.parcellationMode = 'concatenated';
+cfg.dryRun = logical(0);
+cfg.failFast = logical(1);
+cfg.strictWarnings = logical(1);
+cfg.logDir = '';
+end

@@ -1,0 +1,13 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tp2182bc74_c573_4f5a_a087_f24f38414d63'
+
+MIKEY_RUN_CONTROLS_PASS
+MIKEY_UI_LAYOUT_PASS
+MIKEY_GUI_FILTERS_PASS
+MIKEY_FIELDMAP_DIAGNOSTICS_PASS
+MIKEY_MASK_DIAGNOSTICS_PASS
+MIKEY_CONTROLS_FINAL_CHECK_PASS

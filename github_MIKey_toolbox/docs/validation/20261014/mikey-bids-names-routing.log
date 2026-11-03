@@ -1,0 +1,31 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+MIKEY_BIDS_NAMES_PASS
+2026-10-14 15:49:35: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-14 15:49:35: Starting Slice Timing
+2026-10-14 15:49:35: Slice timing for: sub-01
+2026-10-14 15:49:35: Using user-defined number of slices: 4
+2026-10-14 15:49:35: Using user-defined slice order: ascending
+2026-10-14 15:49:35: Error: Missing slice timing parameters: TR. Please check JSON file or set user parameters.
+错误使用 MIKeyBatchState/log (line 35)
+Error: Missing slice timing parameters: TR. Please check JSON file or set user parameters.
+
+出错 MIKey>appendStatus (line 555)
+    fig.log(message);
+
+出错 MIKey>updateStatus (line 549)
+appendStatus(fig, message);
+
+出错 MIKey>processSliceTiming_BIDS (line 1486)
+                    updateStatus(fig, ['Error: ' errorMsg]);
+
+出错 MIKey>executeStage (line 892)
+        processSliceTiming_BIDS(fig, subjectFilter);
+
+出错 MIKey (line 7)
+    executeStage(varargin{2}, varargin{3});
+
+出错 test_mikey_bids_spm_routing (line 20)
+    MIKey('batch',state,step);

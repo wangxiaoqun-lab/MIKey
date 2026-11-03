@@ -1,0 +1,11 @@
+{
+  "sourceEntries": 221,
+  "guiFileUnchanged": true,
+  "MIKey.m_sha256": "eedafba8bfcd823dc49df908ecee8f8ce82af36299ce5431ff72f9c0f45958e4",
+  "changedKnownFiles": [
+    "MIKey_registration_qc.m",
+    "tests/test_mikey_registration_qc.m"
+  ],
+  "nativeSyntaxStatus": "passed",
+  "nativeFiles": 11
+}

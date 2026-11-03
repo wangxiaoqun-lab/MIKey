@@ -1,0 +1,17 @@
+{
+  "pid": 25168,
+  "args": [
+    "-nodesktop",
+    "-nosplash",
+    "-noFigureWindows",
+    "-softwareopengl",
+    "-logfile",
+    "C:/MIKeyValidation/20261019-fd-physical-units/headless-startup.log",
+    "-r",
+    "run('K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/docs/validation/20261019-fd-physical-units/run_headless_checks.m')"
+  ],
+  "started": "2026-10-19T10:05:03.174Z",
+  "status": "exited",
+  "exitCode": 0,
+  "signal": null
+}

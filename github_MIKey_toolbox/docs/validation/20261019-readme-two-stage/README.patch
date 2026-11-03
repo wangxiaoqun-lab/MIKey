@@ -1,0 +1,163 @@
+--- before/README.md
++++ after/README.md
+@@ -134,39 +134,90 @@
+ 
+ Masks must be nonempty binary 0/1 3D images with dimensions and affine matching the corresponding **scaled** image. MIKey checks this in both GUI and script execution. It does not rescale a mask or infer its modality from image dimensions. One mask is used per subject/session/modality; run-specific masks are not automatically matched. If acquisition geometry differs between runs, prepare compatible input/masks before combining them.
+ 
+-## Script quick start
+-
+-```matlab
+-addpath('/shared/software/MIKey');
+-cfg = MIKey_defaults();
+-cfg.spmPath = '/shared/software/spm12';
+-cfg.bidsPath = '/shared/project/BIDS_work';
+-cfg.subjectFilter = 'sub-*';
++## Script quick start: two-stage server workflow
++
++**Edit processing parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m). Run [examples/run_mikey.m](examples/run_mikey.m) for both stages.** The entry script reads that configuration function on each invocation; it has no second editable parameter block and needs no exported MAT/JSON configuration.
++
++The commands below use `/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main` as the installed toolbox root. Replace it with your installation path if needed. Run MATLAB on an allocated compute node, or use the Slurm submission in [Compute-node jobs](#compute-node-jobs).
++
++### 1. Configure and run Step 1
++
++Open the only processing configuration file:
++
++```bash
++cd /newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main
++nano examples/mikey_config_example.m
++```
++
++Modify the existing assignments in that file; do not append duplicate assignments:
++
++```matlab
++cfg.spmPath = '/absolute/path/to/spm12'; % Server SPM12 directory containing spm.m.
++cfg.bidsPath = '/newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main/BIDS_demo';
++cfg.subjectFilter = 'sub-002';          % Change the subject/pattern here.
+ cfg.sessionFilter = '*';
+ cfg.taskFilter = '*';
+ cfg.runFilter = '*';
+-cfg.minTimepoints = 0; % Use 6 to exclude five-frame runs.
+-cfg.steps = 1;
+-cfg.voxelScaleFactor = 20;
+-cfg.dryRun = true;
+-report = MIKey_run(cfg);
++cfg.steps = 1;                         % Run Step 1 alone.
++cfg.minTimepoints = 100;               % Exclude BOLD runs shorter than 100 frames.
+ cfg.dryRun = false;
+-report = MIKey_run(cfg);
+-```
+-
+-Dry run checks configuration, dependencies, selected raw scans and required templates without creating derivatives or unpacking raw images. It does not verify all future intermediate files or registration quality. Runtime stage checks validate prerequisites after preceding stages have run.
+-
+-```matlab
+-config = cfg;
++```
++
++Set the actual SPM and BIDS paths, and review the remaining acquisition/template/processing parameters in the same configuration file. The example subject and minimum time points are editable settings, not requirements for every dataset. `MIKey_run` establishes the configured SPM/code paths automatically.
++
++Save the file and launch the general script from the toolbox root:
++
++```bash
++matlab -nodisplay -nosplash -r "try, run('examples/run_mikey.m'); catch ME, disp(getReport(ME,'extended','hyperlinks','off')); exit(1); end; exit(0);"
++```
++
++This command supports MATLAB R2018a as well as later versions. It prints the resolved configuration file, subject selection and steps. MATLAB exits with a failure status and error stack when processing fails. Each real run also prints its unique report/log directory.
++
++### 2. Prepare masks after Step 1 completes
++
++Wait for successful Step 1 completion. Draw the masks manually on the **scaled images**, then save them in the corresponding derivative directories. For the example BIDS root and subject:
++
++```text
++BIDS_demo/derivatives/MIKey/sub-002/func/sub-002_desc-boldbrain_mask.nii.gz
++BIDS_demo/derivatives/MIKey/sub-002/anat/sub-002_desc-anatbrain_mask.nii.gz
++```
++
++Both `.nii.gz` and `.nii` work. The functional and anatomical masks must separately match their corresponding scaled images in dimensions and affine, and contain binary 0/1 values. With sessions, insert the relevant `ses-*` directory after `sub-002`. See [Modality-specific brain masks](#modality-specific-brain-masks).
++
++### 3. Change only steps, then run the same script
++
++Reopen **the same** `examples/mikey_config_example.m`. After preparing the masks, change its existing step assignment from `cfg.steps = 1;` to:
++
++```matlab
++cfg.steps = 2:10;
++```
++
++Keep the same subject, BIDS directory and preprocessing settings. Save the configuration, return to the toolbox root and run **the identical general entry command**:
++
++```bash
++cd /newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main
++matlab -nodisplay -nosplash -r "try, run('examples/run_mikey.m'); catch ME, disp(getReport(ME,'extended','hyperlinks','off')); exit(1); end; exit(0);"
++```
++
++This invocation reads the updated configuration and starts at Step 2, continuing through Step 10. There is no second subject-specific script or configuration to create. Do not select `1:10` for this workflow: manual mask preparation separates Step 1 from Step 2. The general entry rejects Step 1 combined with subsequent steps.
++
++For a preflight-only check, set `cfg.dryRun = true` in the same configuration file and run the same entry; restore `false` before actual processing. Dry run checks configuration, dependencies, selected raw scans and required templates without creating derivatives or unpacking raw images. It does not verify all future intermediate files or registration quality. Runtime stage checks validate prerequisites after preceding stages have run.
++
++`MIKey_config` validates fields and values and supplies defaults. Unknown fields are rejected. Relative paths resolve against the calling MATLAB working directory; use absolute paths for cluster jobs. Steps accept numeric vectors or strings such as `'2,4:10'`, without evaluating MATLAB expressions. Execution preserves the supplied order and rejects duplicate steps.
++
++Edit parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m), then run [examples/run_mikey.m](examples/run_mikey.m). The execution script loads this configuration and does not define a second parameter block. Processing stages are selected with `cfg.steps`; atlas/network values are not enable/disable switches. For example, keep `cfg.fcLabel='428'` and omit Step 13 to skip FC. Validation follows the selected steps for every stage-specific parameter, including types, numeric bounds, lists, switches, paths and choice membership. Unused values remain unchanged and are checked when their stages are selected later. For example, `fcLabel`, parcellation settings and Step 12 filter settings cannot block Steps 1 or 2-10. Invalid active parameters are listed together in one error; unknown field names and invalid step selections are always rejected. This example uses the explicit settings in the configuration function; it does not load the saved GUI MAT file. Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
++
++### Optional saved-configuration API
++
++MAT/JSON snapshots are supported separately by `MIKey_run`. They are not needed for the two-stage `run_mikey.m` workflow above. To export the parameters already defined in the same configuration function, from MATLAB with the toolbox root and `examples` on its path:
++
++```matlab
++config = MIKey_config(mikey_config_example());
+ save('/shared/project/config.mat', 'config');
+ report = MIKey_run('/shared/project/config.mat');
+ % A JSON configuration file is also accepted.
+-report = MIKey_run('/shared/project/config.json');
+-```
+-
+-`MIKey_config` validates fields and values and supplies defaults. Unknown fields are rejected. Relative paths resolve against the calling MATLAB working directory; use absolute paths for cluster jobs. Steps accept numeric vectors or strings such as `'2,4:10'`, without evaluating MATLAB expressions. Execution preserves the supplied order and rejects duplicate steps.
+-
+-Edit parameters only in [examples/mikey_config_example.m](examples/mikey_config_example.m), then run [examples/run_mikey.m](examples/run_mikey.m). The execution script loads this configuration and does not define a second parameter block. Processing stages are selected with `cfg.steps`; atlas/network values are not enable/disable switches. For example, keep `cfg.fcLabel='428'` and omit Step 13 to skip FC. Validation follows the selected steps for every stage-specific parameter, including types, numeric bounds, lists, switches, paths and choice membership. Unused values remain unchanged and are checked when their stages are selected later. For example, `fcLabel`, parcellation settings and Step 12 filter settings cannot block Steps 1 or 2-10. Invalid active parameters are listed together in one error; unknown field names and invalid step selections are always rejected. This example uses the explicit settings in the configuration function; it does not load the saved GUI MAT file. Begin with Step 1, inspect the scaled images, prepare masks, and then continue. Do not run `1:17` blindly: manual preparation is required between Steps 1 and 2.
++% report = MIKey_run('/shared/project/config.json');
++```
+ 
+ ## Processing steps and prerequisites
+ 
+@@ -279,15 +330,39 @@
+ 
+ ## Compute-node jobs
+ 
+-Edit [examples/submit_slurm.sh](examples/submit_slurm.sh) or [examples/submit_pbs.sh](examples/submit_pbs.sh), together with [examples/mikey_cluster_job.m](examples/mikey_cluster_job.m). Set absolute `MIKEY_ROOT` and `MIKEY_CONFIG`; optional overrides are `MIKEY_SUBJECT`, `MIKEY_STEPS`, `MIKEY_SESSION`, `MIKEY_TASK`, `MIKEY_RUN` and `MIKEY_MIN_TIMEPOINTS`.
+-
+-For MATLAB R2019a or later:
++For the single-configuration, two-stage workflow above, submit the **same job command for each stage**. Set `cfg.steps = 1` in `examples/mikey_config_example.m` before the first submission. Wait for that job to finish and prepare the masks manually; then change only that assignment to `cfg.steps = 2:10` and submit the same command again. Do not change the configuration while its job is queued or running, because the configuration is read when MATLAB starts.
++
++Example Slurm submission from a login/management node:
++
++```bash
++sbatch <<'SH'
++#!/usr/bin/env bash
++#SBATCH --job-name=MIKey
++#SBATCH --cpus-per-task=4
++#SBATCH --mem=16G
++#SBATCH --time=04:00:00
++#SBATCH --output=MIKey-%j.log
++
++set -euo pipefail
++# Add your site's partition/account directives above and load its MATLAB module here if required.
++cd /newdatc/home/wanglab41/mice_MRI_code_ref/MIKey_toolbox_main
++matlab -nodisplay -nosplash -r "try, run('examples/run_mikey.m'); catch ME, disp(getReport(ME,'extended','hyperlinks','off')); exit(1); end; exit(0);"
++SH
++```
++
++Adjust scheduler resources, partition/account and MATLAB environment to your institution. These job settings do not duplicate the processing parameters in `mikey_config_example.m`. A PBS job can invoke the same `matlab ... run('examples/run_mikey.m')` command after setting its working directory and site-specific resources. Run per-subject preparation before a cohort-wide Step 11; then use the matching group selection for final regression. Concurrent jobs must not write the same subject/session outputs.
++
++### Optional MAT/JSON cluster interface
++
++The existing [examples/submit_slurm.sh](examples/submit_slurm.sh), [examples/submit_pbs.sh](examples/submit_pbs.sh) and [examples/mikey_cluster_job.m](examples/mikey_cluster_job.m) provide a separate interface for saved MAT/JSON snapshots. That interface reads absolute `MIKEY_ROOT` and `MIKEY_CONFIG`; optional overrides are `MIKEY_SUBJECT`, `MIKEY_STEPS`, `MIKEY_SESSION`, `MIKEY_TASK`, `MIKEY_RUN` and `MIKEY_MIN_TIMEPOINTS`. The single-configuration workflow above directly calls `run_mikey.m` and requires none of these environment variables or snapshots.
++
++For MATLAB R2019a or later, the saved-configuration entry can be called with:
+ 
+ ```bash
+ matlab -batch "run('/shared/software/MIKey/examples/mikey_cluster_job.m')"
+ ```
+ 
+-For R2018a, use the examples' `-nodisplay -nosplash -nodesktop -r` form with explicit `try/catch`, stack reporting and `exit(1)` on failure. Configure scheduler resources and licenses for your institution. Run per-subject preparation before a cohort-wide Step 11; then use the matching group selection for final regression. Concurrent jobs must not write the same subject/session outputs.
++For R2018a, use a `-nodisplay -nosplash -r` invocation with `try/catch`, stack reporting and `exit(1)` on failure, as in the general entry command above.
+ 
+ A real run saves effective configuration/environment/source hashes, `run.log` and `report.mat` in a unique run directory. A failed stage makes the run fail. `failFast=false` records failures and continues requested stages, but does not convert an unsuccessful run into success. Steps 6 and 7 are safety-critical exceptions: any failure in either step stops the selected pipeline even when failFast is false.
+ 

@@ -1,0 +1,703 @@
+--- before/MIKey.m
++++ after/MIKey.m
+@@ -130,6 +130,7 @@
+ % Step 10: Single Run Noise Regression
+ uilabel(fig, 'Position', [col2_x y_start-55 420 20], 'Text', '10. Noise Regression Strategy Estimation', 'FontSize', 12, 'FontWeight', 'bold');
+ regressionButton = uibutton(fig, 'Position', [col2_x y_start-80 120 22], 'Text', 'Single Run Est');
++fdSettingsButton = uibutton(fig,'Position',[col2_x+396 y_start-80 54 22],'Text','FD...','FontSize',10);
+ 
+ defaultPCStrategyCheckbox = uicheckbox(fig, 'Position', [col2_x+140 y_start-80 250 22], 'Text', 'Use default PC counts', 'Value', true, 'FontSize', 11);
+ uilabel(fig, 'Position', [col2_x y_start-107 115 20], 'Text', 'Custom PC counts:', 'FontSize', 10);
+@@ -301,6 +302,10 @@
+ fig.UserData.labelCustomButton = labelCustomButton;
+ 
+ 
++fdDefaults=MIKey_defaults();
++fig.UserData.fdMethodSetting=struct('Value',fdDefaults.fdMethod);
++fig.UserData.fdRadiusSetting=struct('Value',fdDefaults.fdRadius);
++fig.UserData.fdSettingsButton=fdSettingsButton;
+ fig.UserData.defaultPCStrategyCheckbox = defaultPCStrategyCheckbox;
+ fig.UserData.customPCCountsEdit = customPCCountsEdit;
+ fig.UserData.coregInterpHelp = coregInterpHelp;
+@@ -335,6 +340,7 @@
+ smoothButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 8);
+ noiseButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 9);
+ regressionButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 10);
++fdSettingsButton.ButtonPushedFcn = @(btn,event) configureFD(fig);
+ groupNoiseButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 11);
+ advRegressionButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 12);
+ fcButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 13);
+@@ -616,6 +622,27 @@
+         boldFiles = getBoldFiles(fig, funcPath);
+         updateStatus(fig, ['Subject ' subDirs(i).name ': Found ' num2str(length(boldFiles)) ' BOLD files']);
+     end
++end
++end
++
++function configureFD(fig)
++defaultMethod='Euclidean (L2)';
++currentMethod=fig.UserData.fdMethodSetting.Value;
++if ischar(currentMethod) && strcmp(currentMethod,'power'),defaultMethod='Power (L1)';end
++method=questdlg('FD from backward frame differences (rotations converted using the configured radius):', ...
++    'Step 10 FD Method','Power (L1)','Euclidean (L2)','Cancel',defaultMethod);
++if isempty(method) || strcmp(method,'Cancel'),return;end
++answer=inputdlg('Rotation radius, in the same spatial units as SPM translations:', ...
++    'FD Rotation Radius',1,{num2str(fig.UserData.fdRadiusSetting.Value)});
++if isempty(answer),return;end
++if strcmp(method,'Power (L1)'),value='power';else,value='euclidean';end
++try
++    cfg=MIKey_config(struct('steps',10,'fdMethod',value,'fdRadius',str2double(answer{1})));
++    fig.UserData.fdMethodSetting.Value=cfg.fdMethod;
++    fig.UserData.fdRadiusSetting.Value=cfg.fdRadius;
++    updateStatus(fig,sprintf('Step 10 FD settings: %s; rotation radius=%g (SPM image units).',cfg.fdMethod,cfg.fdRadius));
++catch ME
++    errordlg(ME.message,'Invalid FD Settings');
+ end
+ end
+ 
+@@ -2040,6 +2067,9 @@
+ Gmask_head = spm_vol(fullfile(templatePath, 'brainmask_Mouse_v38.nii'));
+ Gmask = spm_read_vols(Gmask_head);
+ subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
++fdMethod=fig.UserData.fdMethodSetting.Value;
++fdRadius=fig.UserData.fdRadiusSetting.Value;
++updateStatus(fig,sprintf('FD method: %s; rotation radius: %g (SPM image units); backward differences; Pearson frames 2:end.',fdMethod,fdRadius));
+ 
+ processedCount = 0;
+ skippedCount = 0;
+@@ -2066,6 +2096,12 @@
+             smoothedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-smoothed' ext], 'input');
+             pcPath = fullfile(derivFuncPath, [boldBaseName '_desc-NBPCs.mat']);
+             
++            if ~exist(smoothedBoldPath,'file')
++                error('MIKey:Prerequisite','Step 10 requires the Step 8 smoothed image: %s',smoothedBoldPath);
++            end
++            if ~exist(pcPath,'file')
++                error('MIKey:Prerequisite','Step 10 requires the Step 9 PC file: %s',pcPath);
++            end
+             if exist(smoothedBoldPath, 'file') && exist(pcPath, 'file')
+                 cd(derivFuncPath);
+                 
+@@ -2077,19 +2113,30 @@
+                 PC = pcData.PC;
+                 pc_configs = MIKey_pc_counts(fig.UserData.defaultPCStrategyCheckbox.Value, ...
+                     fig.UserData.customPCCountsEdit.Value, numel(head), size(PC,2));
++                rpFile=MIKey_motion_files(derivFuncPath,boldBaseName);
++                if numel(rpFile)~=1
++                    error('MIKey:Prerequisite','Expected one motion file for %s; found %d.',boldBaseName,numel(rpFile));
++                end
++                rp_original=load(fullfile(rpFile(1).folder,rpFile(1).name));
++                if size(rp_original,1)~=numel(head)
++                    error('MIKey:MotionParameters','Motion rows must match BOLD frames: %s',boldBaseName);
++                end
++                [FD,fd_info]=MIKey_framewise_displacement(rp_original,fdMethod,fdRadius);
+                 if exist(resultsPath, 'file')
+                     try
+-                        [cached_counts, ~] = MIKey_noise_result(resultsPath);
++                        [cached_counts, ~, cached_info] = MIKey_noise_result(resultsPath);
++                        cached_motion=load(resultsPath,'rp_original');
++                        cache_matches=isfield(cached_motion,'rp_original') && isequal(cached_motion.rp_original,rp_original) && isequal(cached_info,fd_info);
+                     catch cacheError
+-                        cached_counts = [];
++                        cached_counts = []; cache_matches=false;
+                         updateStatus(fig, ['Recomputing invalid strategy cache: ' cacheError.message]);
+                     end
+-                    if isequal(cached_counts, pc_configs)
+-                        updateStatus(fig, ['Skipping - strategy estimates already match PC counts for: ' boldFile]);
++                    if isequal(cached_counts, pc_configs) && cache_matches
++                        updateStatus(fig, ['Skipping - strategy estimates already match PC counts, FD definition and motion for: ' boldFile]);
+                         skippedCount = skippedCount + 1;
+                         continue;
+                     end
+-                    updateStatus(fig, ['PC counts changed; recomputing strategy estimates for: ' boldFile]);
++                    updateStatus(fig, ['PC counts, FD definition or motion changed; recomputing strategy estimates for: ' boldFile]);
+                 end
+                 results = struct();
+                 fMRI_data = spm_read_vols(head);
+@@ -2101,21 +2148,12 @@
+                 DVARS0 = rms(dd);
+                 DVARS0(1) = median(DVARS0);
+                 
+-                rpFile = MIKey_motion_files(derivFuncPath, boldBaseName);
+-                if ~isempty(rpFile)
+-                    rp = load(fullfile(rpFile(1).folder, rpFile(1).name));
+-                    [~, rp] = gradient(rp);
+-                    magnification = 1;
+-                    radius = 100;
+-                    rp(:,1:3) = rp(:,1:3) / magnification;
+-                    rp(:,4:6) = rp(:,4:6) .* radius;
+-                    drp = rp - [zeros(1,6); rp(1:end-1,:)];
+-                    FD = sqrt(rp(:,1).^2 + rp(:,2).^2 + rp(:,3).^2 + rp(:,4).^2 + rp(:,5).^2 + rp(:,6).^2);
+-                    corr0 = corr(FD, DVARS0');
+-                else
+-                    error('MIKey:Prerequisite', 'Motion file is required for strategy estimation: %s', boldBaseName);
+-                end
+-                
++                corr0=MIKey_fd_dvars_correlation(FD,DVARS0);
++                rp=rp_original;
++                [~,rp]=gradient(rp);
++                rp(:,4:6)=rp(:,4:6)*100; % Existing regression basis; independent of FD radius.
++                drp=rp-[zeros(1,6);rp(1:end-1,:)];
++
+                 updateStatus(fig, ['Estimating PC counts: ' num2str(pc_configs)]);
+                 
+                 for k = 1:length(pc_configs)
+@@ -2127,8 +2165,9 @@
+                     end
+                     
+                     output_name = MIKey_bids_name([boldBaseName '_desc-regressed' num2str(pc_num) 'pc' ext]);
+-                    [DVARS, corr_val] = MY_headmotion_regression_estimate(RegBasFunc, data_ready_regress, FD, Gmask, derivFuncPath, head, output_name);
++                    [DVARS, ~] = MY_headmotion_regression_estimate(RegBasFunc, data_ready_regress, FD, Gmask, derivFuncPath, head, output_name);
+                     
++                    corr_val=MIKey_fd_dvars_correlation(FD,DVARS);
+                     results.(['DVARS' num2str(k)]) = DVARS;
+                     results.(['corr' num2str(k)]) = corr_val;
+                 end
+@@ -2136,6 +2175,8 @@
+                 results.pc_configs = pc_configs;
+                 results.useDefaultPCStrategy = fig.UserData.defaultPCStrategyCheckbox.Value;
+                 results.FD = FD;
++                results.fd_info = fd_info;
++                results.rp_original = rp_original;
+                 results.DVARS0 = DVARS0;
+                 results.corr0 = corr0;
+                 
+@@ -2172,47 +2213,36 @@
+ run_correlations = {};
+ run_files = {};
+ 
+-for i = 1:length(subDirs)
+-
++group_fd_info=[];
++for i=1:numel(subDirs)
+     guiCheckpoint(fig);
+-    subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+-    derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+-    
+-    if ~exist(derivFuncPath, 'dir')
+-        continue;
+-    end
+-    
+-    selectedBold = getBoldFiles(fig, fullfile(subPath, 'func'));
+-    resultFiles = dir(fullfile(derivFuncPath, '__no_selected_results__'));
+-    for selected_idx = 1:numel(selectedBold)
++    subPath=fullfile(subDirs(i).folder,subDirs(i).name);
++    derivFuncPath=fullfile(bidsPath,'derivatives','MIKey',subDirs(i).name,'func');
++    selectedBold=getBoldFiles(fig,fullfile(subPath,'func'));
++    for j=1:numel(selectedBold)
+         guiCheckpoint(fig);
+-        [~, selected_base] = fileparts(selectedBold(selected_idx).name);
+-        resultFiles = [resultFiles; dir(fullfile(derivFuncPath, [selected_base '_desc-regressionResults.mat']))];
+-    end
+-    
+-    for j = 1:length(resultFiles)
+-    
+-        guiCheckpoint(fig);
+-        resultsPath = fullfile(resultFiles(j).folder, resultFiles(j).name);
+-        try
+-            [counts, values] = MIKey_noise_result(resultsPath);
+-            run_counts{end+1} = counts;
+-            run_correlations{end+1} = values;
+-            run_files{end+1} = resultsPath;
+-            
+-        catch ME
+-            
+-            if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+-            if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+-            updateStatus(fig, ['Error loading results file: ' resultsPath ': ' ME.message]);
+-        end
+-    end
+-end
+-
++        [~,base]=fileparts(selectedBold(j).name);
++        resultsPath=fullfile(derivFuncPath,[base '_desc-regressionResults.mat']);
++        if ~exist(resultsPath,'file')
++            error('MIKey:Prerequisite','Step 11 requires Step 10 results for every selected run. Missing: %s. Complete Steps 8-10 for this selection first.',resultsPath);
++        end
++        [counts,values,fd_info]=MIKey_noise_result(resultsPath);
++        if isempty(fd_info)
++            error('MIKey:StrategyFDDefinition','Legacy FD results have no definition metadata: %s. Recompute Step 10 for all selected runs.',resultsPath);
++        end
++        if isempty(group_fd_info),group_fd_info=fd_info;
++        elseif ~isequal(group_fd_info,fd_info)
++            error('MIKey:StrategyFDDefinition','Selected runs use different FD methods/radii/definitions: %s. Recompute Step 10 with identical FD settings for the complete selection.',resultsPath);
++        end
++        run_counts{end+1}=counts;
++        run_correlations{end+1}=values;
++        run_files{end+1}=resultsPath;
++    end
++end
+ if isempty(run_counts)
+-    updateStatus(fig, 'No regression results found for group level analysis');
+-    return;
+-end
++    error('MIKey:Prerequisite','No selected runs with Step 10 results. Check BIDS/subject/session/task/run/minTimepoints selection and complete Steps 8-10.');
++end
++updateStatus(fig,sprintf('Aggregating FD method: %s; rotation radius: %g; %d selected runs.',group_fd_info.method,group_fd_info.rotationRadius,numel(run_counts)));
+ 
+ pc_configs = run_counts{1};
+ for run_idx = 2:numel(run_counts)
+@@ -2238,17 +2268,8 @@
+ updateStatus(fig, ['Comparing shared PC counts: ' num2str(pc_configs)]);
+ 
+ abs_corr_data = abs(all_corr_data);
+-mean_abs_corrs = mean(abs_corr_data, 1);
+-mean_orig_corrs = mean(all_corr_data, 1);
+-
+-best_idx = findOptimalStrategyFromAbsoluteTrend(mean_abs_corrs);
+-
+-if isempty(best_idx)
+-    [~, best_idx] = min(mean_abs_corrs);
+-    updateStatus(fig, 'No clear decreasing trend found in absolute values, using global minimum');
+-else
+-    updateStatus(fig, 'Found optimal strategy at the minimum point of absolute value decreasing trend');
+-end
++[best_idx,mean_abs_corrs,mean_orig_corrs]=MIKey_select_noise_strategy(all_corr_data);
++updateStatus(fig,'Selected the global minimum of mean(abs(CC)) across all selected runs; ties use the first strategy.');
+ 
+ best_strategy = config_labels{best_idx};
+ 
+@@ -2272,7 +2293,7 @@
+ ax.XTickLabelRotation = 45;
+ 
+ groupResultsPath = fullfile(groupAnalysisPath, 'group_level_noise_estimation.mat');
+-save(groupResultsPath, 'all_corr_data', 'abs_corr_data', 'config_labels', 'mean_abs_corrs', 'best_strategy', 'best_idx', 'pc_configs', 'run_files');
++save(groupResultsPath, 'all_corr_data', 'abs_corr_data', 'config_labels', 'mean_abs_corrs', 'best_strategy', 'best_idx', 'pc_configs', 'run_files', 'mean_orig_corrs', 'group_fd_info');
+ 
+ saveas(gcf, fullfile(groupAnalysisPath, 'group_level_noise_estimation_boxplot.png'));
+ saveas(gcf, fullfile(groupAnalysisPath, 'group_level_noise_estimation_boxplot.fig'));
+@@ -2286,57 +2307,14 @@
+ best_strategy_info.mean_orig_corrs = mean_orig_corrs;
+ best_strategy_info.mean_abs_corrs = mean_abs_corrs;
+ best_strategy_info.config_labels = config_labels;
+-best_strategy_info.trend_analysis = 'Selected at minimum point of absolute value decreasing trend before increase';
++best_strategy_info.trend_analysis = 'Global minimum of mean(abs(CC)) across all selected runs';
++best_strategy_info.selection_rule = 'global_min_mean_abs_cc';
++best_strategy_info.fd_info = group_fd_info;
+ 
+ save(fullfile(groupAnalysisPath, 'best_regression_strategy.mat'), 'best_strategy_info');
+ 
+ updateStatus(fig, ['Group level noise estimation completed. Results saved to: ' groupAnalysisPath]);
+ updateStatus(fig, ['Best strategy saved for advanced regression: ' best_strategy]);
+-end
+-
+-function optimal_idx = findOptimalStrategyFromAbsoluteTrend(mean_abs_corrs)
+-n = length(mean_abs_corrs);
+-
+-if n < 3
+-    [~, optimal_idx] = min(mean_abs_corrs);
+-    return;
+-end
+-
+-diffs = diff(mean_abs_corrs);
+-
+-for i = 2:(n-1)
+-
+-    if mean_abs_corrs(i) < mean_abs_corrs(i-1) && mean_abs_corrs(i) < mean_abs_corrs(i+1)
+-        optimal_idx = i;
+-        return;
+-    end
+-end
+-
+-for i = 2:(n-1)
+-
+-    if diffs(i-1) < 0 && diffs(i) > 0
+-        optimal_idx = i;
+-        return;
+-    end
+-end
+-
+-max_neg_diff = 0;
+-candidate_idx = 1;
+-
+-for i = 1:(n-1)
+-
+-    if diffs(i) < max_neg_diff
+-        max_neg_diff = diffs(i);
+-        candidate_idx = i + 1;
+-    end
+-end
+-
+-if max_neg_diff < -0.01
+-    optimal_idx = candidate_idx;
+-    return;
+-end
+-
+-[~, optimal_idx] = min(mean_abs_corrs);
+ end
+ 
+ function processAdvancedRegression_BIDS(fig, subjectFilter)
+--- before/MIKey_defaults.m
++++ after/MIKey_defaults.m
+@@ -13,6 +13,7 @@
+     'detrendFlag', true, 'filterFlag', true, 'highFreq', 0.1, ...
+     'lowFreq', 0.01, 'advRegressionPCOnly', true, ...
+     'useDefaultPCStrategy', true, 'customPCCounts', [0 5 10 20], ...
++    'fdMethod', 'euclidean', 'fdRadius', 100, ...
+     'advRegressionPCCSF', true, 'advRegressionPCGS', true, ...
+     'advRegressionPCCSFGS', true, 'fcLabel', '428', ...
+     'fcCustomPath', '', 'parcNetwork', '428rois', ...
+--- before/MIKey_parameter_map.m
++++ after/MIKey_parameter_map.m
+@@ -14,6 +14,7 @@
+     'detrendFlag', 'detrendCheckbox'; 'filterFlag', 'filterCheckbox';
+     'highFreq', 'highFreqEdit'; 'lowFreq', 'lowFreqEdit';
+     'useDefaultPCStrategy', 'defaultPCStrategyCheckbox'; 'customPCCounts', 'customPCCountsEdit';
++    'fdMethod', 'fdMethodSetting'; 'fdRadius', 'fdRadiusSetting';
+     'advRegressionPCOnly', 'advRegressionPCOnlyCheckbox';
+     'advRegressionPCCSF', 'advRegressionPCCSFCheckbox';
+     'advRegressionPCGS', 'advRegressionPCGSCheckbox';
+--- before/MIKey_parameter_scope.m
++++ after/MIKey_parameter_scope.m
+@@ -15,7 +15,7 @@
+ active=mark(active,{'normInterp','useDefaultTemplate'},ismember(7,s));
+ active=mark(active,{'customTemplatePath'},ismember(7,s) && ~on(cfg.useDefaultTemplate));
+ active=mark(active,{'smoothFWHM'},ismember(8,s));
+-active=mark(active,{'useDefaultPCStrategy'},ismember(10,s));
++active=mark(active,{'useDefaultPCStrategy','fdMethod','fdRadius'},ismember(10,s));
+ active=mark(active,{'customPCCounts'},ismember(10,s) && ~on(cfg.useDefaultPCStrategy));
+ active=mark(active,{'detrendFlag','filterFlag'},ismember(12,s));
+ active=mark(active,{'lowFreq','highFreq'},ismember(12,s) && on(cfg.filterFlag));
+--- before/MIKey_config.m
++++ after/MIKey_config.m
+@@ -62,7 +62,7 @@
+ textFields = {'bidsPath','spmPath','templatePath','codePath','subjectFilter', ...
+     'sessionFilter','taskFilter','runFilter','sliceTimingOrder','customTemplatePath', ...
+     'fcLabel','fcCustomPath','parcNetwork','networkCustomPath','labelCustomPath', ...
+-    'groupNetworkPath','parcellationMode','logDir'};
++    'groupNetworkPath','parcellationMode','logDir','fdMethod'};
+ paths = {'bidsPath','spmPath','templatePath','codePath','customTemplatePath', ...
+     'fcCustomPath','networkCustomPath','labelCustomPath','groupNetworkPath','logDir'};
+ for i=1:numel(textFields)
+@@ -121,7 +121,7 @@
+     end
+ end
+ positive={'voxelScaleFactor','sliceTimingTR','sliceTimingNSlices', ...
+-    'voxelDownsampleFactor','maxIter','confThr','percentTop'};
++    'voxelDownsampleFactor','maxIter','confThr','percentTop','fdRadius'};
+ nonnegative={'changeThr','lowFreq','highFreq','minTimepoints','coregInterp','normInterp'};
+ integers={'sliceTimingNSlices','voxelDownsampleFactor','maxIter','coregInterp','normInterp','minTimepoints'};
+ for names=[positive nonnegative]
+@@ -147,7 +147,8 @@
+     'sliceTimingOrder',{'Auto-detect','ascending','descending','interleaved'}; ...
+     'fcLabel',{'214','428','604','1184','Custom...'}; ...
+     'parcNetwork',{'214rois','428rois','604rois','1184rois'}; ...
+-    'parcellationMode',{'individual','concatenated'}};
++    'parcellationMode',{'individual','concatenated'}; ...
++    'fdMethod',{'power','euclidean'}};
+ for i=1:size(options,1)
+     name=options{i,1};if ~active.(name) || ~valid.(name),continue;end
+     try,choices(cfg.(name),options{i,2},name);
+--- before/MIKey_noise_result.m
++++ after/MIKey_noise_result.m
+@@ -1,6 +1,18 @@
+-function [counts, correlations] = MIKey_noise_result(filename)
++function [counts, correlations, fd_info] = MIKey_noise_result(filename)
+ % Explicit candidate metadata for new files; numbered corr fields for legacy.
+ results = load(filename);
++fd_info=[];
++if isfield(results,'fd_info')
++    fd_info=results.fd_info;
++    if ~isstruct(fd_info) || ~isscalar(fd_info) || ...
++            ~isfield(fd_info,'method') || ~isfield(fd_info,'rotationRadius')
++        error('MIKey:StrategyResults','Invalid FD metadata in %s; recompute Step 10.',filename);
++    end
++    [~,expected]=MIKey_framewise_displacement(zeros(3,6),fd_info.method,fd_info.rotationRadius);
++    if ~isequal(fd_info,expected)
++        error('MIKey:StrategyResults','Unsupported FD definition in %s; recompute Step 10.',filename);
++    end
++end
+ fields = fieldnames(results);
+ indices = [];
+ for i = 1:numel(fields)
+--- before/examples/mikey_config_example.m
++++ after/examples/mikey_config_example.m
+@@ -27,6 +27,8 @@
+ cfg.lowFreq = 0.01;
+ cfg.highFreq = 0.1;
+ cfg.useDefaultPCStrategy = true;
++cfg.fdMethod = 'euclidean'; % 'power': L1, 'euclidean': L2 of framewise motion changes.
++cfg.fdRadius = 100; % Rotation radius in SPM translation units (scaled images: scale physical radius too).
+ cfg.customPCCounts = [0 5 10 20]; % used when useDefaultPCStrategy=false
+ cfg.advRegressionPCOnly = true;
+ cfg.advRegressionPCCSF = true;
+--- before/tests/test_mikey_config_scopes.m
++++ after/tests/test_mikey_config_scopes.m
+@@ -8,7 +8,7 @@
+     'strictWarnings','logDir'};
+ phaseFields={ [common {'voxelScaleFactor'}], ...
+     [common {'templatePath','sliceTimingTR','sliceTimingNSlices','sliceTimingOrder', ...
+-    'coregInterp','normInterp','useDefaultTemplate','smoothFWHM','useDefaultPCStrategy'}] };
++    'coregInterp','normInterp','useDefaultTemplate','smoothFWHM','useDefaultPCStrategy','fdMethod','fdRadius'}] };
+ phases={1,2:10};poison={false,[],NaN,Inf,'disabled',struct('unused',1),{false,'unused'}};
+ for phase=1:2
+     input=d;input.steps=phases{phase};[cfg,active]=MIKey_config(input);
+--- before/tests/test_mikey_pc_strategies.m
++++ after/tests/test_mikey_pc_strategies.m
+@@ -32,6 +32,9 @@
+ for run=1:2
+     file=fullfile(df,sprintf('sub-01_task-rest_run-%02d_bold_desc-regressionResults.mat',run));
+     saved=load(file);assert(isequal(saved.pc_configs,[0 1 3]));
++    assert(strcmp(saved.fd_info.method,'euclidean') && saved.fd_info.rotationRadius==100);
++    assert(isequal(saved.FD,MIKey_framewise_displacement(saved.rp_original,'euclidean',100)));
++    assert(abs(saved.corr0-corr(saved.FD(2:end),saved.DVARS0(2:end)'))<1e-12);
+     [counts,values]=MIKey_noise_result(file);assert(isequal(counts,[0 1 3]) && numel(values)==4);
+ end
+ cfg.runFilter='02';cfg.customPCCounts=[0 2 3];
+@@ -39,6 +42,21 @@
+ saved=load(fullfile(df,'sub-01_task-rest_run-02_bold_desc-regressionResults.mat'));
+ assert(isequal(saved.pc_configs,[0 2 3]) && ~isfield(saved,'corr4'));
+ again=MIKey_run(cfg);assert(~isempty(strfind(fileread(fullfile(again.runDirectory,'run.log')),'Skipping - strategy estimates')));
++% Changing FD settings must invalidate a matching-PC cache.
++cfg.fdMethod='power';changedFD=MIKey_run(cfg);
++assert(contains(fileread(fullfile(changedFD.runDirectory,'run.log')),'recomputing strategy'));
++file02=fullfile(df,'sub-01_task-rest_run-02_bold_desc-regressionResults.mat');
++saved=load(file02);assert(strcmp(saved.fd_info.method,'power'));
++assert(isequal(saved.FD,MIKey_framewise_displacement(saved.rp_original,'power',100)));
++allRuns=cfg;allRuns.steps=11;allRuns.runFilter='*';
++expectError(@()MIKey('batch',MIKeyBatchState(allRuns,-1),11),'MIKey:StrategyFDDefinition');
++cfg.fdRadius=80;changedRadius=MIKey_run(cfg);
++assert(contains(fileread(fullfile(changedRadius.runDirectory,'run.log')),'recomputing strategy'));
++saved=load(file02);assert(saved.fd_info.rotationRadius==80);
++% Legacy metadata-free results are rejected by Step 11 and refreshed by 10.
++saved=rmfield(saved,'fd_info');save(file02,'-struct','saved');
++expectError(@()MIKey('batch',MIKeyBatchState(allRuns,-1),11),'MIKey:StrategyFDDefinition');
++cfg.fdMethod='euclidean';cfg.fdRadius=100;MIKey_run(cfg);
+ cfg.runFilter='*';cfg.steps=11;
+ group=MIKey_run(cfg);assert(strcmp(group.status,'completed'));
+ saved=load(fullfile(MIKey_group_analysis(cfg),'group_level_noise_estimation.mat'));
+@@ -46,6 +64,10 @@
+ assert(isequal(saved.config_labels,{'No regress','12rp','12rp+3'}));
+ best=load(fullfile(MIKey_group_analysis(cfg),'best_regression_strategy.mat'));
+ assert(ismember(best.best_strategy_info.pc_count,[0 3]));
++[~,expectedBest]=min(mean(abs(saved.all_corr_data),1));
++assert(best.best_strategy_info.best_idx==expectedBest);
++assert(strcmp(best.best_strategy_info.selection_rule,'global_min_mean_abs_cc'));
++assert(strcmp(best.best_strategy_info.fd_info.method,'euclidean'));
+ cfg.steps=12;final=MIKey_run(cfg);assert(strcmp(final.status,'completed'));
+ assert(numel(dir(fullfile(df,'*_space-template_desc-Regressedpc_bold.nii')))==2);
+ cfg.customPCCounts=[0 1 3];config=cfg;save(fullfile(work,'config.mat'),'config');
+@@ -53,6 +75,10 @@
+ legacy=fullfile(work,'legacy.mat');corr0=.8;corr1=.3;corr2=.4;extraMetadata=ones(1,17); %#ok<NASGU>
+ save(legacy,'corr0','corr1','corr2','extraMetadata');
+ [counts,~]=MIKey_noise_result(legacy);assert(isequal(counts,[0 20]));
++% The GUI/batch dispatcher must reject missing selected results, not pool a subset.
++saved=load(file02);delete(file02);
++expectError(@()MIKey('batch',MIKeyBatchState(allRuns,-1),11),'MIKey:Prerequisite');
++save(file02,'-struct','saved');
+ result=struct('status','passed','syntheticDirectory',work,'testedStages',[10 11 12]);
+ disp(result);disp('MIKEY_PC_STRATEGIES_PASS');
+ end
+--- before/README.md
++++ after/README.md
+@@ -264,6 +264,40 @@
+ 
+ Counts must be distinct nonnegative integers within each selected run's available range. Count 0 represents motion-only (`12rp`), alongside a separate no-regression baseline. Step 10 records actual counts and recomputes an estimate when its candidate list changes. Step 11 compares the intersection of candidates available across selected runs. Step 12 uses the chosen count. GUI ROI Num in Step 15 accepts one positive number (default 100); the script `clustROINums` interface retains support for multiple counts. K-means partitions the whole brain into N ROIs without guaranteeing equal ROI sizes.
+ 
++### FD methods and group strategy selection (Steps 10-11)
++
++Edit these settings only in `examples/mikey_config_example.m`:
++
++```matlab
++cfg.fdMethod = 'euclidean'; % Default. Use 'power' for Power L1 FD.
++cfg.fdRadius = 100;        % Rotation radius in the same units as SPM translations.
++```
++
++In the GUI, the small **FD...** button beside Step 10 opens the method/radius settings. Save/Load Config retains them. Existing controls keep their positions. These parameters are validated only for Step 10; Step 11 reads the definitions stored with each run's estimates.
++
++For raw SPM motion parameters `rp`, compute backward frame differences, convert the three rotational differences from radians to displacement using `fdRadius`, and aggregate the resulting six changes `d`:
++
++| Method | Formula |
++| --- | --- |
++| `power` | `FD(t) = sum(abs(d(t,:)))` (L1); [Power et al., 2012](https://pmc.ncbi.nlm.nih.gov/articles/PMC3254728/) |
++| `euclidean` | `FD(t) = sqrt(sum(d(t,:).^2))` (L2 in the six motion-parameter displacement components) |
++
++The FD calculation uses raw `rp` backward differences rather than the old central `gradient`. Frame 1 has FD=0; Pearson FD-DVARS correlations use frames 2 through T because frame 1 has no preceding frame. FD settings change the evaluation metric; the existing regression design matrix is retained.
++
++`fdRadius` must use the same spatial units as SPM translations. The default 100 retains the previous rotation conversion radius; it is not a universal mouse brain radius. For example, a physical radius of 5 mm with image coordinates scaled by 20 corresponds to `fdRadius=100`. With unscaled coordinates, that same example requires `fdRadius=5`. Set the appropriate radius for the actual images; the original paper's human-head radius should not be copied automatically to mouse data. L2 is a different metric, not a demonstrated scientific improvement for every dataset.
++
++Step 9 saves PCs in `*_bold_desc-NBPCs.mat`. Step 10 requires the Step 8 smoothed image, PCs and an `rp_*.txt` motion file, and saves `*_bold_desc-regressionResults.mat`. That MAT contains `pc_configs`, `FD`, `DVARS0`, `corr0`, candidate `DVARS1/corr1`, etc., the raw `rp_original`, and explicit `fd_info`. `corr0` is the no-regression baseline; `corrK` corresponds to `pc_configs(K)`. After Step 10, inspect a run in MATLAB with:
++
++```matlab
++[counts, CC, fdInfo] = MIKey_noise_result('/absolute/path/to/sub-001_task-rest_run-01_bold_desc-regressionResults.mat');
++disp(CC(1)); % No-regression baseline.
++disp(table(counts(:), CC(2:end)', 'VariableNames', {'PCCount','CC'}));
++```
++
++Step 10 recomputes old caches without the new definition metadata and caches whose PC list, FD method, radius or raw motion has changed. Step 11 requires valid results for **every selected run**, checks that their FD definitions match, and compares shared PC counts plus the no-regression baseline. It selects the **global minimum of `mean(abs(CC),1)` across runs**, with equal weight per run; ties retain the first strategy (baseline first, then increasing PC count). It no longer uses a local-trend heuristic. Missing runs, legacy FD results and mixed definitions stop the step with a diagnostic.
++
++Group outputs are `group_level_noise_estimation.mat` and `best_regression_strategy.mat` under the selected `group_analysis[/selection-*]` directory. They retain run identifiers, CC matrices/means and the FD definition. Step 12 reads the chosen strategy and PCs to write the final regressed images. After updating, rerun Step 10 for all intended runs, then Step 11 and Step 12; complete Step 8 first if smoothed images are absent. Keep the same selection while aggregating. The image-paired SPM `.mat` sidecars can contain per-volume affine information and are read implicitly with `.nii`; PC/strategy MAT files contain analysis inputs/results, so these are not interchangeable file types to remove in bulk.
++
+ ### Group network templates
+ 
+ `share_temp/AMCP_temp` contains AMCP network templates, including 214/428/604/1184-ROI priors. These specific files are optional choices; users may supply their own valid group network.
+@@ -289,6 +323,7 @@
+ | Template root | Steps 3, 10, 12-17; Step 7 only with the default template |
+ | Smoothing FWHM | Step 8 |
+ | Default PC strategy switch / custom count list | Step 10 / Step 10 with default strategy disabled |
++| FD method and rotation radius | Step 10; Step 11 checks stored run definitions |
+ | Detrending/filtering switches; filter cutoffs | Step 12; cutoffs only with filtering enabled |
+ | Regression output strategies | Steps 12-16 |
+ | FC atlas; custom atlas path | Step 13; path only for `Custom...` |
+@@ -313,6 +348,7 @@
+ | `smoothFWHM`, `coregInterp`, `normInterp` | `[6 6 6]`, `2`, `2`. |
+ | `useDefaultTemplate`, `customTemplatePath` | `true`, empty. |
+ | `useDefaultPCStrategy`, `customPCCounts` | `true`, `[0 5 10 20]`. |
++| `fdMethod`, `fdRadius` | `euclidean` (`power` also available); `100` in SPM translation units. |
+ | `detrendFlag`, `filterFlag` | Both `true`. |
+ | `highFreq`, `lowFreq` | `0.1`, `0.01` Hz: upper/lower cutoff respectively. |
+ | `advRegressionPCOnly`, `advRegressionPCCSF`, `advRegressionPCGS`, `advRegressionPCCSFGS` | All `true`; requested output strategies. |
+--- /dev/null
++++ after/MIKey_framewise_displacement.m
+@@ -0,0 +1,23 @@
++function [FD, info] = MIKey_framewise_displacement(rp, method, radius)
++% Raw SPM motion: translations in image units, rotations in radians.
++% Both metrics use backward differences; the first frame has no displacement.
++if ~(isnumeric(rp) && isreal(rp) && ismatrix(rp) && size(rp,2)==6 && ...
++        size(rp,1)>=3 && all(isfinite(rp(:))))
++    error('MIKey:MotionParameters','Motion parameters must be a finite T-by-6 matrix with T >= 3.');
++end
++if isstring(method) && isscalar(method),method=char(method);end
++if ~ischar(method) || ~any(strcmp(method,{'power','euclidean'}))
++    error('MIKey:FDMethod','fdMethod must be power or euclidean.');
++end
++if ~isnumeric(radius) || ~isreal(radius) || ~isscalar(radius) || ~isfinite(radius) || radius<=0
++    error('MIKey:FDRadius','fdRadius must be a finite positive radius in the same units as SPM translations.');
++end
++delta=[zeros(1,6);diff(double(rp),1,1)];
++delta(:,4:6)=delta(:,4:6)*double(radius);
++if strcmp(method,'power'),FD=sum(abs(delta),2);
++else,FD=sqrt(sum(delta.^2,2));end
++if any(~isfinite(FD)),error('MIKey:MotionParameters','FD overflow; check motion parameters and fdRadius.');end
++info=struct('version',1,'method',method,'rotationRadius',double(radius), ...
++    'difference','backward','firstFrame',0,'correlationStartFrame',2, ...
++    'rotationInputUnits','radians','spatialUnits','SPM image units');
++end
+--- /dev/null
++++ after/MIKey_fd_dvars_correlation.m
+@@ -0,0 +1,15 @@
++function CC = MIKey_fd_dvars_correlation(FD, DVARS)
++% Pearson correlation on paired frame transitions; frame 1 has no predecessor.
++if ~isnumeric(FD) || ~isreal(FD) || ~isvector(FD) || ...
++        ~isnumeric(DVARS) || ~isreal(DVARS) || ~isvector(DVARS) || ...
++        numel(FD)~=numel(DVARS) || numel(FD)<3 || ...
++        any(~isfinite(FD(:))) || any(~isfinite(DVARS(:)))
++    error('MIKey:FDCorrelation','FD and DVARS must be finite equal-length vectors with at least 3 frames.');
++end
++x=double(FD(2:end));y=double(DVARS(2:end));
++if max(x)==min(x) || max(y)==min(y)
++    error('MIKey:FDCorrelation','FD-DVARS correlation is undefined for a constant transition series; inspect motion/data variance and regression rank.');
++end
++CC=corr(x(:),y(:),'type','Pearson');
++if ~isfinite(CC),error('MIKey:FDCorrelation','Nonfinite Pearson FD-DVARS correlation.');end
++end
+--- /dev/null
++++ after/MIKey_select_noise_strategy.m
+@@ -0,0 +1,8 @@
++function [best, meanAbsolute, meanSigned] = MIKey_select_noise_strategy(CC)
++% Rows are runs, columns are matched strategies; ties retain the first column.
++if ~isnumeric(CC) || ~isreal(CC) || ~ismatrix(CC) || isempty(CC) || any(~isfinite(CC(:)))
++    error('MIKey:StrategyResults','CC must be a nonempty finite run-by-strategy matrix.');
++end
++meanAbsolute=mean(abs(CC),1);meanSigned=mean(CC,1);
++[~,best]=min(meanAbsolute);
++end
+--- /dev/null
++++ after/tests/test_mikey_fd.m
+@@ -0,0 +1,44 @@
++function test_mikey_fd
++root=fileparts(fileparts(mfilename('fullpath')));addpath(root);
++% Known motion: offsets disappear, backward differences have known lengths.
++rp=[10 20 30 .4 .5 .6;13 24 30 .4 .5 .6;13 24 42 .4 .5 .6;13 24 42 .4 .55 .6];
++[power,p]=MIKey_framewise_displacement(rp,'power',100);
++[euclidean,e]=MIKey_framewise_displacement(rp,'euclidean',100);
++assert(max(abs(power-[0;7;12;5]))<1e-12);
++assert(max(abs(euclidean-[0;5;12;5]))<1e-12);
++[small,~]=MIKey_framewise_displacement(rp,'euclidean',20);
++assert(max(abs(small-[0;5;12;1]))<1e-12);
++assert(strcmp(p.method,'power') && strcmp(e.method,'euclidean') && e.correlationStartFrame==2);
++shift=rp+repmat([100 -50 20 .2 -.3 .1],4,1);
++assert(max(abs(MIKey_framewise_displacement(shift,'power',100)-power))<1e-11);
++% Central gradients differ from this backward-difference result.
++[~,central]=gradient(rp);central(:,4:6)=central(:,4:6)*100;
++assert(norm(sqrt(sum(central.^2,2))-euclidean)>1);
++fd=[0;1;3;2;5];dv=[1e6;3;2;7;4];
++expected=corr(fd(2:end),dv(2:end));
++assert(abs(MIKey_fd_dvars_correlation(fd,dv)-expected)<1e-12);
++expect(@()MIKey_fd_dvars_correlation(zeros(5,1),dv),'MIKey:FDCorrelation');
++expect(@()MIKey_framewise_displacement(rp(:,1:5),'power',100),'MIKey:MotionParameters');
++expect(@()MIKey_framewise_displacement(rp,'power',0),'MIKey:FDRadius');
++expect(@()MIKey_framewise_displacement(rp,'squared',100),'MIKey:FDMethod');
++% A later global minimum must beat an earlier local minimum.
++CC=[.8 -.2 .4 -.05 .3;-.8 .2 -.4 .05 -.3];
++[best,meanAbs,meanSigned]=MIKey_select_noise_strategy(CC);
++assert(best==4 && max(abs(meanAbs-[.8 .2 .4 .05 .3]))<1e-12);
++assert(all(meanSigned==0));
++assert(MIKey_select_noise_strategy([.2 -.2 .3])==1); % Deterministic tie.
++expect(@()MIKey_select_noise_strategy([1 NaN]),'MIKey:StrategyResults');
++for method={'power','euclidean'}
++ c=MIKey_config(struct('steps',10,'fdMethod',method{1},'fdRadius',80));
++ state=MIKeyBatchState(c,-1);assert(strcmp(state.UserData.fdMethodSetting.Value,method{1}));
++ assert(state.UserData.fdRadiusSetting.Value==80);
++end
++MIKey_config(struct('steps',1,'fdMethod',struct(),'fdRadius',NaN));
++MIKey_config(struct('steps',11,'fdMethod',struct(),'fdRadius',NaN));
++expect(@()MIKey_config(struct('steps',10,'fdMethod','bad','fdRadius',0)),'MIKey:Parameter');
++disp('MIKEY_FD_PASS');
++end
++function expect(fn,id)
++try,fn();catch ME,assert(strcmp(ME.identifier,id),getReport(ME));return;end
++error('MIKey:Test','Expected %s.',id);
++end
+--- /dev/null
++++ after/tests/test_mikey_fd_gui.m
+@@ -0,0 +1,49 @@
++function test_mikey_fd_gui
++% Actual FD button callback with scripted dialog answers, no processing data.
++root=fileparts(fileparts(mfilename('fullpath')));oldPath=path;
++oldVisible=get(groot,'DefaultFigureVisible');before=findall(groot,'Type','figure');
++work=tempname;mkdir(work);cleanup=onCleanup(@()restore(oldPath,oldVisible,before,work));
++write(fullfile(work,'questdlg.m'),sprintf('function value=questdlg(varargin)\nglobal MIKEY_FD_METHOD;value=MIKEY_FD_METHOD;\nend\n'));
++write(fullfile(work,'inputdlg.m'),sprintf('function value=inputdlg(varargin)\nglobal MIKEY_FD_RADIUS;value=MIKEY_FD_RADIUS;\nend\n'));
++write(fullfile(work,'errordlg.m'),sprintf('function errordlg(varargin)\nglobal MIKEY_FD_ERROR;MIKEY_FD_ERROR=varargin{1};\nend\n'));
++addpath(root);addpath(work,'-begin');set(groot,'DefaultFigureVisible','off');
++global MIKEY_FD_METHOD MIKEY_FD_RADIUS MIKEY_FD_ERROR;
++MIKey;figures=findall(groot,'Type','figure');figures=figures(~ismember(figures,before));
++assert(numel(figures)==1);fig=figures(1);fig.Visible='off';ui=fig.UserData;
++assert(strcmp(ui.fdMethodSetting.Value,'euclidean'));
++for trial=1:2
++    if trial==1,MIKEY_FD_METHOD='Power (L1)';method='power';else,MIKEY_FD_METHOD='Euclidean (L2)';method='euclidean';end
++    MIKEY_FD_RADIUS={'75'};ui.fdSettingsButton.ButtonPushedFcn([],[]);
++    assert(strcmp(fig.UserData.fdMethodSetting.Value,method) && fig.UserData.fdRadiusSetting.Value==75);
++    cfg=MIKey_defaults();map=MIKey_parameter_map();
++    for i=1:size(map,1),cfg.(map{i,1})=fig.UserData.(map{i,2}).Value;end
++    cfg.steps=10;cfg=MIKey_config(cfg);assert(strcmp(cfg.fdMethod,method) && cfg.fdRadius==75);
++end
++MIKEY_FD_RADIUS={'invalid'};MIKEY_FD_ERROR='';ui.fdSettingsButton.ButtonPushedFcn([],[]);
++assert(~isempty(MIKEY_FD_ERROR) && fig.UserData.fdRadiusSetting.Value==75);
++MIKEY_FD_METHOD='Cancel';ui.fdSettingsButton.ButtonPushedFcn([],[]);
++assert(strcmp(fig.UserData.fdMethodSetting.Value,'euclidean'));
++rectangles=[];
++for child=reshape(fig.Children,1,[])
++    if ~isprop(child,'Visible') || strcmp(child.Visible,'off'),continue;end
++    a=child.Position;assert(a(1)>=0 && a(2)>=0 && a(1)+a(3)<=fig.Position(3) && a(2)+a(4)<=fig.Position(4));
++    rectangles(end+1,:)=a;
++end
++for i=1:size(rectangles,1)
++    for j=i+1:size(rectangles,1)
++        a=rectangles(i,:);b=rectangles(j,:);
++        assert(min(a(1)+a(3),b(1)+b(3))<=max(a(1),b(1)) || min(a(2)+a(4),b(2)+b(4))<=max(a(2),b(2)));
++    end
++end
++disp('MIKEY_FD_GUI_PASS');
++end
++function write(name,body)
++fid=fopen(name,'w');assert(fid>=0);fprintf(fid,'%s',body);fclose(fid);
++end
++function restore(oldPath,oldVisible,before,work)
++figures=findall(groot,'Type','figure');delete(figures(~ismember(figures,before)));
++path(oldPath);set(groot,'DefaultFigureVisible',oldVisible);
++target=char(java.io.File(work).getCanonicalPath());parent=char(java.io.File(tempdir).getCanonicalPath());
++assert(strcmpi(fileparts(target),parent));if exist(target,'dir'),rmdir(target,'s');end
++clear global MIKEY_FD_METHOD MIKEY_FD_RADIUS MIKEY_FD_ERROR;
++end

@@ -1,0 +1,70 @@
+function result = test_mikey_pc_strategies(spmPath)
+% Actual steps 10/11/12 with custom, non-20-step PC counts and cached estimates.
+root=fileparts(fileparts(mfilename('fullpath')));addpath(root);MIKey_setup(spmPath);
+if ispc
+    folder=fullfile([getenv('SystemDrive') filesep],'MIKeyTest');
+    if ~exist(folder,'dir'),mkdir(folder);end
+    work=tempname(folder);
+else,work=tempname;end
+mkdir(work);func=fullfile(work,'sub-01','func');mkdir(func);
+df=fullfile(work,'derivatives','MIKey','sub-01','func');mkdir(df);
+templates=fullfile(work,'templates');mkdir(templates);mkdir(fullfile(templates,'AMCP_temp'));
+matrix=diag([0.4 0.4 0.4 1]);mask=ones(5,6,4);mask(1,:,:)=0;
+writeNifti(fullfile(templates,'brainmask_Mouse_v38.nii'),mask,matrix);
+writeNifti(fullfile(templates,'AMCP_temp','AMCP_ventricle_mask.nii'),mask,matrix);
+rng(19);
+for run=1:2
+    T=80-16*(run-1);base=sprintf('sub-01_task-rest_run-%02d_bold',run);
+    data=100+randn(5,6,4,T);
+    writeNifti(fullfile(func,[base '.nii']),data,matrix);
+    copyfile(fullfile(func,[base '.nii']),MIKey_bids_path(df,[base '_space-template_desc-smoothed.nii']));
+    [PC,~]=qr(randn(T,6),0);save(fullfile(df,[base '_desc-NBPCs.mat']),'PC');
+    rp=randn(T,6)*0.01;save(fullfile(df,['rp_' base '.txt']),'rp','-ascii');
+end
+cfg=MIKey_defaults();cfg.spmPath=spmPath;cfg.bidsPath=work;cfg.templatePath=templates;
+cfg.steps=10;cfg.useDefaultPCStrategy=false;cfg.customPCCounts=[0 1 3];
+cfg.advRegressionPCCSF=false;cfg.advRegressionPCGS=false;cfg.advRegressionPCCSFGS=false;
+assert(isequal(MIKey_pc_counts(true,[],101,85),[0 20 40 60 80]));
+expectError(@() MIKey_pc_counts(false,[0 7],80,6),'MIKey:PCCounts');
+expectError(@() MIKey_pc_counts(false,'0;disp(1)',80,6),'MIKey:PCCounts');
+expectError(@() MIKey_config(struct('customPCCounts',[0 2 2])),'MIKey:Parameter');
+first=MIKey_run(cfg);assert(strcmp(first.status,'completed'));
+for run=1:2
+    file=fullfile(df,sprintf('sub-01_task-rest_run-%02d_bold_desc-regressionResults.mat',run));
+    saved=load(file);assert(isequal(saved.pc_configs,[0 1 3]));
+    [counts,values]=MIKey_noise_result(file);assert(isequal(counts,[0 1 3]) && numel(values)==4);
+end
+cfg.runFilter='02';cfg.customPCCounts=[0 2 3];
+changed=MIKey_run(cfg);assert(~isempty(strfind(fileread(fullfile(changed.runDirectory,'run.log')),'recomputing strategy')));
+saved=load(fullfile(df,'sub-01_task-rest_run-02_bold_desc-regressionResults.mat'));
+assert(isequal(saved.pc_configs,[0 2 3]) && ~isfield(saved,'corr4'));
+again=MIKey_run(cfg);assert(~isempty(strfind(fileread(fullfile(again.runDirectory,'run.log')),'Skipping - strategy estimates')));
+cfg.runFilter='*';cfg.steps=11;
+group=MIKey_run(cfg);assert(strcmp(group.status,'completed'));
+saved=load(fullfile(MIKey_group_analysis(cfg),'group_level_noise_estimation.mat'));
+assert(isequal(saved.pc_configs,[0 3]) && isequal(size(saved.all_corr_data),[2 3]));
+assert(isequal(saved.config_labels,{'No regress','12rp','12rp+3'}));
+best=load(fullfile(MIKey_group_analysis(cfg),'best_regression_strategy.mat'));
+assert(ismember(best.best_strategy_info.pc_count,[0 3]));
+cfg.steps=12;final=MIKey_run(cfg);assert(strcmp(final.status,'completed'));
+assert(numel(dir(fullfile(df,'*_space-template_desc-Regressedpc.nii')))==2);
+cfg.customPCCounts=[0 1 3];config=cfg;save(fullfile(work,'config.mat'),'config');
+loaded=MIKey_config(fullfile(work,'config.mat'));assert(~loaded.useDefaultPCStrategy && isequal(loaded.customPCCounts,[0 1 3]));
+legacy=fullfile(work,'legacy.mat');corr0=.8;corr1=.3;corr2=.4;extraMetadata=ones(1,17); %#ok<NASGU>
+save(legacy,'corr0','corr1','corr2','extraMetadata');
+[counts,~]=MIKey_noise_result(legacy);assert(isequal(counts,[0 20]));
+result=struct('status','passed','syntheticDirectory',work,'testedStages',[10 11 12]);
+disp(result);disp('MIKEY_PC_STRATEGIES_PASS');
+end
+
+function expectError(action,id)
+try,action();catch ME,assert(strcmp(ME.identifier,id),getReport(ME));return;end
+error('MIKey:Test','Expected %s',id);
+end
+function writeNifti(filename,data,matrix)
+for i=1:size(data,4)
+    v=struct('fname',filename,'dim',[size(data,1) size(data,2) size(data,3)], ...
+        'dt',[16 0],'mat',matrix,'pinfo',[1;0;0],'n',[i 1],'descrip','MIKey synthetic PC strategy test');
+    spm_write_vol(v,data(:,:,:,i));
+end
+end

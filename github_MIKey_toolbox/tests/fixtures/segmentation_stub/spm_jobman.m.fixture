@@ -1,0 +1,52 @@
+function varargout=spm_jobman(action,batches)
+% SERVER TEST FIXTURE: records/routs batches; performs no SPM estimation.
+global MIKEY_SEGMENTATION_JOBS MIKEY_SEGMENTATION_OMIT
+if ~strcmp(action,'run'),varargout=cell(1,nargout);return;end
+for k=1:numel(batches)
+    job=batches{k};MIKEY_SEGMENTATION_JOBS{end+1}=job;
+    if isfield(job.spm,'tools')
+        p=job.spm.tools.oldnorm.estwrite;
+        assert(numel(p.subj.source)==1 && ischar(p.subj.source{1}));
+        assert(numel(p.subj.resample)==2);
+        for i=1:numel(p.subj.resample)
+            input=strip(p.subj.resample{i});[folder,name,ext]=fileparts(input);
+            copyfile(input,fullfile(folder,[p.roptions.prefix name ext]));
+        end
+        input=strip(p.subj.source{1});[folder,name]=fileparts(input);
+        Affine=eye(4);save(fullfile(folder,[name '_sn.mat']),'Affine');
+    elseif isfield(job.spm.spatial,'preproc')
+        p=job.spm.spatial.preproc;
+        assert(iscell(p.channel.vols) && ischar(p.channel.vols{1}));
+        input=strip(p.channel.vols{1});
+        assert(contains(input,'desc-segInput_T2w.nii') && ~contains(input,'segMasked'));
+        data=spm_read_vols(spm_vol(input));assert(all(data(:)==2),'Must segment the unmasked normalized T2.');
+        assert(isequal([p.tissue.ngaus],[1 1 2 3 4]));
+        for i=1:5
+            assert(endsWith(p.tissue(i).tpm{1},sprintf('AMCP_TPM.nii,%d',i)));
+            assert(isequal(p.tissue(i).native,[1 1]) && isequal(p.tissue(i).warped,[1 1]));
+            for prefix={'c','rc','wc','mwc'}
+                if isequal(MIKEY_SEGMENTATION_OMIT,[prefix{1} num2str(i)]),continue;end
+                copyfile(input,MIKey_prefixed_file([prefix{1} num2str(i)],input));
+            end
+        end
+        for prefix={'m','BiasField_','y_'}
+            copyfile(input,MIKey_prefixed_file(prefix{1},input));
+        end
+        [folder,name]=fileparts(input);testModel=struct('fiveClasses',true);
+        save(fullfile(folder,[name '_seg8.mat']),'testModel');
+    elseif isfield(job.spm.spatial,'smooth')
+        p=job.spm.spatial.smooth;assert(numel(p.data)==3);
+        for i=1:3
+            input=strip(p.data{i});[folder,name,ext]=fileparts(input);
+            assert(startsWith(name,['mwc' num2str(i)]));
+            copyfile(input,fullfile(folder,[p.prefix name ext]));
+        end
+    else
+        error('MIKey:Test','Unexpected Step 17 batch.');
+    end
+end
+varargout=cell(1,nargout);
+end
+function filename=strip(filename)
+filename=regexprep(filename,',\d+$','');
+end

@@ -1,0 +1,4121 @@
+function MIKey(varargin)
+% MIKey opens the GUI; MIKey(config) runs the noninteractive interface.
+if nargin == 1
+    MIKey_run(varargin{1});
+    return;
+elseif nargin == 3 && strcmp(varargin{1}, 'batch') && isa(varargin{2}, 'MIKeyBatchState')
+    executeStage(varargin{2}, varargin{3});
+    return;
+elseif nargin ~= 0
+    error('MIKey:Arguments', 'Use MIKey or MIKey(config).');
+end
+clc;
+fig = uifigure('Name', 'MIKey - Mouse Image Key Toolbox', 'Position', [30 30 1400 950]);
+createGUIComponents(fig);
+end
+
+function createGUIComponents(fig)
+
+window_width = 1400;
+col_width = floor(window_width / 3);
+col1_x = 20;
+col2_x = col1_x + col_width;
+col3_x = col2_x + col_width;
+
+uilabel(fig, 'Position', [col1_x 920 300 20], 'Text', 'Select BIDS Root Folder', 'FontSize', 11, 'FontWeight', 'bold','FontColor', 'red');
+bidsButton = uibutton(fig, 'Position', [col1_x 890 150 25], 'Text', 'Select BIDS Folder','BackgroundColor', [1 0.8 0.8]);
+
+uilabel(fig, 'Position', [col2_x-50 895 80 20], 'Text', 'Template:', 'FontSize', 10);
+templateEdit = uieditfield(fig, 'text', 'Position', [col2_x+40 895 200 20], 'Value', fullfile(fileparts(mfilename('fullpath')), 'share_temp'));
+
+uilabel(fig, 'Position', [col3_x-50 895 70 20], 'Text', 'Code Path:', 'FontSize', 10);
+codeEdit = uieditfield(fig, 'text', 'Position', [col3_x+30 895 200 20], 'Value', fullfile(fileparts(mfilename('fullpath')), 'scripts'));
+
+uilabel(fig, 'Position', [col1_x 850 90 20], 'Text', 'Subj Filter:', 'FontSize', 10);
+subjectsEdit = uieditfield(fig, 'text', 'Position', [col1_x+100 850 120 20], 'Value', 'sub-*');
+
+uilabel(fig, 'Position', [col2_x 850 80 20], 'Text', 'Steps:', 'FontSize', 10);
+stagesEdit = uieditfield(fig, 'text', 'Position', [col2_x+90 850 80 20], 'Value', '1:17');
+
+runStepsButton = uibutton(fig, 'Position', [col3_x 850 250 30], 'Text', 'Run Selected Steps','BackgroundColor', [0.8 0.8 1]);
+uilabel(fig, 'Position', [col1_x+230 850 40 20], 'Text', 'Ses:', 'FontSize', 10);
+sessionEdit = uieditfield(fig, 'text', 'Position', [col1_x+275 850 90 20], 'Value', '*');
+uilabel(fig, 'Position', [col2_x+180 850 40 20], 'Text', 'Task:', 'FontSize', 10);
+taskEdit = uieditfield(fig, 'text', 'Position', [col2_x+225 850 100 20], 'Value', '*');
+uilabel(fig, 'Position', [col3_x+260 850 40 20], 'Text', 'Run:', 'FontSize', 10);
+runEdit = uieditfield(fig, 'text', 'Position', [col3_x+300 850 100 20], 'Value', '*');
+
+uilabel(fig, 'Position', [col2_x 920 130 20], 'Text', 'Min Time Points (N):', 'FontSize', 10);
+minTimepointsEdit = uieditfield(fig, 'numeric', 'Position', [col2_x+135 920 55 20], 'Value', 0, 'Limits', [0 Inf]);
+if isprop(minTimepointsEdit, 'RoundFractionalValues'), minTimepointsEdit.RoundFractionalValues = 'on'; end
+uilabel(fig, 'Position', [col2_x+200 920 250 20], 'Text', 'Skip BOLD runs with T < N (0 = off)', 'FontSize', 9, 'FontColor', [0.5 0.5 0.5]);
+pauseButton = uibutton(fig, 'Position', [col3_x 920 80 22], 'Text', 'Pause', 'Enable', 'off');
+resumeButton = uibutton(fig, 'Position', [col3_x+90 920 80 22], 'Text', 'Resume', 'Enable', 'off');
+stopButton = uibutton(fig, 'Position', [col3_x+180 920 80 22], 'Text', 'Stop', 'Enable', 'off');
+
+
+separator_y = 820;
+uipanel(fig, 'Position', [20 separator_y window_width-40 2], ...
+    'BackgroundColor', [0.7 0.7 0.7], 'BorderType', 'none');
+
+
+y_start = 770;
+
+% Step 1: Voxel Scaling
+uilabel(fig, 'Position', [col1_x y_start 200 20], 'Text', '1. Voxel Scaling', 'FontSize', 12, 'FontWeight', 'bold');
+scalingButton = uibutton(fig, 'Position', [col1_x y_start-25 120 22], 'Text', 'Execute');
+uilabel(fig, 'Position', [col1_x+130 y_start-25 60 20], 'Text', 'Scale:', 'FontSize', 9);
+voxelScaleEdit = uieditfield(fig, 'numeric', 'Position', [col1_x+190 y_start-25 50 20], 'Value', 20);
+
+uilabel(fig, 'Position', [col1_x y_start-55 400 20], 'Text', 'Masks: *_desc-boldbrain_mask / *_desc-anatbrain_mask', 'FontSize', 10, 'FontWeight', 'bold','FontColor', [0.5 0.5 0.5]);
+
+% Step 2: Mask Data
+uilabel(fig, 'Position', [col1_x y_start-85 200 20], 'Text', '2. Mask Data', 'FontSize', 12, 'FontWeight', 'bold');
+maskButton = uibutton(fig, 'Position', [col1_x y_start-110 120 22], 'Text', 'Whole-brain Mask');
+
+% Step 3: Fieldmap Correction
+uilabel(fig, 'Position', [col1_x y_start-140 250 20], 'Text', '3. Fieldmap Correction (Opt)', 'FontSize', 12, 'FontWeight', 'bold');
+fieldmapButton = uibutton(fig, 'Position', [col1_x y_start-165 120 22], 'Text', 'Fieldmap Corr');
+
+% Step 4: Slice Timing
+uilabel(fig, 'Position', [col1_x y_start-195 200 20], 'Text', '4. Slice Timing (Opt)', 'FontSize', 12, 'FontWeight', 'bold');
+slicetimeButton = uibutton(fig, 'Position', [col1_x y_start-220 120 22], 'Text', 'Slice Timing');
+uilabel(fig, 'Position', [col1_x+130 y_start-220 30 20], 'Text', 'TR:', 'FontSize', 9);
+sliceTimingTR = uieditfield(fig, 'numeric', 'Position', [col1_x+160 y_start-220 40 20], 'Value', 2.0);
+uilabel(fig, 'Position', [col1_x+210 y_start-220 40 20], 'Text', 'Slices:', 'FontSize', 9);
+sliceTimingNSlices = uieditfield(fig, 'numeric', 'Position', [col1_x+250 y_start-220 40 20], 'Value', 30);
+
+uilabel(fig, 'Position', [col1_x y_start-245 60 20], 'Text', 'Slice Order:', 'FontSize', 9);
+sliceTimingOrder = uidropdown(fig, 'Position', [col1_x+65 y_start-245 180 20], ...
+    'Items', {'Auto-detect', 'ascending', 'descending', 'interleaved'}, 'Value', 'Auto-detect');
+
+% Step 5: Realignment
+uilabel(fig, 'Position', [col1_x y_start-275 200 20], 'Text', '5. Realignment', 'FontSize', 12, 'FontWeight', 'bold');
+realignButton = uibutton(fig, 'Position', [col1_x y_start-300 120 22], 'Text', 'Realignment');
+
+% Step 6: Coregistration
+uilabel(fig, 'Position', [col1_x y_start-330 200 20], 'Text', '6. Coregistration', 'FontSize', 12, 'FontWeight', 'bold');
+coregButton = uibutton(fig, 'Position', [col1_x y_start-355 120 22], 'Text', 'Coregistration');
+uilabel(fig, 'Position', [col1_x+130 y_start-355 60 20], 'Text', 'Interp:', 'FontSize', 9);
+coregInterpEdit = uieditfield(fig, 'numeric', 'Position', [col1_x+190 y_start-355 40 20], 'Value', 2);
+
+coregInterpHelp = uilabel(fig, 'Position', [col1_x y_start-405 410 42], 'Text', {'0: Nearest neighbour; 1: Trilinear', '2: 2nd, 3: 3rd, 4: 4th degree B-spline', '5: 5th, 6: 6th, 7: 7th degree B-spline'}, 'FontSize', 10, 'FontColor', [0.5 0.5 0.5]);
+
+% Step 7: Normalization
+uilabel(fig, 'Position', [col1_x y_start-445 200 20], 'Text', '7. Normalization', 'FontSize', 12, 'FontWeight', 'bold');
+normButton = uibutton(fig, 'Position', [col1_x y_start-470 120 22], 'Text', 'Normalization');
+uilabel(fig, 'Position', [col1_x+130 y_start-470 60 20], 'Text', 'Interp:', 'FontSize', 9);
+normInterpEdit = uieditfield(fig, 'numeric', 'Position', [col1_x+190 y_start-470 40 20], 'Value', 2);
+
+normInterpHelp = uilabel(fig, 'Position', [col1_x y_start-520 410 42], 'Text', {'0: Nearest neighbour; 1: Trilinear', '2: 2nd, 3: 3rd, 4: 4th degree B-spline', '5: 5th, 6: 6th, 7: 7th degree B-spline'}, 'FontSize', 10, 'FontColor', [0.5 0.5 0.5]);
+
+uilabel(fig, 'Position', [col1_x y_start-550 100 20], 'Text', 'Use Def Template:', 'FontSize', 9);
+useDefaultTemplateCheckbox = uicheckbox(fig, 'Position', [col1_x+100 y_start-550 20 20], 'Text', '', 'Value', true);
+uilabel(fig, 'Position', [col1_x+130 y_start-550 55 20], 'Text', 'Custom:', 'FontSize', 9);
+templateCustomEdit = uieditfield(fig, 'text', 'Position', [col1_x+190 y_start-550 120 20], 'Visible', 'off');
+templateCustomButton = uibutton(fig, 'Position', [col1_x+310 y_start-550 40 20], 'Text', '...', 'Visible', 'off');
+
+% Step 8: Smoothing
+uilabel(fig, 'Position', [col1_x y_start-580 200 20], 'Text', '8. Smoothing', 'FontSize', 12, 'FontWeight', 'bold');
+smoothButton = uibutton(fig, 'Position', [col1_x y_start-605 120 22], 'Text', 'Smoothing');
+uilabel(fig, 'Position', [col1_x+130 y_start-605 50 20], 'Text', 'FWHM:', 'FontSize', 9);
+smoothFWHM = uieditfield(fig, 'text', 'Position', [col1_x+180 y_start-605 80 20], 'Value', '6 6 6');
+
+% Step 9: Noise PC Estimation
+uilabel(fig, 'Position', [col2_x y_start 400 20], 'Text', '9. Non-brain Noise PCs Estimation', 'FontSize', 12, 'FontWeight', 'bold');
+noiseButton = uibutton(fig, 'Position', [col2_x y_start-25 120 22], 'Text', 'Estimate PCs');
+
+% Step 10: Single Run Noise Regression
+uilabel(fig, 'Position', [col2_x y_start-55 420 20], 'Text', '10. Noise Regression Strategy Estimation', 'FontSize', 12, 'FontWeight', 'bold');
+regressionButton = uibutton(fig, 'Position', [col2_x y_start-80 120 22], 'Text', 'Single Run Est');
+
+defaultPCStrategyCheckbox = uicheckbox(fig, 'Position', [col2_x+140 y_start-80 250 22], 'Text', 'Use default PC counts', 'Value', true, 'FontSize', 11);
+uilabel(fig, 'Position', [col2_x y_start-107 115 20], 'Text', 'Custom PC counts:', 'FontSize', 10);
+customPCCountsEdit = uieditfield(fig, 'text', 'Position', [col2_x+120 y_start-107 250 20], 'Value', '0 5 10 20', 'Enable', 'off');
+uilabel(fig, 'Position', [col2_x y_start-133 420 20], 'Text', 'Default: 0, 20, 40, ...; custom: space/comma-separated counts.', 'FontSize', 9, 'FontColor', [0.5 0.5 0.5]);
+
+% Step 11: Optimal Noise Regression Strategy
+uilabel(fig, 'Position', [col2_x y_start-165 250 20], 'Text', '11. Optimal Noise Strategy', 'FontSize', 12, 'FontWeight', 'bold');
+groupNoiseButton = uibutton(fig, 'Position', [col2_x y_start-190 120 22], 'Text', 'Cross Run Est');
+
+% Step 12: Advanced Regression
+uilabel(fig, 'Position', [col2_x y_start-220 400 20], 'Text', '12. Final Noise Regression Strategy', 'FontSize', 12, 'FontWeight', 'bold');
+advRegressionButton = uibutton(fig, 'Position', [col2_x y_start-245 120 22], 'Text', 'Final Regression');
+
+% Head Motion Regression parameters
+uilabel(fig, 'Position', [col2_x+130 y_start-245 45 20], 'Text', 'Detrend:', 'FontSize', 9);
+detrendCheckbox = uicheckbox(fig, 'Position', [col2_x+180 y_start-245 20 20], 'Text', '', 'Value', true);
+uilabel(fig, 'Position', [col2_x+210 y_start-245 35 20], 'Text', 'Filter:', 'FontSize', 9);
+filterCheckbox = uicheckbox(fig, 'Position', [col2_x+250 y_start-245 20 20], 'Text', '', 'Value', true);
+
+uilabel(fig, 'Position', [col2_x y_start-270 70 20], 'Text', 'High Freq:', 'FontSize', 9);
+highFreqEdit = uieditfield(fig, 'numeric', 'Position', [col2_x+70 y_start-270 40 20], 'Value', 0.1);
+uilabel(fig, 'Position', [col2_x+120 y_start-270 70 20], 'Text', 'Low Freq:', 'FontSize', 9);
+lowFreqEdit = uieditfield(fig, 'numeric', 'Position', [col2_x+190 y_start-270 40 20], 'Value', 0.01);
+
+% Advanced regression strategies
+uilabel(fig, 'Position', [col2_x y_start-295 120 20], 'Text', 'Strategies:', 'FontSize', 9, 'FontWeight', 'bold');
+advRegressionPCOnlyCheckbox = uicheckbox(fig, 'Position', [col2_x y_start-320 70 20], 'Text', 'PC only', 'FontSize', 10, 'Value', true);
+advRegressionPCCSFCheckbox = uicheckbox(fig, 'Position', [col2_x+80 y_start-320 70 20], 'Text', 'PC+CSF', 'FontSize', 10, 'Value', true);
+advRegressionPCGSCheckbox = uicheckbox(fig, 'Position', [col2_x+160 y_start-320 70 20], 'Text', 'PC+GS', 'FontSize', 10, 'Value', true);
+advRegressionPCCSFGSCheckbox = uicheckbox(fig, 'Position', [col2_x+240 y_start-320 115 20], 'Text', 'PC+CSF+GS', 'FontSize', 10, 'Value', true);
+
+% Step 13: Region FC
+uilabel(fig, 'Position', [col2_x y_start-350 200 20], 'Text', '13. Region/Network FC', 'FontSize', 12, 'FontWeight', 'bold');
+fcButton = uibutton(fig, 'Position', [col2_x y_start-375 120 22], 'Text', 'FC Analysis');
+uilabel(fig, 'Position', [col2_x+130 y_start-375 60 20], 'Text', 'Label:', 'FontSize', 9);
+fcLabelDropdown = uidropdown(fig, 'Position', [col2_x+190 y_start-375 100 20], ...
+    'Items', {'214', '428', '604', '1184', 'Custom...'}, 'Value', '428');
+fcCustomEdit = uieditfield(fig, 'text', 'Position', [col2_x y_start-400 220 20], 'Visible', 'off');
+fcCustomButton = uibutton(fig, 'Position', [col2_x+230 y_start-400 40 20], 'Text', '...', 'Visible', 'off');
+
+% Step 14: Individual Parcellation - Prior Label (Moved to middle column)
+uilabel(fig, 'Position', [col2_x y_start-425 300 20], 'Text', '14. Parcellation - Prior Label', 'FontSize', 12, 'FontWeight', 'bold');
+parcellationButton = uibutton(fig, 'Position', [col2_x y_start-450 120 22], 'Text', 'Network Parc');
+uilabel(fig, 'Position', [col2_x+130 y_start-450 80 20], 'Text', 'Network:', 'FontSize', 9);
+parcNetworkDropdown = uidropdown(fig, 'Position', [col2_x+210 y_start-450 180 20], ...
+    'Items', {'214rois', '428rois', '604rois', '1184rois'}, 'Value', '428rois');
+
+useCustomParcCheckbox = uicheckbox(fig, 'Position', [col2_x y_start-475 150 20], 'Text', 'Use Custom', 'Value', false);
+networkCustomEdit = uieditfield(fig, 'text', 'Position', [col2_x y_start-500 180 20], 'Visible', 'off');
+networkCustomButton = uibutton(fig, 'Position', [col2_x+190 y_start-500 40 20], 'Text', '...', 'Visible', 'off');
+labelCustomEdit = uieditfield(fig, 'text', 'Position', [col2_x y_start-525 180 20], 'Visible', 'off');
+labelCustomButton = uibutton(fig, 'Position', [col2_x+190 y_start-525 40 20], 'Text', '...', 'Visible', 'off');
+
+
+% Step 15: Individual Parcellation - Clustering
+uilabel(fig, 'Position', [col3_x y_start 300 20], 'Text', '15. Parcellation - Clustering', 'FontSize', 12, 'FontWeight', 'bold');
+parcellationClustButton = uibutton(fig, 'Position', [col3_x y_start-25 120 22], 'Text', 'Clustering Parc');
+uilabel(fig, 'Position', [col3_x+130 y_start-25 70 20], 'Text', 'ROI Num:', 'FontSize', 9);
+clustROIEdit = uieditfield(fig, 'numeric', 'Position', [col3_x+200 y_start-25 100 20], 'Value', 100, 'Limits', [1 Inf]);
+if isprop(clustROIEdit, 'RoundFractionalValues'), clustROIEdit.RoundFractionalValues = 'on'; end
+roiHelp = uilabel(fig, 'Position', [col3_x y_start-55 425 20], 'Text', 'Partition the whole brain into N ROIs.', 'FontSize', 10, 'FontColor', [0.5 0.5 0.5]);
+
+% Step 16: Individual Parcellation - Voxel Mode
+uilabel(fig, 'Position', [col3_x y_start-85 300 20], 'Text', '16. Parcellation - Voxel Mode', 'FontSize', 12, 'FontWeight', 'bold');
+parcellationVoxelButton = uibutton(fig, 'Position', [col3_x y_start-110 120 22], 'Text', 'Voxel Parc');
+uilabel(fig, 'Position', [col3_x+130 y_start-110 90 20], 'Text', 'Downsample:', 'FontSize', 9);
+voxelDownsampleEdit = uieditfield(fig, 'numeric', 'Position', [col3_x+220 y_start-110 50 20], 'Value', 2);
+
+% Step 17: Tissue Segmentation
+uilabel(fig, 'Position', [col3_x y_start-140 250 20], 'Text', '17. Tissue Segmentation', 'FontSize', 12, 'FontWeight', 'bold');
+tissueSegButton = uibutton(fig, 'Position', [col3_x y_start-165 120 22], 'Text', 'Tissue Seg');
+
+% Shared Parcellation Parameters
+uilabel(fig, 'Position', [col3_x y_start-215 200 20], 'Text', 'Parcellation Parameters', 'FontSize', 11, 'FontWeight', 'bold');
+
+uilabel(fig, 'Position', [col3_x y_start-240 70 20], 'Text', 'Percent Top:', 'FontSize', 9);
+percentTopEdit = uieditfield(fig, 'numeric', 'Position', [col3_x+70 y_start-240 50 20], 'Value', 0.8);
+
+uilabel(fig, 'Position', [col3_x+130 y_start-240 60 20], 'Text', 'Max Iter:', 'FontSize', 9);
+maxIterEdit = uieditfield(fig, 'numeric', 'Position', [col3_x+190 y_start-240 50 20], 'Value', 30);
+
+uilabel(fig, 'Position', [col3_x y_start-265 80 20], 'Text', 'Change Thr:', 'FontSize', 9);
+changeThrEdit = uieditfield(fig, 'numeric', 'Position', [col3_x+80 y_start-265 50 20], 'Value', 0.001);
+
+uilabel(fig, 'Position', [col3_x+140 y_start-265 70 20], 'Text', 'Conf Thr:', 'FontSize', 9);
+confThrEdit = uieditfield(fig, 'numeric', 'Position', [col3_x+210 y_start-265 50 20], 'Value', 2.5);
+
+% Parcellation corrections
+useTSNRCheckbox = uicheckbox(fig, 'Position', [col3_x y_start-295 80 20], 'Text', 'Use tSNR', 'Value', false);
+useInterSubjectVarCheckbox = uicheckbox(fig, 'Position', [col3_x+90 y_start-295 120 20], 'Text', 'Use Inter-Subj Var', 'Value', false);
+parcellationUseParallelCheckbox = uicheckbox(fig, 'Position', [col3_x+220 y_start-295 100 20], 'Text', 'Parallel', 'Value', false);
+
+uilabel(fig, 'Position', [col3_x y_start-320 90 20], 'Text', 'Group Network:', 'FontSize', 9);
+groupNetworkEdit = uieditfield(fig, 'text', 'Position', [col3_x+90 y_start-320 220 20], 'Value', '');
+groupNetworkButton = uibutton(fig, 'Position', [col3_x+315 y_start-320 40 20], 'Text', '...');
+
+configButton = uibutton(fig, 'Position', [col3_x y_start-355 120 25], 'Text', 'Load Config');
+saveConfigButton = uibutton(fig, 'Position', [col3_x+130 y_start-355 120 25], 'Text', 'Save Config');
+
+
+uilabel(fig, 'Position', [50 135 1300 20], 'Text', 'Status Display:', 'FontSize', 11, 'FontWeight', 'bold');
+statusText = uitextarea(fig, 'Position', [50 10 1300 120], 'Editable', false);
+
+fig.UserData.bidsButton = bidsButton;
+fig.UserData.runStepsButton = runStepsButton;
+fig.UserData.scalingButton = scalingButton;
+fig.UserData.maskButton = maskButton;
+fig.UserData.fieldmapButton = fieldmapButton;
+fig.UserData.slicetimeButton = slicetimeButton;
+fig.UserData.realignButton = realignButton;
+fig.UserData.coregButton = coregButton;
+fig.UserData.normButton = normButton;
+fig.UserData.smoothButton = smoothButton;
+fig.UserData.noiseButton = noiseButton;
+fig.UserData.regressionButton = regressionButton;
+fig.UserData.groupNoiseButton = groupNoiseButton;
+fig.UserData.advRegressionButton = advRegressionButton;
+fig.UserData.fcButton = fcButton;
+fig.UserData.parcellationButton = parcellationButton;
+fig.UserData.parcellationClustButton = parcellationClustButton;
+fig.UserData.parcellationVoxelButton = parcellationVoxelButton;
+fig.UserData.tissueSegButton = tissueSegButton;
+fig.UserData.statusText = statusText;
+fig.UserData.templateEdit = templateEdit;
+fig.UserData.codeEdit = codeEdit;
+fig.UserData.subjectsEdit = subjectsEdit;
+fig.UserData.sessionEdit = sessionEdit;
+fig.UserData.taskEdit = taskEdit;
+fig.UserData.runEdit = runEdit;
+fig.UserData.stagesEdit = stagesEdit;
+fig.UserData.voxelScaleEdit = voxelScaleEdit;
+fig.UserData.sliceTimingTR = sliceTimingTR;
+fig.UserData.sliceTimingNSlices = sliceTimingNSlices;
+fig.UserData.sliceTimingOrder = sliceTimingOrder;
+fig.UserData.smoothFWHM = smoothFWHM;
+fig.UserData.coregInterpEdit = coregInterpEdit;
+fig.UserData.normInterpEdit = normInterpEdit;
+fig.UserData.fcLabelDropdown = fcLabelDropdown;
+fig.UserData.parcNetworkDropdown = parcNetworkDropdown;
+fig.UserData.fcCustomEdit = fcCustomEdit;
+fig.UserData.groupNetworkEdit = groupNetworkEdit;
+fig.UserData.groupNetworkButton = groupNetworkButton;
+fig.UserData.networkCustomEdit = networkCustomEdit;
+fig.UserData.labelCustomEdit = labelCustomEdit;
+fig.UserData.useCustomParcCheckbox = useCustomParcCheckbox;
+fig.UserData.clustROIEdit = clustROIEdit;
+fig.UserData.voxelDownsampleEdit = voxelDownsampleEdit;
+fig.UserData.useTSNRCheckbox = useTSNRCheckbox;
+fig.UserData.useInterSubjectVarCheckbox = useInterSubjectVarCheckbox;
+fig.UserData.parcellationUseParallelCheckbox = parcellationUseParallelCheckbox;
+fig.UserData.advRegressionPCOnlyCheckbox = advRegressionPCOnlyCheckbox;
+fig.UserData.advRegressionPCCSFCheckbox = advRegressionPCCSFCheckbox;
+fig.UserData.advRegressionPCGSCheckbox = advRegressionPCGSCheckbox;
+fig.UserData.advRegressionPCCSFGSCheckbox = advRegressionPCCSFGSCheckbox;
+fig.UserData.percentTopEdit = percentTopEdit;
+fig.UserData.maxIterEdit = maxIterEdit;
+fig.UserData.changeThrEdit = changeThrEdit;
+fig.UserData.confThrEdit = confThrEdit;
+fig.UserData.detrendCheckbox = detrendCheckbox;
+fig.UserData.filterCheckbox = filterCheckbox;
+fig.UserData.highFreqEdit = highFreqEdit;
+fig.UserData.lowFreqEdit = lowFreqEdit;
+fig.UserData.useDefaultTemplateCheckbox = useDefaultTemplateCheckbox;
+fig.UserData.templateCustomEdit = templateCustomEdit;
+fig.UserData.templateCustomButton = templateCustomButton;
+fig.UserData.fcCustomButton = fcCustomButton;
+fig.UserData.networkCustomButton = networkCustomButton;
+fig.UserData.labelCustomButton = labelCustomButton;
+
+
+fig.UserData.defaultPCStrategyCheckbox = defaultPCStrategyCheckbox;
+fig.UserData.customPCCountsEdit = customPCCountsEdit;
+fig.UserData.coregInterpHelp = coregInterpHelp;
+fig.UserData.normInterpHelp = normInterpHelp;
+fig.UserData.roiHelp = roiHelp;
+
+fig.UserData.minTimepointsEdit = minTimepointsEdit;
+fig.UserData.pauseButton = pauseButton;
+fig.UserData.resumeButton = resumeButton;
+fig.UserData.stopButton = stopButton;
+fig.UserData.runControl = MIKeyRunControl();
+% Permit control callbacks at the processing checkpoints when supported.
+for item = reshape(fig.Children, 1, [])
+    if isprop(item, 'Interruptible'), item.Interruptible = 'on'; end
+    if isprop(item, 'BusyAction'), item.BusyAction = 'queue'; end
+end
+pauseButton.ButtonPushedFcn = @(btn,event) pauseGUIRun(fig);
+resumeButton.ButtonPushedFcn = @(btn,event) resumeGUIRun(fig);
+stopButton.ButtonPushedFcn = @(btn,event) stopGUIRun(fig);
+fig.CloseRequestFcn = @(src,event) closeGUI(fig);
+
+bidsButton.ButtonPushedFcn = @(btn,event) selectBIDSFolder(fig);
+runStepsButton.ButtonPushedFcn = @(btn,event) runSelectedSteps(fig);
+scalingButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 1);
+maskButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 2);
+fieldmapButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 3);
+slicetimeButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 4);
+realignButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 5);
+coregButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 6);
+normButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 7);
+smoothButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 8);
+noiseButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 9);
+regressionButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 10);
+groupNoiseButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 11);
+advRegressionButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 12);
+fcButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 13);
+parcellationButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 14);
+parcellationClustButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 15);
+parcellationVoxelButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 16);
+tissueSegButton.ButtonPushedFcn = @(btn,event) runGUIStage(fig, 17);
+configButton.ButtonPushedFcn = @(btn,event) loadConfiguration(fig);
+saveConfigButton.ButtonPushedFcn = @(btn,event) saveConfiguration(fig);
+
+
+fcLabelDropdown.ValueChangedFcn = @(dd,event) handleDropdownChange(fig, 'fc');
+useCustomParcCheckbox.ValueChangedFcn = @(cb,event) handleCustomParcCheckbox(fig);
+useDefaultTemplateCheckbox.ValueChangedFcn = @(cb,event) handleTemplateCheckbox(fig);
+templateCustomButton.ButtonPushedFcn = @(btn,event) selectCustomTemplate(fig);
+fcCustomButton.ButtonPushedFcn = @(btn,event) selectCustomFile(fig, 'fc');
+networkCustomButton.ButtonPushedFcn = @(btn,event) selectCustomFile(fig, 'network');
+groupNetworkButton.ButtonPushedFcn = @(btn,event) selectCustomFile(fig, 'groupNetwork');
+labelCustomButton.ButtonPushedFcn = @(btn,event) selectCustomFile(fig, 'label');
+
+defaultPCStrategyCheckbox.ValueChangedFcn = @(src,event) handlePCStrategyCheckbox(fig);
+handlePCStrategyCheckbox(fig);
+handleCustomParcCheckbox(fig);
+handleTemplateCheckbox(fig);
+handleDropdownChange(fig, 'fc');
+end
+
+
+function handlePCStrategyCheckbox(fig)
+if fig.UserData.defaultPCStrategyCheckbox.Value
+    fig.UserData.customPCCountsEdit.Enable = 'off';
+else
+    fig.UserData.customPCCountsEdit.Enable = 'on';
+end
+end
+
+function handleDropdownChange(fig, dropdownType)
+switch dropdownType
+    case 'fc'
+        if strcmp(fig.UserData.fcLabelDropdown.Value, 'Custom...')
+
+            fig.UserData.fcCustomEdit.Visible = 'on';
+            fig.UserData.fcCustomButton.Visible = 'on';
+        else
+
+            fig.UserData.fcCustomEdit.Visible = 'off';
+            fig.UserData.fcCustomButton.Visible = 'off';
+        end
+end
+end
+
+function handleCustomParcCheckbox(fig)
+if fig.UserData.useCustomParcCheckbox.Value
+
+    fig.UserData.parcNetworkDropdown.Visible = 'off';
+    fig.UserData.networkCustomEdit.Visible = 'on';
+    fig.UserData.labelCustomEdit.Visible = 'on';
+    fig.UserData.networkCustomButton.Visible = 'on';
+    fig.UserData.labelCustomButton.Visible = 'on';
+else
+
+    fig.UserData.parcNetworkDropdown.Visible = 'on';
+    fig.UserData.networkCustomEdit.Visible = 'off';
+    fig.UserData.labelCustomEdit.Visible = 'off';
+    fig.UserData.networkCustomButton.Visible = 'off';
+    fig.UserData.labelCustomButton.Visible = 'off';
+end
+end
+
+function handleTemplateCheckbox(fig)
+if fig.UserData.useDefaultTemplateCheckbox.Value
+
+    fig.UserData.templateCustomEdit.Visible = 'off';
+    fig.UserData.templateCustomButton.Visible = 'off';
+else
+
+    fig.UserData.templateCustomEdit.Visible = 'on';
+    fig.UserData.templateCustomButton.Visible = 'on';
+end
+end
+
+function selectCustomTemplate(fig)
+[file, path] = uigetfile('*.nii', 'Select Custom Template File');
+if file ~= 0
+    filePath = fullfile(path, file);
+    fig.UserData.templateCustomEdit.Value = filePath;
+    updateStatus(fig, ['Selected custom template: ' filePath]);
+end
+end
+
+function selectCustomFile(fig, fileType)
+[file, path] = uigetfile('*.nii', ['Select ' fileType ' file']);
+if file ~= 0
+    filePath = fullfile(path, file);
+    
+    if validateNiftiDimensions(fig, filePath)
+        switch fileType
+            case 'fc'
+                fig.UserData.fcCustomEdit.Value = filePath;
+            case 'groupNetwork'
+                fig.UserData.groupNetworkEdit.Value = filePath;
+            case 'network'
+                fig.UserData.networkCustomEdit.Value = filePath;
+            case 'label'
+                fig.UserData.labelCustomEdit.Value = filePath;
+        end
+        updateStatus(fig, ['Selected ' fileType ' file: ' filePath]);
+    else
+        errordlg(['The selected ' fileType ' file has incorrect dimensions or data type. Please select a file matching Template_Mouse_v38.nii dimensions with integer values 1:n.'], 'File Validation Error');
+    end
+end
+end
+
+function isValid = validateNiftiDimensions(fig, filePath)
+isValid = false;
+try
+    templatePath = fig.UserData.templateEdit.Value;
+    templateFile = fullfile(templatePath, 'Template_Mouse_v38.nii');
+    
+    if ~exist(templateFile, 'file')
+        updateStatus(fig, 'Warning: Template file not found, skipping dimension validation');
+        isValid = true;
+        return;
+    end
+    
+    templateHeader = spm_vol(templateFile);
+    customHeader = spm_vol(filePath);
+    
+    if ~isequal(templateHeader.dim, customHeader.dim)
+        updateStatus(fig, ['Dimension mismatch: Template=' mat2str(templateHeader.dim) ', Custom=' mat2str(customHeader.dim)]);
+        return;
+    end
+    
+    customData = spm_read_vols(customHeader);
+    uniqueVals = unique(customData(:));
+    uniqueVals = uniqueVals(~isnan(uniqueVals) & uniqueVals ~= 0);
+    
+    if any(uniqueVals ~= round(uniqueVals)) || ~isequal(uniqueVals', 1:length(uniqueVals))
+        updateStatus(fig, 'Data validation failed: Values should be integers from 1 to n');
+        return;
+    end
+    
+    isValid = true;
+    updateStatus(fig, 'Custom file validation passed');
+    
+catch ME
+    updateStatus(fig, ['File validation error: ' ME.message]);
+end
+end
+
+function runSelectedSteps(fig)
+if ~isfield(fig.UserData, 'bidsPath')
+    errordlg('Please select BIDS folder first', 'Error');
+    return;
+end
+
+stepsStr = fig.UserData.stagesEdit.Value;
+steps = parseStepsString(stepsStr);
+
+if isempty(steps)
+    errordlg('Invalid steps format. Please use format like "1:17" or "1,2,3,5:8"', 'Error');
+    return;
+end
+
+if ~beginGUIRun(fig), return; end
+cleanup = onCleanup(@() finishGUIRun(fig)); %#ok<NASGU>
+try
+    updateStatus(fig, ['Running steps: ' stepsStr]);
+    for i = 1:length(steps)
+        guiCheckpoint(fig, true);
+        step = steps(i);
+        if step >= 1 && step <= 17
+            updateStatus(fig, ['=== Starting Step ' num2str(step) ' ===']);
+            executeStage(fig, step);
+            updateStatus(fig, ['=== Completed Step ' num2str(step) ' ===']);
+        else
+            updateStatus(fig, ['Warning: Invalid step number ' num2str(step) ', skipping']);
+        end
+    end
+    updateStatus(fig, 'All selected steps completed!');
+catch ME
+    reportGUIRunError(fig, ME);
+end
+end
+
+
+function steps = parseStepsString(stepsStr)
+steps = [];
+try
+    stepsStr = strrep(stepsStr, ' ', '');
+    parts = strsplit(stepsStr, ',');
+    
+    for i = 1:length(parts)
+        part = parts{i};
+        if contains(part, ':')
+            rangeParts = strsplit(part, ':');
+            if length(rangeParts) == 2
+                startStep = str2double(rangeParts{1});
+                endStep = str2double(rangeParts{2});
+                if ~isnan(startStep) && ~isnan(endStep)
+                    steps = [steps, startStep:endStep];
+                end
+            end
+        else
+            step = str2double(part);
+            if ~isnan(step)
+                steps = [steps, step];
+            end
+        end
+    end
+    
+    steps = unique(steps);
+    
+catch
+    steps = [];
+end
+end
+
+function updateStatus(fig, message)
+appendStatus(fig, message);
+guiCheckpoint(fig, true);
+end
+
+function appendStatus(fig, message)
+if isa(fig, 'MIKeyBatchState')
+    fig.log(message);
+    return;
+end
+currentText = fig.UserData.statusText.Value;
+timestamp = datestr(now, 'yyyy-mm-dd HH:MM:SS');
+formattedMessage = [timestamp, ': ', message];
+
+if isempty(currentText)
+    newText = {formattedMessage};
+else
+    newText = [currentText; {formattedMessage}];
+end
+fig.UserData.statusText.Value = newText;
+drawnow;
+end
+
+function selectBIDSFolder(fig)
+bidsPath = uigetdir('', 'Select BIDS Root Folder');
+if bidsPath == 0
+    return;
+end
+fig.UserData.bidsPath = bidsPath;
+updateStatus(fig, ['Selected BIDS folder: ' bidsPath]);
+toolboxRoot = fileparts(mfilename('fullpath'));
+fig.UserData.templateEdit.Value = fullfile(toolboxRoot, 'share_temp');
+fig.UserData.codeEdit.Value = fullfile(toolboxRoot, 'scripts');
+checkBIDSStructure(fig, bidsPath);
+end
+
+function checkBIDSStructure(fig, bidsPath)
+subDirs = getSubjectContexts(fig, bidsPath, fig.UserData.subjectsEdit.Value);
+if isempty(subDirs)
+    updateStatus(fig, 'Warning: No subject directories found (sub-*)');
+    return;
+end
+
+updateStatus(fig, ['Found ' num2str(length(subDirs)) ' subject directories']);
+
+for i = 1:length(subDirs)
+    subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+    
+    anatPath = MIKey_anat_path(subPath);
+    if exist(anatPath, 'dir')
+        t2Files = MIKey_nifti_files(anatPath, '*_T2w.nii');
+        updateStatus(fig, ['Subject ' subDirs(i).name ': Found ' num2str(length(t2Files)) ' T2w files']);
+    end
+    fmapPath = fullfile(subPath, 'fmap');
+    if exist(fmapPath, 'dir')
+        fmapFiles = MIKey_nifti_files(fmapPath, '*.nii');
+        updateStatus(fig, ['Subject ' subDirs(i).name ': Found ' num2str(length(fmapFiles)) ' fmap files']);
+    end
+    funcPath = fullfile(subPath, 'func');
+    if exist(funcPath, 'dir')
+        boldFiles = getBoldFiles(fig, funcPath);
+        updateStatus(fig, ['Subject ' subDirs(i).name ': Found ' num2str(length(boldFiles)) ' BOLD files']);
+    end
+end
+end
+
+function loadConfiguration(fig)
+[file, folder] = uigetfile('*.mat', 'Select Configuration File');
+if isequal(file, 0), return; end
+try
+    config = MIKey_config(fullfile(folder, file));
+    if numel(config.clustROINums) ~= 1
+        error('MIKey:GUIROI', 'GUI ROI Num accepts one integer. Use MIKey_run for a list of ROI counts.');
+    end
+    fig.UserData.bidsPath = config.bidsPath;
+    map = MIKey_parameter_map();
+    for i = 1:size(map, 1)
+        value = config.(map{i, 1});
+        if any(strcmp(map{i, 1}, {'smoothFWHM', 'customPCCounts', 'steps'}))
+            value = strtrim(sprintf('%g ', value));
+            if strcmp(map{i, 1}, 'steps')
+                value = strrep(value, ' ', ',');
+            end
+        end
+        fig.UserData.(map{i, 2}).Value = value;
+    end
+    handleTemplateCheckbox(fig);
+    handleCustomParcCheckbox(fig);
+    handleDropdownChange(fig, 'fc');
+    handlePCStrategyCheckbox(fig);
+    updateStatus(fig, ['Loaded configuration: ' file]);
+catch ME
+    updateStatus(fig, ['Error loading configuration: ' ME.message]);
+end
+end
+
+function saveConfiguration(fig)
+[file, folder] = uiputfile('MIKey_BIDS_config.mat', 'Save Configuration As');
+if isequal(file, 0), return; end
+try
+    config = MIKey_defaults();
+    if isfield(fig.UserData, 'bidsPath')
+        config.bidsPath = fig.UserData.bidsPath;
+    end
+    map = MIKey_parameter_map();
+    for i = 1:size(map, 1)
+        config.(map{i, 1}) = fig.UserData.(map{i, 2}).Value;
+    end
+    config = MIKey_config(config);
+    save(fullfile(folder, file), 'config');
+    updateStatus(fig, ['Saved configuration: ' file]);
+catch ME
+    updateStatus(fig, ['Error saving configuration: ' ME.message]);
+end
+end
+
+function mode = selectParcellationMode(fig)
+if isa(fig, 'MIKeyBatchState')
+    if strcmp(fig.Config.parcellationMode, 'individual')
+        mode = 'Individual Runs (separate folders)';
+    else
+        mode = 'Concatenated Runs (single folder)';
+    end
+else
+    mode = questdlg('Select parcellation mode:', 'Parcellation Mode', ...
+        'Individual Runs (separate folders)', 'Concatenated Runs (single folder)', ...
+        'Individual Runs (separate folders)');
+end
+end
+
+function filename = getGroupNetworkFile(fig, templatePath)
+cfg = struct('templatePath', templatePath, ...
+    'parcNetwork', fig.UserData.parcNetworkDropdown.Value, ...
+    'useCustomParc', fig.UserData.useCustomParcCheckbox.Value, ...
+    'networkCustomPath', fig.UserData.networkCustomEdit.Value, ...
+    'groupNetworkPath', fig.UserData.groupNetworkEdit.Value);
+filename = MIKey_group_network(cfg);
+updateStatus(fig, ['Using group network: ' filename]);
+end
+
+function cfg = getSelectionConfig(fig, bidsPath)
+cfg = MIKey_defaults();
+cfg.bidsPath = bidsPath;
+cfg.subjectFilter = fig.UserData.subjectsEdit.Value;
+cfg.sessionFilter = fig.UserData.sessionEdit.Value;
+cfg.taskFilter = fig.UserData.taskEdit.Value;
+cfg.runFilter = fig.UserData.runEdit.Value;
+cfg.minTimepoints = fig.UserData.minTimepointsEdit.Value;
+if isfield(fig.UserData, 'activeStage')
+    cfg.steps = fig.UserData.activeStage;
+else
+    cfg.steps = parseStepsString(fig.UserData.stagesEdit.Value);
+end
+end
+
+function scopes = getSubjectContexts(fig, bidsPath, subjectFilter)
+cfg = getSelectionConfig(fig, bidsPath);
+cfg.subjectFilter = subjectFilter;
+[scopes, excluded] = MIKey_subjects(cfg);
+if ~isfield(fig.UserData, 'excludedTimepointFiles'), fig.UserData.excludedTimepointFiles = {}; end
+for i = 1:numel(excluded)
+    if ~any(strcmp(fig.UserData.excludedTimepointFiles, excluded(i).source))
+        fig.UserData.excludedTimepointFiles{end+1} = excluded(i).source;
+        updateStatus(fig, sprintf('Excluded short BOLD (T=%d < N=%d): %s', excluded(i).timepoints, excluded(i).minimum, excluded(i).source));
+    end
+end
+end
+
+function files = getBoldFiles(fig, directory)
+cfg = getSelectionConfig(fig, fig.UserData.bidsPath);
+files = MIKey_bold_files(directory, cfg);
+end
+
+function directory = getGroupAnalysisPath(fig, bidsPath)
+directory = MIKey_group_analysis(getSelectionConfig(fig, bidsPath));
+end
+
+function directory = selectedConcatenatedDirectory(fig, directory)
+key = MIKey_selection_key(getSelectionConfig(fig, fig.UserData.bidsPath));
+if ~isempty(key), directory = fullfile(directory, key); end
+end
+
+function stem = scopeFilename(subjectName)
+stem = regexprep(subjectName, '[\\/]', '_');
+end
+
+function runGUIStage(fig, stage)
+if ~beginGUIRun(fig), return; end
+cleanup = onCleanup(@() finishGUIRun(fig)); %#ok<NASGU>
+try
+    executeStage(fig, stage);
+    guiCheckpoint(fig, true);
+catch ME
+    reportGUIRunError(fig, ME);
+end
+end
+
+function started = beginGUIRun(fig)
+started = false;
+if fig.UserData.runControl.Active
+    appendStatus(fig, 'A task is already running. Use Pause, Resume or Stop.');
+    return;
+end
+if ~isfield(fig.UserData, 'bidsPath')
+    errordlg('Please select BIDS folder first', 'Error'); return;
+end
+try
+    MIKey_config(struct('minTimepoints', fig.UserData.minTimepointsEdit.Value));
+catch ME
+    appendStatus(fig, ['Error: ' ME.message]); return;
+end
+fig.UserData.runControl.start();
+fig.UserData.excludedTimepointFiles = {};
+previous = cell(0,2);
+children = fig.Children;
+for i = 1:numel(children)
+    item = children(i);
+    if isprop(item, 'Enable') && ~isequal(item, fig.UserData.statusText) && ...
+            ~isequal(item, fig.UserData.pauseButton) && ~isequal(item, fig.UserData.resumeButton) && ~isequal(item, fig.UserData.stopButton)
+        previous(end+1,:) = {item,item.Enable}; %#ok<AGROW>
+        item.Enable = 'off';
+    end
+end
+fig.UserData.runEnabledStates = previous;
+syncRunButtons(fig);
+started = true;
+end
+
+function finishGUIRun(fig)
+if ~isvalid(fig), return; end
+control = fig.UserData.runControl;
+control.finish();
+if isfield(fig.UserData, 'runEnabledStates')
+    previous = fig.UserData.runEnabledStates;
+    for i = 1:size(previous,1)
+        if isvalid(previous{i,1}), previous{i,1}.Enable = previous{i,2}; end
+    end
+end
+syncRunButtons(fig);
+if control.CloseRequested, delete(fig); end
+end
+
+function reportGUIRunError(fig, exception)
+if strcmp(exception.identifier, 'MIKey:Stopped')
+    appendStatus(fig, 'Stopped by user. Completed outputs are retained; no further files or steps will run.');
+elseif strncmp(exception.identifier, 'MIKey:Registration', 18)
+    appendStatus(fig, ['Processing stopped: ' exception.message]);
+else
+    appendStatus(fig, ['Error: ' exception.message]);
+end
+end
+
+function pauseGUIRun(fig)
+control = fig.UserData.runControl;
+if ~control.Active || control.StopRequested, return; end
+control.requestPause(); syncRunButtons(fig);
+appendStatus(fig, 'Pause requested. Waiting for a checkpoint; an active SPM/MEX operation must return first.');
+end
+
+function resumeGUIRun(fig)
+control = fig.UserData.runControl;
+if ~control.Active || control.StopRequested, return; end
+control.resume(); syncRunButtons(fig);
+appendStatus(fig, 'Resumed processing.');
+end
+
+function stopGUIRun(fig)
+control = fig.UserData.runControl;
+if ~control.Active, return; end
+control.requestStop(); syncRunButtons(fig);
+appendStatus(fig, 'Stop requested. Waiting for a checkpoint; MATLAB will remain open.');
+end
+
+function syncRunButtons(fig)
+control = fig.UserData.runControl;
+fig.UserData.pauseButton.Enable = onOff(control.Active && ~control.PauseRequested && ~control.StopRequested);
+fig.UserData.resumeButton.Enable = onOff(control.Active && control.PauseRequested && ~control.StopRequested);
+fig.UserData.stopButton.Enable = onOff(control.Active && ~control.StopRequested);
+end
+
+function value = onOff(enabled)
+value = 'off'; if enabled, value = 'on'; end
+end
+
+function closeGUI(fig)
+if fig.UserData.runControl.Active
+    fig.UserData.runControl.CloseRequested = true;
+    stopGUIRun(fig);
+else
+    delete(fig);
+end
+end
+
+function guiCheckpoint(fig, force)
+if nargin < 2, force = false; end
+if isa(fig, 'MIKeyBatchState'), return; end
+if isvalid(fig) && isfield(fig.UserData, 'runControl')
+    fig.UserData.runControl.checkpoint(force);
+end
+end
+
+function executeStage(fig, stage)
+fig.UserData.activeStage = stage;
+if ~isfield(fig.UserData, 'bidsPath')
+    errordlg('Please select BIDS folder first', 'Error');
+    return;
+end
+
+codePath = fig.UserData.codeEdit.Value;
+if exist(codePath, 'dir')
+    addpath(genpath(codePath));
+    updateStatus(fig, ['Added code path: ' codePath]);
+else
+    errordlg('Code path not found', 'Error');
+    return;
+end
+
+templatePath = fig.UserData.templateEdit.Value;
+if ~exist(templatePath, 'dir')
+    errordlg('Template path not found', 'Error');
+    return;
+end
+
+subjectFilter = fig.UserData.subjectsEdit.Value;
+
+cfg = MIKey_defaults();
+if isa(fig, 'MIKeyBatchState'), cfg = fig.Config; end
+cfg.bidsPath = fig.UserData.bidsPath;
+map = MIKey_parameter_map();
+for parameter = 1:size(map,1)
+    cfg.(map{parameter,1}) = fig.UserData.(map{parameter,2}).Value;
+end
+cfg.steps = stage;
+try
+switch stage
+    case 1
+        updateStatus(fig, 'Starting Voxel Scaling');
+        processVoxelScaling_BIDS(fig, subjectFilter, templatePath);
+    case 2
+        updateStatus(fig, 'Starting Mask Generation');
+        processMaskedData_BIDS(fig, subjectFilter);
+    case 3
+        updateStatus(fig, 'Starting Fieldmap Correction');
+        processFieldmapCorrection_BIDS(fig, subjectFilter, templatePath);
+    case 4
+        updateStatus(fig, 'Starting Slice Timing');
+        processSliceTiming_BIDS(fig, subjectFilter);
+    case 5
+        updateStatus(fig, 'Starting Realignment');
+        processRealignment_BIDS(fig, subjectFilter);
+    case 6
+        updateStatus(fig, 'Starting Coregistration');
+        processCoregistration_BIDS(fig, subjectFilter);
+    case 7
+        updateStatus(fig, 'Starting Normalization');
+        processNormalization_BIDS(fig, subjectFilter, templatePath);
+    case 8
+        updateStatus(fig, 'Starting Smoothing');
+        processSmoothing_BIDS(fig, subjectFilter);
+    case 9
+        updateStatus(fig, 'Starting Non-brain Noise PCs Estimation');
+        processNoisePCEstimation_BIDS(fig, subjectFilter);
+    case 10
+        updateStatus(fig, 'Starting Noise Regression Strategy Estimation');
+        processMotionRegression_BIDS(fig, subjectFilter);
+    case 11
+        updateStatus(fig, 'Starting Group Level Noise Estimation');
+        processGroupLevelNoiseEstimation_BIDS(fig, subjectFilter);
+    case 12
+        updateStatus(fig, 'Starting Final Noise Regression Strategy');
+        processAdvancedRegression_BIDS(fig, subjectFilter);
+    case 13
+        updateStatus(fig, 'Starting Functional Connectivity');
+        processFunctionalConnectivity_BIDS(fig, subjectFilter, templatePath);
+    case 14
+        updateStatus(fig, 'Starting Individual Parcellation - Prior Label');
+        processIndividualParcellationPrior_BIDS(fig, subjectFilter, templatePath);
+    case 15
+        updateStatus(fig, 'Starting Individual Parcellation - Clustering');
+        processIndividualParcellationClust_BIDS(fig, subjectFilter, templatePath);
+    case 16
+        updateStatus(fig, 'Starting Individual Parcellation - Voxel Mode');
+        processIndividualParcellationVoxel_BIDS(fig, subjectFilter, templatePath);
+    case 17
+        updateStatus(fig, 'Starting Tissue Segmentation');
+        processTissueSegmentation_BIDS(fig, subjectFilter);
+end
+catch ME
+    MIKey_write_derivative_metadata(cfg);
+    rethrow(ME);
+end
+MIKey_write_derivative_metadata(cfg);
+end
+
+%% BIDS-Compatible Processing Functions with file existence checks
+
+function processVoxelScaling_BIDS(fig, subjectFilter, templatePath)
+bidsPath = fig.UserData.bidsPath;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+if isfield(fig.UserData, 'voxelScaleEdit')
+    voxelScaleFactor = fig.UserData.voxelScaleEdit.Value;
+else
+    voxelScaleFactor = 20;
+end
+
+if isempty(voxelScaleFactor) || voxelScaleFactor <= 0
+    updateStatus(fig, 'Warning: Invalid voxel scaling factor, using default value of 20');
+    voxelScaleFactor = 20;
+end
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Processing subject: ' subDirs(i).name]);
+        updateStatus(fig, ['Using voxel scaling factor: ' num2str(voxelScaleFactor)]);
+        
+        funcPath = fullfile(subPath, 'func');
+        if exist(funcPath, 'dir')
+            boldFiles = getBoldFiles(fig, funcPath);
+            
+            for j = 1:length(boldFiles)
+            
+                guiCheckpoint(fig);
+                boldFile = boldFiles(j).name;
+                [~, baseName, ext] = fileparts(boldFile);
+                
+                derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+                if ~exist(derivPath, 'dir')
+                    mkdir(derivPath);
+                end
+                
+                scaledBoldPath = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext]);
+                if exist(scaledBoldPath, 'file')
+                    updateStatus(fig, ['Skipping - voxel scaled BOLD already exists: ' boldFile]);
+                    skippedCount = skippedCount + 1;
+                    continue;
+                end
+                
+                origBoldPath = fullfile(boldFiles(j).folder, boldFiles(j).sourceName);
+                derivBoldPath = MIKey_bids_path(derivPath, [baseName '_desc-orig' ext]);
+                MIKey_copy_nifti(origBoldPath, derivBoldPath, @() guiCheckpoint(fig));
+                progressClock = tic;
+                MIKey_scale_nifti(derivBoldPath, scaledBoldPath, voxelScaleFactor, ...
+                    @() guiCheckpoint(fig), @scalingProgress);
+                
+                updateStatus(fig, ['Completed voxel scaling for: ' boldFile]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+        anatPath = MIKey_anat_path(subPath);
+        if exist(anatPath, 'dir')
+            t2Files = MIKey_nifti_files(anatPath, '*_T2w.nii');
+            
+            for j = 1:length(t2Files)
+            
+                guiCheckpoint(fig);
+                t2File = t2Files(j).name;
+                [~, baseName, ext] = fileparts(t2File);
+                
+                derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'anat');
+                if ~exist(derivPath, 'dir')
+                    mkdir(derivPath);
+                end
+                
+                scaledT2Path = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext]);
+                if exist(scaledT2Path, 'file')
+                    updateStatus(fig, ['Skipping - voxel scaled T2w already exists: ' t2File]);
+                    skippedCount = skippedCount + 1;
+                    continue;
+                end
+                
+                origT2Path = fullfile(t2Files(j).folder, t2Files(j).sourceName);
+                derivT2Path = MIKey_bids_path(derivPath, [baseName '_desc-orig' ext]);
+                MIKey_copy_nifti(origT2Path, derivT2Path, @() guiCheckpoint(fig));
+                guiCheckpoint(fig, true);
+                
+                data_head = spm_vol(derivT2Path);
+                data = spm_read_vols(data_head);
+                data_head.mat = data_head.mat * voxelScaleFactor;
+                data_head.mat(4,4) = 1;
+                data_head.fname = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext]);
+                spm_write_vol(data_head, data);
+                
+                updateStatus(fig, ['Completed voxel scaling for: ' t2File]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+        fmapPath = fullfile(subPath, 'fmap');
+        if exist(fmapPath, 'dir')
+            fmapFiles = MIKey_nifti_files(fmapPath, '*.nii');
+            
+            for j = 1:length(fmapFiles)
+            
+                guiCheckpoint(fig);
+                fmapFile = fmapFiles(j).name;
+                [~, baseName, ext] = fileparts(fmapFile);
+                
+                derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'fmap');
+                if ~exist(derivPath, 'dir')
+                    mkdir(derivPath);
+                end
+                
+                scaledfmapPath = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext]);
+                if exist(scaledfmapPath, 'file')
+                    updateStatus(fig, ['Skipping - voxel scaled fmap already exists: ' fmapFile]);
+                    skippedCount = skippedCount + 1;
+                    continue;
+                end
+                
+                origfmapPath = fullfile(fmapFiles(j).folder, fmapFiles(j).sourceName);
+                derivfmapPath = MIKey_bids_path(derivPath, [baseName '_desc-orig' ext]);
+                MIKey_copy_nifti(origfmapPath, derivfmapPath, @() guiCheckpoint(fig));
+                guiCheckpoint(fig, true);
+                
+                data_head = spm_vol(derivfmapPath);
+                data = spm_read_vols(data_head);
+                data_head.mat = data_head.mat * voxelScaleFactor;
+                data_head.mat(4,4) = 1;
+                data_head.fname = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext]);
+                spm_write_vol(data_head, data);
+                
+                updateStatus(fig, ['Completed voxel scaling for: ' fmapFile]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error processing subject ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Voxel scaling completed: %d files processed, %d files skipped', processedCount, skippedCount));
+updateStatus(fig, 'Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.');
+
+    function scalingProgress(volume, total)
+        if volume == 1 || volume == total || toc(progressClock) >= 2
+            updateStatus(fig, sprintf('Scaling BOLD volume %d of %d: %s', volume, total, boldFile));
+            progressClock = tic;
+        end
+    end
+end
+
+function processMaskedData_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+processedCount = 0;
+skippedCount = 0;
+if isempty(subDirs)
+    reportEmptySelection(fig, bidsPath, subjectFilter, 'Mask application');
+    return;
+end
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Generating whole-brain masked data for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        if exist(funcPath, 'dir')
+            boldFiles = getBoldFiles(fig, funcPath);
+            if ~isempty(boldFiles)
+                for j = 1:length(boldFiles)
+                    guiCheckpoint(fig);
+                    boldFile = boldFiles(j).name;
+                    [~, baseName, ext] = fileparts(boldFile);
+                    
+                    derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+                    
+                    maskedboldPath = MIKey_bids_path(derivPath, [baseName '_desc-masked' ext]);
+                    if exist(maskedboldPath, 'file')
+                        updateStatus(fig, ['Skipping - masked BOLD already exists for: ' boldFile]);
+                        skippedCount = skippedCount + 1;
+                        continue;
+                    end
+                    
+                    boldMaskPath = MIKey_mask_file(derivPath, 'func', funcPath);
+                    if isempty(boldMaskPath)
+                        updateStatus(fig, ['Warning - BOLD brain mask not found for: ' subDirs(i).name '. Expected *_desc-boldbrain_mask.nii or .nii.gz in ' derivPath]);
+                        continue;
+                    end
+
+                    scaledBoldPath = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext], 'input');
+                    if exist(scaledBoldPath, 'file')
+                        boldmask = MIKey_load_mask(derivPath, 'func', scaledBoldPath, funcPath);
+                        updateStatus(fig, ['Using BOLD mask: ' boldMaskPath]);
+                        boldHead = spm_vol(scaledBoldPath);
+                        boldData = spm_read_vols(boldHead);
+                        
+                        maskedData = boldData .* repmat(boldmask, [1, 1, 1, size(boldData, 4)]);
+                        
+                        for k = 1:numel(boldHead)
+                            boldHead(k).fname = maskedboldPath;
+                        end
+                        spm_write_vol_4D(boldHead, maskedData);
+                        
+                        updateStatus(fig, ['Completed BOLD masking for: ' boldFile]);
+                        processedCount = processedCount + 1;
+                    else
+                        updateStatus(fig, ['Warning - scaled BOLD data not found for: ' boldFile]);
+                    end
+                end
+            end
+        end
+        
+        anatPath = MIKey_anat_path(subPath);
+        if exist(anatPath, 'dir')
+            t2Files = MIKey_nifti_files(anatPath, '*_T2w.nii');
+            if ~isempty(t2Files)
+                for j = 1:length(t2Files)
+                    guiCheckpoint(fig);
+                    t2File = t2Files(j).name;
+                    [~, baseName, ext] = fileparts(t2File);
+                    
+                    derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'anat');
+                    
+                    maskedT2Path = MIKey_bids_path(derivPath, [baseName '_desc-masked' ext]);
+                    if exist(maskedT2Path, 'file')
+                        updateStatus(fig, ['Skipping - masked T2w already exists for: ' t2File]);
+                        skippedCount = skippedCount + 1;
+                        continue;
+                    end
+                    
+                    t2MaskPath = MIKey_mask_file(derivPath, 'anat', anatPath);
+                    if isempty(t2MaskPath)
+                        updateStatus(fig, ['Warning - T2w brain mask not found for: ' subDirs(i).name '. Expected *_desc-anatbrain_mask.nii or .nii.gz in ' derivPath]);
+                        continue;
+                    end
+
+                    scaledT2Path = MIKey_bids_path(derivPath, [baseName '_desc-scaled' ext], 'input');
+                    if exist(scaledT2Path, 'file')
+                        t2mask = MIKey_load_mask(derivPath, 'anat', scaledT2Path, anatPath);
+                        updateStatus(fig, ['Using T2w mask: ' t2MaskPath]);
+                        t2Head = spm_vol(scaledT2Path);
+                        t2Data = spm_read_vols(t2Head);
+                        
+                        maskedT2Data = t2Data .* t2mask;
+                        
+                        t2Head.fname = maskedT2Path;
+                        spm_write_vol(t2Head, maskedT2Data);
+                        
+                        updateStatus(fig, ['Completed T2w masking for: ' t2File]);
+                        processedCount = processedCount + 1;
+                    else
+                        updateStatus(fig, ['Warning - scaled T2w data not found for: ' t2File]);
+                    end
+                end
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error processing masked data for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+if processedCount == 0 && skippedCount == 0
+    updateStatus(fig, 'Mask application not completed: no files processed. Check the missing brain-mask/scaled-input messages above.');
+else
+    updateStatus(fig, sprintf('Mask application completed: %d files processed, %d files skipped', processedCount, skippedCount));
+    updateStatus(fig, 'Please proceed to the next step');
+end
+end
+
+function reportEmptySelection(fig, bidsPath, subjectFilter, stageName)
+cfg = getSelectionConfig(fig, bidsPath);
+available = dir(fullfile(bidsPath, 'sub-*'));
+available = available([available.isdir]);
+message = sprintf(['No scans match subject=%s, session=%s, task=%s, run=%s, minTimepoints=%d. ' ...
+    'Available raw subject directories: %s. Subject Filter matches directory names.'], ...
+    subjectFilter, cfg.sessionFilter, cfg.taskFilter, cfg.runFilter, cfg.minTimepoints, strjoin({available.name}, ', '));
+updateStatus(fig, message);
+updateStatus(fig, [stageName ' not started: no matching scans.']);
+if isa(fig, 'MIKeyBatchState'), error('MIKey:Selection', '%s', message); end
+end
+
+function processFieldmapCorrection_BIDS(fig, subjectFilter, templatePath)
+bidsPath = fig.UserData.bidsPath;
+template = fullfile(templatePath, 'Template_Mouse_v38.nii,1');
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+processedCount = 0;
+skippedCount = 0;
+missingCount = 0;
+if isempty(subDirs)
+    reportEmptySelection(fig, bidsPath, subjectFilter, 'Fieldmap correction');
+    return;
+end
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        fmapPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'fmap');
+        if ~exist(fmapPath, 'dir')
+            updateStatus(fig, ['Missing scaled fieldmap directory: ' fmapPath '. Run Step 1 for the selected raw subject directory.']);
+            missingCount = missingCount + 1;
+            continue;
+        end
+        
+        updateStatus(fig, ['Fieldmap correction for: ' subDirs(i).name]);
+        
+        echo1_M = MIKey_fmap_files(fmapPath, 'magnitude1');
+        echo1_P = MIKey_fmap_files(fmapPath, 'phase1');
+        echo2_M = MIKey_fmap_files(fmapPath, 'magnitude2');
+        echo2_P = MIKey_fmap_files(fmapPath, 'phase2');
+        
+        if isempty(echo1_M) || isempty(echo1_P) || isempty(echo2_M) || isempty(echo2_P)
+            updateStatus(fig, ['Incomplete scaled fieldmap data in: ' fmapPath '. Expected magnitude1, phase1, magnitude2 and phase2 _desc-scaled.nii files.']);
+            missingCount = missingCount + 1;
+            continue;
+        end
+        
+        echo1_M_path{1,1} = fullfile(echo1_M(1).folder, [echo1_M(1).name ',1']);
+        echo1_P_path{1,1} = fullfile(echo1_P(1).folder, [echo1_P(1).name ',1']);
+        echo2_M_path{1,1} = fullfile(echo2_M(1).folder, [echo2_M(1).name ',1']);
+        echo2_P_path{1,1} = fullfile(echo2_P(1).folder, [echo2_P(1).name ',1']);
+        ref{1,1} = template;
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, baseName, ext] = fileparts(boldFile);
+            
+            derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            fieldmapCorrectedPath = MIKey_bids_path(derivPath, [baseName '_desc-fieldmap' ext]);
+            if exist(fieldmapCorrectedPath, 'file')
+                updateStatus(fig, ['Skipping - fieldmap corrected file already exists: ' boldFile]);
+                skippedCount = skippedCount + 1;
+                continue;
+            end
+            
+            scaledBoldPath = MIKey_bids_path(derivPath, [baseName '_desc-masked' ext], 'input');
+            
+            if exist(scaledBoldPath, 'file')
+                epi_first_frame{1,1} = [scaledBoldPath ',1'];
+                all_func = MIKey_scans(scaledBoldPath);
+                
+                fieldmap_mlb = UN_fieldmap_batch_struct(echo1_P_path, echo1_M_path, echo2_P_path, echo2_M_path, epi_first_frame, ref, all_func);
+                spm_jobman('run', fieldmap_mlb);
+                
+                tempFieldmapPath = MIKey_prefixed_file('fieldmap', scaledBoldPath);
+                if exist(tempFieldmapPath, 'file')
+                    movefile(tempFieldmapPath, fieldmapCorrectedPath);
+                    cd(derivPath);
+                    delete('mean*.nii');delete('u*.nii');delete('wf*nii');
+                    updateStatus(fig, ['Completed fieldmap correction for: ' boldFile]);
+                    processedCount = processedCount + 1;
+                else
+                    error('MIKey:FieldmapOutput', 'SPM did not produce the expected corrected image: %s', tempFieldmapPath);
+                end
+            else
+                updateStatus(fig, ['Missing masked BOLD input: ' scaledBoldPath '. Apply the brain mask in Step 2 before Step 3.']);
+                missingCount = missingCount + 1;
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        missingCount = missingCount + 1;
+        updateStatus(fig, ['Error in fieldmap correction for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+if processedCount == 0 && skippedCount == 0
+    updateStatus(fig, sprintf('Fieldmap correction not completed: no files processed; %d missing input(s) or error(s). See the messages above.', missingCount));
+elseif missingCount > 0
+    updateStatus(fig, sprintf('Fieldmap correction incomplete: %d files processed, %d files skipped, %d missing input(s) or error(s).', processedCount, skippedCount, missingCount));
+else
+    updateStatus(fig, sprintf('Fieldmap correction completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+end
+
+function processSliceTiming_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+if isfield(fig.UserData, 'sliceTimingTR')
+    user_TR = fig.UserData.sliceTimingTR.Value;
+    if user_TR == 2.0
+        user_TR = [];
+    end
+else
+    user_TR = [];
+end
+
+if isfield(fig.UserData, 'sliceTimingNSlices')
+    user_NSlices = fig.UserData.sliceTimingNSlices.Value;
+    if user_NSlices == 30
+        user_NSlices = [];
+    end
+else
+    user_NSlices = [];
+end
+
+if isfield(fig.UserData, 'sliceTimingOrder')
+    user_SliceOrder = fig.UserData.sliceTimingOrder.Value;
+    if strcmp(user_SliceOrder, 'Auto-detect from JSON')
+        user_SliceOrder = [];
+    end
+else
+    user_SliceOrder = [];
+end
+
+processedCount = 0;
+skippedCount = 0;
+errorCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Slice timing for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, baseName, ext] = fileparts(boldFile);
+            
+            derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            sliceTimedPath = MIKey_bids_path(derivPath, [baseName '_desc-slicetimed' ext]);
+            if exist(sliceTimedPath, 'file')
+                updateStatus(fig, ['Skipping - slice timed file already exists: ' boldFile]);
+                skippedCount = skippedCount + 1;
+                continue;
+            end
+            
+            inputPath1 = MIKey_bids_path(derivPath, [baseName '_desc-fieldmap' ext], 'input');
+            inputPath2 = MIKey_bids_path(derivPath, [baseName '_desc-masked' ext], 'input');
+            if exist(inputPath1, 'file')
+                inputPath = inputPath1;
+                [~, inputStem, inputExtension] = fileparts(inputPath1);
+                inputname = [inputStem inputExtension];
+                
+            else
+                inputPath = inputPath2;
+                [~, inputStem, inputExtension] = fileparts(inputPath2);
+                inputname = [inputStem inputExtension];
+            end
+            
+            if exist(inputPath, 'file')
+                cd(derivPath);
+                
+                EPI_TR = [];
+                Nslice = [];
+                slice_order = [];
+                
+                jsonFile = dir(fullfile(funcPath, [baseName '.json']));
+                if ~isempty(jsonFile)
+                    try
+                        info = jsondecode(fileread(fullfile(jsonFile(1).folder, jsonFile(1).name)));
+                        
+                        if isfield(info, 'RepetitionTime')
+                            EPI_TR = info.RepetitionTime;
+                        elseif isfield(info, 'repetitiontime')
+                            EPI_TR = info.repetitiontime;
+                        elseif isfield(info, 'TR')
+                            EPI_TR = info.TR;
+                        elseif isfield(info, 'tr')
+                            EPI_TR = info.tr;
+                        end
+                        
+                        slice_timing = [];
+                        if isfield(info, 'SliceTiming')
+                            slice_timing = info.SliceTiming;
+                        elseif isfield(info, 'slicetiming')
+                            slice_timing = info.slicetiming;
+                        elseif isfield(info, 'SliceTimingSec')
+                            slice_timing = info.SliceTimingSec;
+                        end
+                        
+                        if ~isempty(slice_timing)
+                            Nslice = length(slice_timing);
+                            slice_order = inferSliceOrder(slice_timing);
+                            updateStatus(fig, ['Inferred slice order from JSON: ' slice_order]);
+                        end
+                        
+                    catch ME
+                        
+                        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+                        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+                        updateStatus(fig, ['Error reading JSON file for ' boldFile ': ' ME.message]);
+                    end
+                end
+                
+                if isempty(EPI_TR) && ~isempty(user_TR)
+                    EPI_TR = user_TR;
+                    updateStatus(fig, ['Using user-defined TR: ' num2str(EPI_TR)]);
+                end
+                
+                if isempty(Nslice) && ~isempty(user_NSlices)
+                    Nslice = user_NSlices;
+                    updateStatus(fig, ['Using user-defined number of slices: ' num2str(Nslice)]);
+                end
+                
+                if isempty(slice_order) && ~isempty(user_SliceOrder)
+                    slice_order = user_SliceOrder;
+                    updateStatus(fig, ['Using user-defined slice order: ' slice_order]);
+                end
+                
+                if isempty(EPI_TR) || isempty(Nslice) || isempty(slice_order)
+                    errorMsg = 'Missing slice timing parameters: ';
+                    missingParams = {};
+                    if isempty(EPI_TR)
+                        missingParams{end+1} = 'TR';
+                    end
+                    if isempty(Nslice)
+                        missingParams{end+1} = 'number of slices';
+                    end
+                    if isempty(slice_order)
+                        missingParams{end+1} = 'slice order';
+                    end
+                    errorMsg = [errorMsg strjoin(missingParams, ', ')];
+                    errorMsg = [errorMsg '. Please check JSON file or set user parameters.'];
+                    
+                    updateStatus(fig, ['Error: ' errorMsg]);
+                    errorCount = errorCount + 1;
+                    continue;
+                end
+                
+                all_func = UN_find_images_in_all_scans(derivPath, inputname(1:end-4), '.nii', [1 Inf], 'separate_cells');
+                slicetiming_mlb = UN_get_default_slicetiming_batch_struct(all_func, Nslice, EPI_TR, slice_order);
+                spm_jobman('run', slicetiming_mlb);
+                
+                sliceFiles = dir(MIKey_prefixed_file('slicetime', fullfile(derivPath, inputname)));
+                if ~isempty(sliceFiles)
+                    movefile(fullfile(sliceFiles(1).folder, sliceFiles(1).name), sliceTimedPath);
+                    updateStatus(fig, ['Completed slice timing for: ' boldFile]);
+                    updateStatus(fig, ['Parameters - TR: ' num2str(EPI_TR) ', Slices: ' num2str(Nslice) ', Order: ' slice_order]);
+                    processedCount = processedCount + 1;
+                end
+            else
+                updateStatus(fig, ['Warning: No input file found for slice timing: ' boldFile]);
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in slice timing for ' subDirs(i).name ': ' ME.message]);
+        errorCount = errorCount + 1;
+    end
+end
+updateStatus(fig, sprintf('Slice timing completed: %d files processed, %d files skipped, %d errors', processedCount, skippedCount, errorCount));
+updateStatus(fig, ['Please proceed to the next step']);
+end
+
+function slice_order = inferSliceOrder(slice_timing)
+n_slices = length(slice_timing);
+[~, acq_order] = sort(slice_timing);
+
+if isequal(acq_order, 1:n_slices)
+    slice_order = 'ascending';
+    return;
+end
+
+if isequal(acq_order, n_slices:-1:1)
+    slice_order = 'descending';
+    return;
+end
+
+odd_first = [1:2:n_slices, 2:2:n_slices];
+if isequal(acq_order, odd_first)
+    slice_order = 'interleaved ascending (odd first)';
+    return;
+end
+
+even_first = [2:2:n_slices, 1:2:n_slices];
+if isequal(acq_order, even_first)
+    slice_order = 'interleaved ascending (even first)';
+    return;
+end
+
+odd_first_desc = [n_slices:-2:1, n_slices-1:-2:1];
+if isequal(acq_order, odd_first_desc)
+    slice_order = 'interleaved descending (odd first)';
+    return;
+end
+
+even_first_desc = [n_slices-1:-2:1, n_slices:-2:1];
+if isequal(acq_order, even_first_desc)
+    slice_order = 'interleaved descending (even first)';
+    return;
+end
+
+if n_slices >= 4
+    diffs = diff(acq_order);
+    
+    if all(abs(diffs(1:2:end-1)) > 1) && all(abs(diffs(2:2:end)) > 1)
+        if acq_order(1) < acq_order(2)
+            slice_order = 'interleaved ascending';
+        else
+            slice_order = 'interleaved descending';
+        end
+        return;
+    end
+end
+
+slice_order = 'interleaved ascending';
+end
+
+function processRealignment_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Realignment for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, baseName, ext] = fileparts(boldFile);
+            
+            derivPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            realignedPath = MIKey_bids_path(derivPath, [baseName '_desc-realign' ext]);
+            if exist(realignedPath, 'file')
+                updateStatus(fig, ['Skipping - realigned file already exists: ' boldFile]);
+                skippedCount = skippedCount + 1;
+                continue;
+            end
+            
+            inputPath1 = MIKey_bids_path(derivPath, [baseName '_desc-slicetimed' ext], 'input');
+            inputPath2 = MIKey_bids_path(derivPath, [baseName '_desc-fieldmap' ext], 'input');
+            inputPath3 = MIKey_bids_path(derivPath, [baseName '_desc-masked' ext], 'input');
+            if exist(inputPath1, 'file')
+                inputPath = inputPath1;
+                [~, inputStem, inputExtension] = fileparts(inputPath1);
+                inputname = [inputStem inputExtension];
+            elseif exist(inputPath2, 'file')
+                inputPath = inputPath2;
+                [~, inputStem, inputExtension] = fileparts(inputPath2);
+                inputname = [inputStem inputExtension];
+            elseif exist(inputPath3, 'file')
+                inputPath = inputPath3;
+                [~, inputStem, inputExtension] = fileparts(inputPath3);
+                inputname = [inputStem inputExtension];
+            else
+                error('No suitable functional file found for baseName: %s', baseName);
+            end
+            
+            if exist(inputPath, 'file')
+                cd(derivPath);
+                all_func = UN_find_images_in_all_scans(derivPath, inputname(1:end-4), '.nii', [1 Inf], 'separate_cells');
+                realign_mlb = MY_get_default_realign_batch_struct(all_func);
+                if ~isa(fig, 'MIKeyBatchState')
+                    F = spm_figure('GetWin');
+                end
+                spm_jobman('run', realign_mlb);
+                
+                tempRealignedPath = dir(MIKey_prefixed_file('realign', fullfile(derivPath, inputname)));
+                meanrealignedPath = dir(MIKey_prefixed_file('mean', fullfile(derivPath, inputname)));
+                if ~isempty(tempRealignedPath)
+                    movefile(fullfile(tempRealignedPath(1).folder,tempRealignedPath(1).name), realignedPath);
+                    delete(fullfile(meanrealignedPath(1).folder,meanrealignedPath(1).name));
+                    updateStatus(fig, ['Completed realignment for: ' boldFile]);
+                    processedCount = processedCount + 1;
+                end
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in realignment for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Realignment completed: %d files processed, %d files skipped', processedCount, skippedCount));
+updateStatus(fig, ['Please proceed to the next step']);
+end
+
+function processCoregistration_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+interp = fig.UserData.coregInterpEdit.Value;
+processedCount = 0; skippedCount = 0;
+for i = 1:length(subDirs)
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        boldFiles = getBoldFiles(fig, fullfile(subPath, 'func'));
+        t2Files = MIKey_nifti_files(MIKey_anat_path(subPath), '*_T2w.nii');
+        if isempty(boldFiles), continue; end
+        if numel(t2Files) ~= 1
+            error('MIKey:RegistrationQC', 'Step 6 requires one unambiguous T2w input; found %d for %s. Processing stopped.', numel(t2Files), subDirs(i).name);
+        end
+        for j = 1:length(boldFiles)
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, base, ext] = fileparts(boldFile);
+            df = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            da = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'anat');
+            output = MIKey_bids_path(df, [base '_desc-T2coreg' ext]);
+            bold = MIKey_bids_path(df, [base '_desc-realign' ext], 'input');
+            t2 = MIKey_bids_path(da, [t2Files(1).name(1:end-4) '_desc-masked' ext], 'input');
+            runRegistrationCheck(fig, 6, 'pre', bold, t2, df, base);
+            meanBold = MIKey_bids_path(df, [base '_desc-mean' ext], 'input');
+            if ~exist(meanBold, 'file')
+                heads = spm_vol(bold);
+                image = zeros(heads(1).dim);
+                for k = 1:numel(heads)
+                    guiCheckpoint(fig);
+                    image = image + spm_read_vols(heads(k));
+                end
+                head = heads(1); head.fname = meanBold;
+                spm_write_vol(head, image / numel(heads));
+            end
+            runRegistrationPair(fig, 6, bold, bold, meanBold, df, [base '_meanCheck']);
+            if exist(output, 'file')
+                runRegistrationCheck(fig, 6, 'post', meanBold, output, df, base);
+                runRegistrationPair(fig, 6, bold, bold, output, df, base);
+                updateStatus(fig, ['Skipping - validated coregistration already completed for: ' boldFile]);
+                skippedCount = skippedCount + 1; continue;
+            end
+            % SPM estimates in-place: work on our private copy, never the source.
+            [workspace, workspaceCleanup] = registrationWorkspace(); %#ok<NASGU>
+            sourceCopy = fullfile(workspace, 'source_T2w.nii');
+            copyfile(t2, sourceCopy);
+            if exist([t2(1:end-4) '.mat'], 'file')
+                copyfile([t2(1:end-4) '.mat'], fullfile(workspace, 'source_T2w.mat'));
+            end
+            job = MY_get_default_coreg_batch_struct({[meanBold ',1']}, {[sourceCopy ',1']}, {''}, interp);
+            guiCheckpoint(fig, true);
+            updateStatus(fig, ['Starting SPM coregistration estimation and reslicing for: ' boldFile]);
+            spm_jobman('run', job);
+            candidate = MIKey_prefixed_file('coreg', sourceCopy);
+            runRegistrationCheck(fig, 6, 'post', meanBold, candidate, df, base);
+            runRegistrationPair(fig, 6, bold, bold, candidate, df, base);
+            guiCheckpoint(fig, true);
+            publishRegistrationImage(candidate, output);
+            clear workspaceCleanup;
+            updateStatus(fig, ['Completed coregistration for: ' boldFile]);
+            processedCount = processedCount + 1;
+        end
+    catch ME
+        stopRegistration(6, ME);
+    end
+end
+updateStatus(fig, sprintf('Coregistration completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function processNormalization_BIDS(fig, subjectFilter, templatePath)
+bidsPath = fig.UserData.bidsPath;
+if fig.UserData.useDefaultTemplateCheckbox.Value
+    template = fullfile(templatePath, 'Template_Mouse_v38.nii');
+else
+    template = fig.UserData.templateCustomEdit.Value;
+end
+if isempty(template) || ~exist(template, 'file')
+    error('MIKey:RegistrationQC', 'Step 7 template is missing: %s. Select the correct template. Processing stopped.', template);
+end
+interp = fig.UserData.normInterpEdit.Value;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+processedCount = 0; skippedCount = 0;
+for i = 1:length(subDirs)
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        boldFiles = getBoldFiles(fig, fullfile(subPath, 'func'));
+        for j = 1:length(boldFiles)
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, base, ext] = fileparts(boldFile);
+            df = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            bold = MIKey_bids_path(df, [base '_desc-realign' ext], 'input');
+            t2 = MIKey_bids_path(df, [base '_desc-T2coreg' ext], 'input');
+            outputBold = MIKey_bids_path(df, [base '_space-template_desc-normalized' ext]);
+            outputT2 = MIKey_bids_path(df, [base '_space-template_desc-T2normalized' ext]);
+            runRegistrationCheck(fig, 7, 'pre', template, t2, df, base);
+            runRegistrationPair(fig, 7, bold, bold, t2, df, base);
+            if exist(outputBold, 'file') && exist(outputT2, 'file')
+                runRegistrationCheck(fig, 7, 'post', template, outputT2, df, base);
+                runRegistrationCheck(fig, 7, 'post', template, outputBold, df, [base '_boldCheck']);
+                runRegistrationPair(fig, 7, bold, outputBold, outputT2, df, base);
+                updateStatus(fig, ['Skipping - validated normalization already completed for: ' boldFile]);
+                skippedCount = skippedCount + 1; continue;
+            end
+            ref = {[template ',1']}; source = {[t2 ',1']};
+            scans = [MIKey_scans(bold); source];
+            job = UN_get_default_oldnormalize_batch_struct(ref, source, scans, interp);
+            guiCheckpoint(fig, true);
+            updateStatus(fig, ['Starting SPM normalization estimation and reslicing for: ' boldFile]);
+            spm_jobman('run', job);
+            candidateBold = MIKey_prefixed_file('norm', bold);
+            candidateT2 = MIKey_prefixed_file('norm', t2);
+            runRegistrationCheck(fig, 7, 'post', template, candidateT2, df, base);
+            runRegistrationCheck(fig, 7, 'post', template, candidateBold, df, [base '_boldCheck']);
+            runRegistrationPair(fig, 7, bold, candidateBold, candidateT2, df, base);
+            guiCheckpoint(fig, true);
+            publishRegistrationImage(candidateT2, outputT2);
+            publishRegistrationImage(candidateBold, outputBold);
+            updateStatus(fig, ['Completed normalization for: ' boldFile]);
+            processedCount = processedCount + 1;
+        end
+    catch ME
+        stopRegistration(7, ME);
+    end
+end
+updateStatus(fig, sprintf('Normalization completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function runRegistrationCheck(fig, stage, phase, reference, moving, directory, base)
+entities = regexprep(base, '_bold(?=_|$)', '');
+reportPath = fullfile(directory, 'registration_qc', sprintf('%s_desc-step%d%sQC.json', entities, stage, phase));
+updateStatus(fig, sprintf('Registration QC started: Step %d %s. Reference: %s. Moving: %s', stage, phase, reference, moving));
+MIKey_registration_qc(stage, phase, reference, moving, reportPath, @() guiCheckpoint(fig));
+updateStatus(fig, sprintf('Registration QC passed: Step %d %s. Report: %s', stage, phase, reportPath));
+end
+
+function runRegistrationPair(fig, stage, original, output, anatomy, directory, base)
+entities = regexprep(base, '_bold(?=_|$)', '');
+reportPath = fullfile(directory, 'registration_qc', sprintf('%s_desc-step%dgridQC.json', entities, stage));
+updateStatus(fig, sprintf('Registration grid QC started: Step %d. BOLD: %s. T2w: %s', stage, output, anatomy));
+MIKey_registration_pair(stage, original, output, anatomy, reportPath, @() guiCheckpoint(fig));
+updateStatus(fig, sprintf('Registration grid QC passed: Step %d. Report: %s', stage, reportPath));
+end
+
+function stopRegistration(stage, exception)
+if strcmp(exception.identifier, 'MIKey:Stopped') || strncmp(exception.identifier, 'MIKey:Registration', 18)
+    rethrow(exception);
+end
+failure = MException('MIKey:RegistrationFailed', ...
+    'Step %d registration failed: %s. Processing stopped. Check image scale, affine/origin, orientation, brain mask and selected template with SPM Check Reg.', stage, exception.message);
+failure = addCause(failure, exception); throw(failure);
+end
+
+function publishRegistrationImage(source, destination)
+movefile(source, destination, 'f');
+sidecar = [source(1:end-4) '.mat'];
+if exist(sidecar, 'file'), movefile(sidecar, [destination(1:end-4) '.mat'], 'f'); end
+end
+
+function [directory, cleanup] = registrationWorkspace()
+directory = tempname(tempdir); mkdir(directory);
+cleanup = onCleanup(@() removeRegistrationWorkspace(directory));
+end
+
+function removeRegistrationWorkspace(directory)
+target = char(java.io.File(directory).getCanonicalPath());
+parent = char(java.io.File(tempdir).getCanonicalPath());
+if ~strcmpi(fileparts(target), parent)
+    error('MIKey:TemporaryPath', 'Unexpected registration workspace cleanup path: %s', target);
+end
+if exist(target, 'dir'), rmdir(target, 's'); end
+end
+
+function processSmoothing_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+
+if isfield(fig.UserData, 'smoothFWHM')
+    user_smooth = parseSmoothingParameters(fig.UserData.smoothFWHM.Value);
+    if ~isempty(user_smooth) && isnumeric(user_smooth) && length(user_smooth) == 3 && all(user_smooth >= 0)
+        smooth_para = user_smooth;
+        updateStatus(fig, ['Using user-defined smoothing FWHM: [' num2str(smooth_para) '] mm']);
+    else
+        smooth_para = [6, 6, 6];
+        updateStatus(fig, 'Invalid smoothing parameters, using default [6, 6, 6] mm');
+    end
+else
+    smooth_para = [6, 6, 6];
+    updateStatus(fig, 'Using default smoothing FWHM: [6, 6, 6] mm');
+end
+
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Smoothing for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            smoothedPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-smoothed' ext]);
+            if exist(smoothedPath, 'file')
+                updateStatus(fig, ['Skipping - smoothed file already exists: ' boldFile]);
+                skippedCount = skippedCount + 1;
+                continue;
+            end
+            
+            normalizedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-normalized' ext], 'input');
+            
+            if exist(normalizedBoldPath, 'file')
+                cd(derivFuncPath);
+                
+                all_func = MIKey_scans(normalizedBoldPath);
+                Smooth_mlb = MY_get_default_smooth_batch_struct(all_func, smooth_para);
+                spm_jobman('run', Smooth_mlb);
+                
+                tempSmoothedPath = MIKey_prefixed_file('s', normalizedBoldPath);
+                if exist(tempSmoothedPath, 'file')
+                    movefile(tempSmoothedPath, smoothedPath);
+                    updateStatus(fig, ['Completed smoothing for: ' boldFile ' with FWHM=[' num2str(smooth_para) '] mm']);
+                    processedCount = processedCount + 1;
+                end
+            else
+                updateStatus(fig, ['Warning: Normalized BOLD file not found for: ' boldFile]);
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in smoothing for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Smoothing completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function smooth_para = parseSmoothingParameters(user_input)
+if ischar(user_input) || isstring(user_input)
+    user_input = strrep(user_input, ',', ' ');
+    smooth_para = str2num(user_input);
+elseif isnumeric(user_input)
+    smooth_para = user_input;
+else
+    smooth_para = [6, 6, 6];
+end
+
+if length(smooth_para) ~= 3
+    smooth_para = [6, 6, 6];
+end
+end
+
+function processNoisePCEstimation_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Noise PC estimation for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            pcPath = fullfile(derivFuncPath, [boldBaseName '_desc-NBPCs.mat']);
+            if exist(pcPath, 'file')
+                updateStatus(fig, ['Skipping - noise PCs already exist for: ' boldFile]);
+                skippedCount = skippedCount + 1;
+                continue;
+            end
+            
+            scaledBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_desc-scaled' ext], 'input');
+            boldMaskPath = MIKey_mask_file(derivFuncPath, 'func', funcPath);
+
+            if exist(scaledBoldPath, 'file')==2 && ~isempty(boldMaskPath)
+                bold_mask = MIKey_load_mask(derivFuncPath, 'func', scaledBoldPath, funcPath);
+                fMRI_data = spm_read_vols(spm_vol(scaledBoldPath));
+                timepoint=size(fMRI_data,4);
+                PC = MY_get_principle_component_out_of_brian(fMRI_data, bold_mask, timepoint-1);
+                
+                save(pcPath, 'PC');
+                
+                updateStatus(fig, ['Completed noise PC estimation for: ' boldFile]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in noise PC estimation for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Noise PC estimation completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function processMotionRegression_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+templatePath = fig.UserData.templateEdit.Value;
+Gmask_head = spm_vol(fullfile(templatePath, 'brainmask_Mouse_v38.nii'));
+Gmask = spm_read_vols(Gmask_head);
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Motion regression for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            resultsPath = fullfile(derivFuncPath, [boldBaseName '_desc-regressionResults.mat']);
+            smoothedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-smoothed' ext], 'input');
+            pcPath = fullfile(derivFuncPath, [boldBaseName '_desc-NBPCs.mat']);
+            
+            if exist(smoothedBoldPath, 'file') && exist(pcPath, 'file')
+                cd(derivFuncPath);
+                
+                head = spm_vol(smoothedBoldPath);
+                pcData = load(pcPath, 'PC');
+                if ~isfield(pcData, 'PC') || size(pcData.PC,1) ~= numel(head)
+                    error('MIKey:PCMatrix', 'PC rows must match BOLD time points: %s', pcPath);
+                end
+                PC = pcData.PC;
+                pc_configs = MIKey_pc_counts(fig.UserData.defaultPCStrategyCheckbox.Value, ...
+                    fig.UserData.customPCCountsEdit.Value, numel(head), size(PC,2));
+                if exist(resultsPath, 'file')
+                    try
+                        [cached_counts, ~] = MIKey_noise_result(resultsPath);
+                    catch cacheError
+                        cached_counts = [];
+                        updateStatus(fig, ['Recomputing invalid strategy cache: ' cacheError.message]);
+                    end
+                    if isequal(cached_counts, pc_configs)
+                        updateStatus(fig, ['Skipping - strategy estimates already match PC counts for: ' boldFile]);
+                        skippedCount = skippedCount + 1;
+                        continue;
+                    end
+                    updateStatus(fig, ['PC counts changed; recomputing strategy estimates for: ' boldFile]);
+                end
+                results = struct();
+                fMRI_data = spm_read_vols(head);
+                timepoint=size(fMRI_data,4);
+                data_ready_regress = fmask(fMRI_data, Gmask);
+                clear fMRI_data;
+                
+                dd = data_ready_regress - [data_ready_regress(:,1), data_ready_regress(:,1:end-1)];
+                DVARS0 = rms(dd);
+                DVARS0(1) = median(DVARS0);
+                
+                rpFile = MIKey_motion_files(derivFuncPath, boldBaseName);
+                if ~isempty(rpFile)
+                    rp = load(fullfile(rpFile(1).folder, rpFile(1).name));
+                    [~, rp] = gradient(rp);
+                    magnification = 1;
+                    radius = 100;
+                    rp(:,1:3) = rp(:,1:3) / magnification;
+                    rp(:,4:6) = rp(:,4:6) .* radius;
+                    drp = rp - [zeros(1,6); rp(1:end-1,:)];
+                    FD = sqrt(rp(:,1).^2 + rp(:,2).^2 + rp(:,3).^2 + rp(:,4).^2 + rp(:,5).^2 + rp(:,6).^2);
+                    corr0 = corr(FD, DVARS0');
+                else
+                    error('MIKey:Prerequisite', 'Motion file is required for strategy estimation: %s', boldBaseName);
+                end
+                
+                updateStatus(fig, ['Estimating PC counts: ' num2str(pc_configs)]);
+                
+                for k = 1:length(pc_configs)
+                    pc_num = pc_configs(k);
+                    if pc_num == 0
+                        RegBasFunc = [ones([size(rp,1),1]) rp drp];
+                    else
+                        RegBasFunc = [ones([size(rp,1),1]) rp drp PC(:,1:pc_num)];
+                    end
+                    
+                    output_name = MIKey_bids_name([boldBaseName '_desc-regressed' num2str(pc_num) 'pc' ext]);
+                    [DVARS, corr_val] = MY_headmotion_regression_estimate(RegBasFunc, data_ready_regress, FD, Gmask, derivFuncPath, head, output_name);
+                    
+                    results.(['DVARS' num2str(k)]) = DVARS;
+                    results.(['corr' num2str(k)]) = corr_val;
+                end
+                
+                results.pc_configs = pc_configs;
+                results.useDefaultPCStrategy = fig.UserData.defaultPCStrategyCheckbox.Value;
+                results.FD = FD;
+                results.DVARS0 = DVARS0;
+                results.corr0 = corr0;
+                
+                save(resultsPath, '-struct', 'results');
+                updateStatus(fig, ['Completed motion regression for: ' boldFile]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in motion regression for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Motion regression completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function processGroupLevelNoiseEstimation_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+updateStatus(fig, 'Starting group level noise estimation...');
+
+groupAnalysisPath = getGroupAnalysisPath(fig, bidsPath);
+if ~exist(groupAnalysisPath, 'dir')
+    mkdir(groupAnalysisPath);
+end
+
+all_corr_data = [];
+config_labels = {};
+run_counts = {};
+run_correlations = {};
+run_files = {};
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+    derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+    
+    if ~exist(derivFuncPath, 'dir')
+        continue;
+    end
+    
+    selectedBold = getBoldFiles(fig, fullfile(subPath, 'func'));
+    resultFiles = dir(fullfile(derivFuncPath, '__no_selected_results__'));
+    for selected_idx = 1:numel(selectedBold)
+        guiCheckpoint(fig);
+        [~, selected_base] = fileparts(selectedBold(selected_idx).name);
+        resultFiles = [resultFiles; dir(fullfile(derivFuncPath, [selected_base '_desc-regressionResults.mat']))];
+    end
+    
+    for j = 1:length(resultFiles)
+    
+        guiCheckpoint(fig);
+        resultsPath = fullfile(resultFiles(j).folder, resultFiles(j).name);
+        try
+            [counts, values] = MIKey_noise_result(resultsPath);
+            run_counts{end+1} = counts;
+            run_correlations{end+1} = values;
+            run_files{end+1} = resultsPath;
+            
+        catch ME
+            
+            if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+            if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+            updateStatus(fig, ['Error loading results file: ' resultsPath ': ' ME.message]);
+        end
+    end
+end
+
+if isempty(run_counts)
+    updateStatus(fig, 'No regression results found for group level analysis');
+    return;
+end
+
+pc_configs = run_counts{1};
+for run_idx = 2:numel(run_counts)
+    guiCheckpoint(fig);
+    pc_configs = intersect(pc_configs, run_counts{run_idx});
+end
+pc_configs = sort(pc_configs);
+if isempty(pc_configs)
+    error('MIKey:StrategyCandidates', 'No PC count is shared by all selected runs; use the same custom counts and recompute step 10.');
+end
+config_labels = cell(1, numel(pc_configs)+1);
+config_labels{1} = 'No regress';
+for k = 1:numel(pc_configs)
+    if pc_configs(k) == 0, config_labels{k+1} = '12rp';
+    else, config_labels{k+1} = ['12rp+' num2str(pc_configs(k))]; end
+end
+all_corr_data = zeros(numel(run_counts), numel(pc_configs)+1);
+for run_idx = 1:numel(run_counts)
+    guiCheckpoint(fig);
+    [~, positions] = ismember(pc_configs, run_counts{run_idx});
+    all_corr_data(run_idx,:) = run_correlations{run_idx}([1 positions+1]);
+end
+updateStatus(fig, ['Comparing shared PC counts: ' num2str(pc_configs)]);
+
+abs_corr_data = abs(all_corr_data);
+mean_abs_corrs = mean(abs_corr_data, 1);
+mean_orig_corrs = mean(all_corr_data, 1);
+
+best_idx = findOptimalStrategyFromAbsoluteTrend(mean_abs_corrs);
+
+if isempty(best_idx)
+    [~, best_idx] = min(mean_abs_corrs);
+    updateStatus(fig, 'No clear decreasing trend found in absolute values, using global minimum');
+else
+    updateStatus(fig, 'Found optimal strategy at the minimum point of absolute value decreasing trend');
+end
+
+best_strategy = config_labels{best_idx};
+
+updateStatus(fig, ['Group level analysis completed. Total runs: ' num2str(size(all_corr_data, 1))]);
+updateStatus(fig, ['Best regression strategy: ' best_strategy]);
+updateStatus(fig, ['Original mean correlation: ' num2str(mean_orig_corrs(best_idx))]);
+updateStatus(fig, ['Absolute mean correlation: ' num2str(mean_abs_corrs(best_idx))]);
+
+figure('Position', [100, 100, 1200, 800]);
+
+errorbar(1:length(config_labels), mean_abs_corrs, std(abs_corr_data, 0, 1), 'o-', 'LineWidth', 2, 'MarkerSize', 8);
+set(gca, 'XTick', 1:length(config_labels), 'XTickLabel', config_labels);
+title('Mean Absolute FD-DVARS Correlation ¡À SD');
+ylabel('Absolute Correlation Value');
+xlabel('Regression Strategy');
+grid on;
+ax = gca;
+hold on;
+plot(best_idx, mean_abs_corrs(best_idx), 'ro', 'MarkerSize', 12, 'LineWidth', 3);
+text(best_idx, mean_abs_corrs(best_idx), ' Optimal', 'VerticalAlignment', 'bottom', 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'red');
+ax.XTickLabelRotation = 45;
+
+groupResultsPath = fullfile(groupAnalysisPath, 'group_level_noise_estimation.mat');
+save(groupResultsPath, 'all_corr_data', 'abs_corr_data', 'config_labels', 'mean_abs_corrs', 'best_strategy', 'best_idx', 'pc_configs', 'run_files');
+
+saveas(gcf, fullfile(groupAnalysisPath, 'group_level_noise_estimation_boxplot.png'));
+saveas(gcf, fullfile(groupAnalysisPath, 'group_level_noise_estimation_boxplot.fig'));
+
+best_strategy_info.best_strategy = best_strategy;
+best_strategy_info.best_idx = best_idx;
+best_strategy_info.pc_configs = pc_configs;
+best_strategy_info.pc_count = 0;
+if best_idx > 1, best_strategy_info.pc_count = pc_configs(best_idx-1); end
+best_strategy_info.include_motion = best_idx > 1;
+best_strategy_info.mean_orig_corrs = mean_orig_corrs;
+best_strategy_info.mean_abs_corrs = mean_abs_corrs;
+best_strategy_info.config_labels = config_labels;
+best_strategy_info.trend_analysis = 'Selected at minimum point of absolute value decreasing trend before increase';
+
+save(fullfile(groupAnalysisPath, 'best_regression_strategy.mat'), 'best_strategy_info');
+
+updateStatus(fig, ['Group level noise estimation completed. Results saved to: ' groupAnalysisPath]);
+updateStatus(fig, ['Best strategy saved for advanced regression: ' best_strategy]);
+end
+
+function optimal_idx = findOptimalStrategyFromAbsoluteTrend(mean_abs_corrs)
+n = length(mean_abs_corrs);
+
+if n < 3
+    [~, optimal_idx] = min(mean_abs_corrs);
+    return;
+end
+
+diffs = diff(mean_abs_corrs);
+
+for i = 2:(n-1)
+
+    if mean_abs_corrs(i) < mean_abs_corrs(i-1) && mean_abs_corrs(i) < mean_abs_corrs(i+1)
+        optimal_idx = i;
+        return;
+    end
+end
+
+for i = 2:(n-1)
+
+    if diffs(i-1) < 0 && diffs(i) > 0
+        optimal_idx = i;
+        return;
+    end
+end
+
+max_neg_diff = 0;
+candidate_idx = 1;
+
+for i = 1:(n-1)
+
+    if diffs(i) < max_neg_diff
+        max_neg_diff = diffs(i);
+        candidate_idx = i + 1;
+    end
+end
+
+if max_neg_diff < -0.01
+    optimal_idx = candidate_idx;
+    return;
+end
+
+[~, optimal_idx] = min(mean_abs_corrs);
+end
+
+function processAdvancedRegression_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+templatePath = fig.UserData.templateEdit.Value;
+Gmask_head = spm_vol(fullfile(templatePath, 'brainmask_Mouse_v38.nii'));
+Gmask = spm_read_vols(Gmask_head);
+ventricle_mask = spm_read_vols(spm_vol(fullfile(templatePath, 'AMCP_temp', 'AMCP_ventricle_mask.nii')));
+
+groupAnalysisPath = getGroupAnalysisPath(fig, bidsPath);
+bestStrategyPath = fullfile(groupAnalysisPath, 'best_regression_strategy.mat');
+
+if ~exist(bestStrategyPath, 'file')
+    updateStatus(fig, 'Error: Best regression strategy not found. Please run group level noise estimation first.');
+    return;
+end
+
+load(bestStrategyPath, 'best_strategy_info');
+updateStatus(fig, ['Using best regression strategy: ' best_strategy_info.best_strategy]);
+
+selected_strategies = {};
+if fig.UserData.advRegressionPCOnlyCheckbox.Value
+    selected_strategies{end+1} = 'pc';
+end
+if fig.UserData.advRegressionPCCSFCheckbox.Value
+    selected_strategies{end+1} = 'pcCSF';
+end
+if fig.UserData.advRegressionPCGSCheckbox.Value
+    selected_strategies{end+1} = 'pcGS';
+end
+if fig.UserData.advRegressionPCCSFGSCheckbox.Value
+    selected_strategies{end+1} = 'pcCSFGS';
+end
+
+if isempty(selected_strategies)
+    updateStatus(fig, 'Warning: No regression strategies selected. Using default PC only.');
+    selected_strategies = {'pc'};
+end
+
+updateStatus(fig, ['Selected regression strategies: ' strjoin(selected_strategies, ', ')]);
+
+detrend_flag = fig.UserData.detrendCheckbox.Value;
+filter_flag = fig.UserData.filterCheckbox.Value;
+High_f = fig.UserData.highFreqEdit.Value;
+Low_f = fig.UserData.lowFreqEdit.Value;
+
+updateStatus(fig, ['Head Motion Regression Parameters - Detrend: ' num2str(detrend_flag) ...
+    ', Filter: ' num2str(filter_flag) ', High Freq: ' num2str(High_f) ...
+    ', Low Freq: ' num2str(Low_f)]);
+
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Advanced regression for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            resultsPath = fullfile(derivFuncPath, [boldBaseName '_desc-advancedRegressionResults.mat']);
+            if exist(resultsPath, 'file')
+                updateStatus(fig, ['Skipping - advanced regression already completed for: ' boldFile]);
+                skippedCount = skippedCount + 1;
+                continue;
+            end
+            
+            smoothedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-smoothed' ext], 'input');
+            pcPath = fullfile(derivFuncPath, [boldBaseName '_desc-NBPCs.mat']);
+            
+            if exist(smoothedBoldPath, 'file') && exist(pcPath, 'file')
+                cd(derivFuncPath);
+                
+                head = spm_vol(smoothedBoldPath);
+                fMRI_data = spm_read_vols(head);
+                
+                jsonFile = dir(fullfile(funcPath, [boldBaseName '.json']));
+                if ~isempty(jsonFile)
+                    info = jsondecode(fileread(fullfile(jsonFile(1).folder, jsonFile(1).name)));
+                    EPI_TR = info.RepetitionTime;
+                else
+                    EPI_TR = fig.UserData.sliceTimingTR.Value;
+                end
+                
+                data_ready_regress = fmask(fMRI_data, Gmask);
+                csf = fmask(fMRI_data, ventricle_mask);
+                csf = mean(csf, 1)';
+                GS = fmask(fMRI_data, Gmask);
+                GS = mean(GS, 1)';
+                clear fMRI_data;
+                
+                rpFile = MIKey_motion_files(derivFuncPath, boldBaseName);
+                if ~isempty(rpFile)
+                    rp = load(fullfile(rpFile(1).folder, rpFile(1).name));
+                    [~, rp] = gradient(rp);
+                    radius = 100;
+                    rp(:,1:3) = rp(:,1:3);
+                    rp(:,4:6) = rp(:,4:6) .* radius;
+                    drp = rp - [zeros(1,6); rp(1:end-1,:)];
+                end
+                
+                load(pcPath);
+                
+                pc_num = extractPCNumber(best_strategy_info.best_strategy);
+                if isfield(best_strategy_info, 'pc_count'), pc_num = best_strategy_info.pc_count; end
+                if strcmp(best_strategy_info.best_strategy, 'No regress')
+                    optimal_RegBasFunc = ones(size(rp,1),1);
+                elseif pc_num == 0
+                    optimal_RegBasFunc = [ones([size(rp,1),1]) rp drp];
+                else
+                    optimal_RegBasFunc = [ones([size(rp,1),1]) rp drp PC(:,1:pc_num)];
+                end
+                
+                for k = 1:length(selected_strategies)
+                    strategy = selected_strategies{k};
+                    
+                    switch strategy
+                        case 'pc'
+                            RegBasFunc = optimal_RegBasFunc;
+                            output_name = MIKey_bids_name([boldBaseName '_space-template_desc-Regressedpc' ext]);
+                            MY_headmotion_regression_combined(RegBasFunc, data_ready_regress, Gmask, derivFuncPath, head, output_name, detrend_flag, filter_flag, EPI_TR, High_f, Low_f);
+                        case 'pcCSF'
+                            RegBasFunc = [optimal_RegBasFunc csf];
+                            output_name = MIKey_bids_name([boldBaseName '_space-template_desc-RegressedpcCSF' ext]);
+                            MY_headmotion_regression_combined(RegBasFunc, data_ready_regress, Gmask, derivFuncPath, head, output_name, detrend_flag, filter_flag, EPI_TR, High_f, Low_f);
+                        case 'pcGS'
+                            RegBasFunc = [optimal_RegBasFunc GS];
+                            output_name = MIKey_bids_name([boldBaseName '_space-template_desc-RegressedpcGS' ext]);
+                            MY_headmotion_regression_combined(RegBasFunc, data_ready_regress, Gmask, derivFuncPath, head, output_name, detrend_flag, filter_flag, EPI_TR, High_f, Low_f);
+                        case 'pcCSFGS'
+                            RegBasFunc = [optimal_RegBasFunc csf GS];
+                            output_name = MIKey_bids_name([boldBaseName '_space-template_desc-RegressedpcCSFGS' ext]);
+                            MY_headmotion_regression_combined(RegBasFunc, data_ready_regress, Gmask, derivFuncPath, head, output_name, detrend_flag, filter_flag, EPI_TR, High_f, Low_f);
+                    end
+                    
+                end
+                
+                updateStatus(fig, ['Completed noise regression for: ' boldFile]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in regression for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Advanced regression completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function pc_num = extractPCNumber(strategy_str)
+if strcmp(strategy_str, 'No regress')
+    pc_num = 0;
+elseif strcmp(strategy_str, '12rp')
+    pc_num = 0;
+else
+    tokens = regexp(strategy_str, '12rp\+(\d+)', 'tokens');
+    if ~isempty(tokens)
+        pc_num = str2double(tokens{1}{1});
+    else
+        pc_num = 0;
+    end
+end
+end
+
+function processFunctionalConnectivity_BIDS(fig, subjectFilter, templatePath)
+bidsPath = fig.UserData.bidsPath;
+
+selected_label = fig.UserData.fcLabelDropdown.Value;
+if strcmp(selected_label, 'Custom...')
+    customLabelPath = fig.UserData.fcCustomEdit.Value;
+    if isempty(customLabelPath) || ~exist(customLabelPath, 'file')
+        updateStatus(fig, 'Error: Custom FC label file not specified or not found');
+        return;
+    end
+    label_file = customLabelPath;
+    label_name = 'Custom';
+else
+    switch selected_label
+        case '214'
+            label_file = 'Label_Mouse_214_v38.nii';
+        case '428'
+            label_file = 'Label_Mouse_428_v38.nii';
+        case '604'
+            label_file = 'Label_Mouse_604_v38.nii';
+        case '1184'
+            label_file = 'Label_Mouse_1184_v38.nii';
+    end
+    label_file = fullfile(templatePath, label_file);
+    label_name = selected_label;
+end
+
+if ~exist(label_file, 'file')
+    updateStatus(fig, ['Error: Label file not found: ' label_file]);
+    return;
+end
+
+try
+    label_head = spm_vol(label_file);
+    label = spm_read_vols(label_head);
+    updateStatus(fig, ['Using label file: ' label_file ' with ' num2str(length(unique(label))) ' regions']);
+catch ME
+    if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+    if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+    updateStatus(fig, ['Error loading label file: ' ME.message]);
+    return;
+end
+
+Gmask_head = spm_vol(fullfile(templatePath, 'brainmask_Mouse_v38.nii'));
+Gmask = spm_read_vols(Gmask_head);
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+selected_strategies = {};
+if fig.UserData.advRegressionPCOnlyCheckbox.Value
+    selected_strategies{end+1} = 'Regressedpc';
+end
+if fig.UserData.advRegressionPCCSFCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSF';
+end
+if fig.UserData.advRegressionPCGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcGS';
+end
+if fig.UserData.advRegressionPCCSFGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSFGS';
+end
+
+if isempty(selected_strategies)
+    updateStatus(fig, 'Warning: No regression strategies selected for FC. Using default PC only.');
+    selected_strategies = {'Regressedpc'};
+end
+
+updateStatus(fig, ['FC will be computed for strategies: ' strjoin(selected_strategies, ', ')]);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Functional connectivity for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+            
+            for strategy_idx = 1:length(selected_strategies)
+            
+                guiCheckpoint(fig);
+                strategy_suffix = selected_strategies{strategy_idx};
+                strategy_name = strrep(strategy_suffix, 'Regressed', '');
+                
+                regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix ext], 'input');
+                
+                if ~exist(regressedBoldPath, 'file')
+                    updateStatus(fig, ['Warning: Regression output not found for strategy ' strategy_name ': ' regressedBoldPath]);
+                    continue;
+                end
+                
+                fcPath = fullfile(derivFuncPath, [boldBaseName '_desc-' label_name 'regionFC_' strategy_suffix '.mat']);
+                if exist(fcPath, 'file')
+                    updateStatus(fig, ['Skipping - FC already computed for: ' boldFile ' with ' strategy_name]);
+                    skippedCount = skippedCount + 1;
+                    continue;
+                end
+                
+                if exist(regressedBoldPath, 'file')
+                    cd(derivFuncPath);
+                    
+                    all_img_head = spm_vol(regressedBoldPath);
+                    all_img= spm_read_vols(all_img_head);
+                    all_img_reshape = reshape(all_img, [], size(all_img,4));
+                    clear all_img;
+                    all_roi = [];
+                    roi_num = unique(label);
+                    
+                    for k = 1:max(roi_num)
+                        idx_roi = find(label == k);
+                        if ~isempty(idx_roi)
+                            all_roi(k,:) = mean(all_img_reshape(idx_roi,:), 1);
+                        else
+                            all_roi(k,:) = zeros(1, size(all_img_reshape, 2));
+                        end
+                    end
+                    
+                    all_roi_zscore = (all_roi - mean(all_roi, 2)) ./ std(all_roi, 0, 2);
+                    all_roi_zscore(isnan(all_roi_zscore)) = 0;
+                    
+                    pearson_corr = corr(all_roi_zscore');
+                    pearson_corr(logical(eye(size(pearson_corr)))) = 0;
+                    pearson_corr_z = atanh(pearson_corr);
+                    
+                    save(fcPath, 'pearson_corr_z');
+                    updateStatus(fig, ['Completed FC calculation for: ' boldFile ' with ' strategy_name ' using ' label_name ' labels']);
+                    processedCount = processedCount + 1;
+                end
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in FC calculation for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Functional connectivity completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function processIndividualParcellationPrior_BIDS(fig, subjectFilter, templatePath)
+bidsPath = fig.UserData.bidsPath;
+GMWM_head = spm_vol(fullfile(templatePath, 'AMCP_temp', 'AMCP_GMWM_mask.nii'));
+GMWM_mask = spm_read_vols(GMWM_head);
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+selected_networks = {fig.UserData.parcNetworkDropdown.Value};
+use_custom = fig.UserData.useCustomParcCheckbox.Value;
+
+network_configs = {
+    struct('network_file', 'AMCP_214prior_11net.nii', 'label_file', 'Label_Mouse_214_v38.nii', 'folder_suffix', 'prior_mode_214', 'dice_file', 'dice_cross_runs_based_214roi.mat'),
+    struct('network_file', 'AMCP_428prior_11net.nii', 'label_file', 'Label_Mouse_428_v38.nii', 'folder_suffix', 'prior_mode_428', 'dice_file', 'dice_cross_runs_based_428roi.mat'),
+    struct('network_file', 'AMCP_604prior_12net.nii', 'label_file', 'Label_Mouse_604_v38.nii', 'folder_suffix', 'prior_mode_604', 'dice_file', 'dice_cross_runs_based_604roi.mat'),
+    struct('network_file', 'AMCP_1184prior_13net.nii', 'label_file', 'Label_Mouse_1184_v38.nii', 'folder_suffix', 'prior_mode_1184', 'dice_file', 'dice_cross_runs_based_1184roi.mat'),
+    struct('network_file', 'AMCP_428prior_17net.nii', 'label_file', 'Label_Mouse_428_v38.nii', 'folder_suffix', 'prior_mode_428', 'dice_file', 'dice_cross_runs_based_428roi.mat')
+    };
+
+selected_strategies = {};
+if fig.UserData.advRegressionPCOnlyCheckbox.Value
+    selected_strategies{end+1} = 'Regressedpc';
+end
+if fig.UserData.advRegressionPCCSFCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSF';
+end
+if fig.UserData.advRegressionPCGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcGS';
+end
+if fig.UserData.advRegressionPCCSFGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSFGS';
+end
+
+if isempty(selected_strategies)
+    updateStatus(fig, 'Warning: No regression strategies selected for parcellation. Using default PC only.');
+    selected_strategies = {'Regressedpc'};
+end
+
+updateStatus(fig, ['Parcellation will use strategies: ' strjoin(selected_strategies, ', ')]);
+
+selected_configs = {};
+
+if use_custom
+    custom_network_path = fig.UserData.networkCustomEdit.Value;
+    custom_label_path = fig.UserData.labelCustomEdit.Value;
+    
+    if isempty(custom_network_path) || ~exist(custom_network_path, 'file')
+        updateStatus(fig, 'Error: Custom network file not specified or not found');
+        return;
+    end
+    if isempty(custom_label_path) || ~exist(custom_label_path, 'file')
+        updateStatus(fig, 'Error: Custom label file not specified or not found');
+        return;
+    end
+    
+    custom_config = struct();
+    custom_config.network_file = custom_network_path;
+    custom_config.label_file = custom_label_path;
+    [~, network_name, ~] = fileparts(custom_network_path);
+    [~, label_name, ~] = fileparts(custom_label_path);
+    custom_config.folder_suffix = ['prior_mode_' label_name ''];
+    custom_config.dice_file = ['dice_cross_runs_' label_name '.mat'];
+    selected_configs{1} = custom_config;
+    
+    updateStatus(fig, ['Using custom configuration: Network=' network_name ', Label=' label_name]);
+else
+    for config_idx = 1:length(network_configs)
+        guiCheckpoint(fig);
+        config = network_configs{config_idx};
+        network_choices = {'214rois', '428rois', '604rois', '1184rois', '428rois_17net'};
+        if any(strcmp(network_choices{config_idx}, selected_networks))
+            selected_configs{end+1} = config;
+            selected_configs{end}.network_file = fullfile(templatePath, 'AMCP_temp', selected_configs{end}.network_file);
+            selected_configs{end}.label_file = fullfile(templatePath, selected_configs{end}.label_file);
+        end
+    end
+end
+
+if isempty(selected_configs)
+    selected_configs{1} = network_configs{2};
+    selected_configs{1}.network_file = fullfile(templatePath, 'AMCP_temp', selected_configs{1}.network_file);
+    selected_configs{1}.label_file = fullfile(templatePath, selected_configs{1}.label_file);
+    updateStatus(fig, 'No network selected, using default configuration: 428');
+end
+
+updateStatus(fig, ['Using ' num2str(length(selected_configs)) ' configuration(s) for parcellation']);
+
+percent_top = fig.UserData.percentTopEdit.Value;
+max_iter = fig.UserData.maxIterEdit.Value;
+change_thr = fig.UserData.changeThrEdit.Value;
+conf_thr = fig.UserData.confThrEdit.Value;
+
+updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+
+use_tSNR = fig.UserData.useTSNRCheckbox.Value;
+use_inter_subject_var = fig.UserData.useInterSubjectVarCheckbox.Value;
+
+updateStatus(fig, ['Correction parameters - Use tSNR: ' num2str(use_tSNR) ', Use Inter-Subject Var: ' num2str(use_inter_subject_var)]);
+
+InterSubjectVar_heads = struct();
+if use_inter_subject_var
+    updateStatus(fig, 'Calculating Inter-Subject Variability maps for all selected strategies...');
+    for strategy_idx = 1:length(selected_strategies)
+        guiCheckpoint(fig);
+        strategy_suffix = selected_strategies{strategy_idx};
+        InterSubjectVar_head = computeInterSubjectVariabilityBIDS(fig, bidsPath, subjectFilter, strategy_suffix, templatePath);
+        if ~isempty(InterSubjectVar_head)
+            InterSubjectVar_heads.(strategy_suffix) = InterSubjectVar_head;
+            updateStatus(fig, ['Inter-Subject Variability map computed for strategy: ' strategy_suffix]);
+        else
+            updateStatus(fig, ['Warning: Failed to compute Inter-Subject Variability map for strategy ' strategy_suffix '. Continuing without it.']);
+        end
+    end
+end
+
+parcellation_mode = selectParcellationMode(fig);
+
+if isempty(parcellation_mode)
+    updateStatus(fig, 'Parcellation cancelled by user');
+    return;
+end
+
+updateStatus(fig, ['Selected parcellation mode: ' parcellation_mode]);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Individual parcellation for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        if isempty(boldFiles)
+            updateStatus(fig, ['No BOLD files found for subject: ' subDirs(i).name]);
+            continue;
+        end
+        
+        switch parcellation_mode
+            case 'Individual Runs (separate folders)'
+                [processed, skipped] = processIndividualRuns_Prior(fig, bidsPath, subDirs(i).name, boldFiles, ...
+                    selected_configs, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+                    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads);
+                processedCount = processedCount + processed;
+                skippedCount = skippedCount + skipped;
+                
+            case 'Concatenated Runs (single folder)'
+                [processed, skipped] = processConcatenatedRuns_Prior(fig, bidsPath, subDirs(i).name, boldFiles, ...
+                    selected_configs, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+                    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads);
+                processedCount = processedCount + processed;
+                skippedCount = skippedCount + skipped;
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in parcellation for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Individual parcellation completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function [processedCount, skippedCount] = processIndividualRuns_Prior(fig, bidsPath, subjectName, boldFiles, ...
+    selected_configs, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads)
+
+processedCount = 0;
+skippedCount = 0;
+derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subjectName, 'func');
+
+for config_idx = 1:length(selected_configs)
+
+    guiCheckpoint(fig);
+    config = selected_configs{config_idx};
+    
+    if ~exist(config.network_file, 'file')
+        updateStatus(fig, ['Warning: Network file not found: ' config.network_file]);
+        continue;
+    end
+    if ~exist(config.label_file, 'file')
+        updateStatus(fig, ['Warning: Label file not found: ' config.label_file]);
+        continue;
+    end
+    
+    group_net = spm_read_vols(spm_vol(config.network_file));
+    
+    for strategy_idx = 1:length(selected_strategies)
+    
+        guiCheckpoint(fig);
+        strategy_suffix = selected_strategies{strategy_idx};
+        strategy_name = strrep(strategy_suffix, 'Regressed', '');
+        
+        strategy_net_maps = [];
+        strategy_run_names = {};
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            output_dir = fullfile(derivFuncPath, [boldBaseName '_parcellation_' config.folder_suffix '_' strategy_suffix]);
+            parcellationPath = MIKey_bids_path(output_dir, [boldBaseName '_space-template_desc-individualParcellation' ext]);
+            
+            if exist(parcellationPath, 'file')
+                updateStatus(fig, ['Skipping - individual parcellation already exists for: ' boldFile ' with ' strategy_name]);
+                skippedCount = skippedCount + 1;
+                
+                existing_net_map = spm_read_vols(spm_vol(parcellationPath));
+                strategy_net_maps(:, :, :, end+1) = existing_net_map;
+                strategy_run_names{end+1} = boldBaseName;
+                continue;
+            end
+            
+            regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix ext], 'input');
+            if ~exist(regressedBoldPath, 'file')
+                updateStatus(fig, ['Warning: Regression output not found for ' strategy_name ': ' regressedBoldPath]);
+                continue;
+            end
+            
+            tSNR_path = '';
+            if use_tSNR
+                tSNR_path = calculateTSNR(fig, derivFuncPath, boldBaseName, strategy_suffix);
+                if isempty(tSNR_path)
+                    updateStatus(fig, ['Warning: Failed to calculate tSNR for ' boldFile '. Continuing without tSNR correction.']);
+                else
+                    updateStatus(fig, ['tSNR calculated for: ' boldFile]);
+                end
+            end
+            
+            InterSubjectVar_head = [];
+            if isfield(InterSubjectVar_heads, strategy_suffix)
+                InterSubjectVar_head = InterSubjectVar_heads.(strategy_suffix);
+            end
+            
+            if exist(regressedBoldPath, 'file')
+                cd(derivFuncPath);
+                
+                fMRI_4D = spm_read_vols(spm_vol(regressedBoldPath));
+                
+                optional_params = {'UseParallel', fig.UserData.parcellationUseParallelCheckbox.Value, 'CheckpointFcn', @() guiCheckpoint(fig)};
+                if use_tSNR && ~isempty(tSNR_path)
+                    optional_params{end+1} = 'tSNR';
+                    optional_params{end+1} = true;
+                    optional_params{end+1} = 'tSNRfile';
+                    optional_params{end+1} = tSNR_path;
+                end
+                
+                if ~isempty(InterSubjectVar_head)
+                    optional_params{end+1} = 'InterSubjectVar';
+                    optional_params{end+1} = InterSubjectVar_head;
+                end
+                
+                [net_map, corr_map, iter] = individualized_parcellation_rsfMRI_v3(fMRI_4D, group_net, GMWM_head, 'prior', config.label_file, percent_top, output_dir, max_iter, change_thr, conf_thr, optional_params{:});
+                
+                net_head = GMWM_head;
+                net_head.fname = parcellationPath;
+                net_head.dt = [16 0];
+                spm_write_vol(net_head, net_map);
+                
+                strategy_net_maps(:, :, :, end+1) = net_map;
+                strategy_run_names{end+1} = boldBaseName;
+                
+                updateStatus(fig, ['Completed individual parcellation for: ' boldFile ' with config ' config.folder_suffix ' and ' strategy_name]);
+                updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+        if size(strategy_net_maps, 4) > 1
+            M = size(strategy_net_maps, 4);
+            dice_strategy = zeros(M, M);
+            for k = 1:M
+                for m = 1:M
+                    dice_strategy(k, m) = dice_coefficient(strategy_net_maps(:, :, :, k), strategy_net_maps(:, :, :, m), GMWM_mask);
+                end
+            end
+            
+            strategy_dice_file = fullfile(derivFuncPath, [config.dice_file(1:end-4) '_' strategy_suffix '.mat']);
+            save(strategy_dice_file, 'dice_strategy', 'strategy_run_names');
+            
+            mean_dice = mean(dice_strategy(dice_strategy > 0 & ~eye(M)));
+            updateStatus(fig, ['Configuration ' config.folder_suffix ' strategy ' strategy_name ' average Dice (across runs): ' num2str(mean_dice)]);
+        end
+    end
+end
+
+end
+
+function [processedCount, skippedCount] = processConcatenatedRuns_Prior(fig, bidsPath, subjectName, boldFiles, ...
+    selected_configs, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads)
+
+processedCount = 0;
+skippedCount = 0;
+derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subjectName, 'func');
+
+concatenated_dir = fullfile(derivFuncPath, 'parcellation_concatenated');
+concatenated_dir = selectedConcatenatedDirectory(fig, concatenated_dir);
+if ~exist(concatenated_dir, 'dir')
+    mkdir(concatenated_dir);
+end
+
+for config_idx = 1:length(selected_configs)
+
+    guiCheckpoint(fig);
+    config = selected_configs{config_idx};
+    
+    if ~exist(config.network_file, 'file')
+        updateStatus(fig, ['Warning: Network file not found: ' config.network_file]);
+        continue;
+    end
+    if ~exist(config.label_file, 'file')
+        updateStatus(fig, ['Warning: Label file not found: ' config.label_file]);
+        continue;
+    end
+    
+    group_net = spm_read_vols(spm_vol(config.network_file));
+    
+    for strategy_idx = 1:length(selected_strategies)
+    
+        guiCheckpoint(fig);
+        strategy_suffix = selected_strategies{strategy_idx};
+        strategy_name = strrep(strategy_suffix, 'Regressed', '');
+        
+        config_output_dir = fullfile(concatenated_dir, [config.folder_suffix '_' strategy_suffix]);
+        concatenated_parcellationPath = MIKey_bids_path(config_output_dir, [scopeFilename(subjectName) '_space-template_desc-concatenatedParcellation.nii']);
+        
+        if exist(concatenated_parcellationPath, 'file')
+            updateStatus(fig, ['Skipping - concatenated parcellation already exists for config ' config.folder_suffix ' and ' strategy_name]);
+            skippedCount = skippedCount + 1;
+            continue;
+        end
+        
+        all_fMRI_data = [];
+        valid_runs = {};
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix ext], 'input');
+            
+            if exist(regressedBoldPath, 'file')
+                fMRI_data = spm_read_vols(spm_vol(regressedBoldPath));
+                
+                if isempty(all_fMRI_data)
+                    all_fMRI_data = fMRI_data;
+                else
+                    all_fMRI_data = cat(4, all_fMRI_data, fMRI_data);
+                end
+                
+                valid_runs{end+1} = boldBaseName;
+                updateStatus(fig, ['Added run ' boldBaseName ' to concatenated data for ' strategy_name]);
+            else
+                updateStatus(fig, ['Skipping run ' boldBaseName ' - missing regression output for ' strategy_name]);
+            end
+        end
+        
+        if isempty(all_fMRI_data)
+            updateStatus(fig, ['No valid runs found for concatenation with strategy ' strategy_name]);
+            continue;
+        end
+        
+        updateStatus(fig, ['Concatenated ' num2str(length(valid_runs)) ' runs for strategy ' strategy_name]);
+        updateStatus(fig, ['Final data dimensions: ' mat2str(size(all_fMRI_data))]);
+        
+        if ~exist(config_output_dir, 'dir')
+            mkdir(config_output_dir);
+        end
+        
+        tSNR_path = '';
+        if use_tSNR
+            tSNR_path = calculateTSNRFromData(fig, config_output_dir, all_fMRI_data, GMWM_head, [scopeFilename(subjectName) '_space-template_desc-tSNRconcatenated.nii']);
+            if isempty(tSNR_path)
+                updateStatus(fig, ['Warning: Failed to calculate tSNR for concatenated data. Continuing without tSNR correction.']);
+            else
+                updateStatus(fig, 'tSNR calculated for concatenated data');
+            end
+        end
+        
+        InterSubjectVar_head = [];
+        if isfield(InterSubjectVar_heads, strategy_suffix)
+            InterSubjectVar_head = InterSubjectVar_heads.(strategy_suffix);
+        end
+        
+        optional_params = {'UseParallel', fig.UserData.parcellationUseParallelCheckbox.Value, 'CheckpointFcn', @() guiCheckpoint(fig)};
+        if use_tSNR && ~isempty(tSNR_path)
+            optional_params{end+1} = 'tSNR';
+            optional_params{end+1} = true;
+            optional_params{end+1} = 'tSNRfile';
+            optional_params{end+1} = tSNR_path;
+        end
+        
+        if ~isempty(InterSubjectVar_head)
+            optional_params{end+1} = 'InterSubjectVar';
+            optional_params{end+1} = InterSubjectVar_head;
+        end
+        
+        cd(derivFuncPath);
+        [net_map, corr_map, iter] = individualized_parcellation_rsfMRI_v3(all_fMRI_data, group_net, GMWM_head, 'prior', config.label_file, percent_top, config_output_dir, max_iter, change_thr, conf_thr, optional_params{:});
+        
+        net_head = GMWM_head;
+        net_head.fname = concatenated_parcellationPath;
+        net_head.dt = [16 0];
+        spm_write_vol(net_head, net_map);
+        
+        concat_info.valid_runs = valid_runs;
+        concat_info.strategy = strategy_name;
+        concat_info.config = config;
+        concat_info.use_tSNR = use_tSNR;
+        concat_info.use_inter_subject_var = ~isempty(InterSubjectVar_head);
+        concat_info.data_dimensions = size(all_fMRI_data);
+        concat_info.parcellation_params = struct('percent_top', percent_top, 'max_iter', max_iter, 'change_thr', change_thr, 'conf_thr', conf_thr);
+        save(fullfile(config_output_dir, 'concatenation_info.mat'), 'concat_info');
+        
+        updateStatus(fig, ['Completed concatenated parcellation for ' subjectName ' with config ' config.folder_suffix ' and ' strategy_name]);
+        updateStatus(fig, ['Used ' num2str(length(valid_runs)) ' runs: ' strjoin(valid_runs, ', ')]);
+        updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+        processedCount = processedCount + 1;
+        
+        clear all_fMRI_data net_map corr_map;
+    end
+end
+end
+
+
+function processIndividualParcellationClust_BIDS(fig, subjectFilter, templatePath)
+bidsPath = fig.UserData.bidsPath;
+GMWM_head = spm_vol(fullfile(templatePath, 'AMCP_temp', 'AMCP_GMWM_mask.nii'));
+GMWM_mask = spm_read_vols(GMWM_head);
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+roi_nums = fig.UserData.clustROIEdit.Value;
+if ischar(roi_nums) || isstring(roi_nums)
+    roi_nums = sscanf(strrep(char(roi_nums), ',', ' '), '%f')';
+end
+if isempty(roi_nums)
+    roi_nums = 100;
+    updateStatus(fig, 'Using default ROI numbers: 100, 200, 400, 800');
+end
+
+updateStatus(fig, ['Using ROI numbers: ' num2str(roi_nums)]);
+
+selected_strategies = {};
+if fig.UserData.advRegressionPCOnlyCheckbox.Value
+    selected_strategies{end+1} = 'Regressedpc';
+end
+if fig.UserData.advRegressionPCCSFCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSF';
+end
+if fig.UserData.advRegressionPCGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcGS';
+end
+if fig.UserData.advRegressionPCCSFGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSFGS';
+end
+
+if isempty(selected_strategies)
+    updateStatus(fig, 'Warning: No regression strategies selected for clustering parcellation. Using default PC only.');
+    selected_strategies = {'Regressedpc'};
+end
+
+updateStatus(fig, ['Clustering parcellation will use strategies: ' strjoin(selected_strategies, ', ')]);
+
+percent_top = fig.UserData.percentTopEdit.Value;
+max_iter = fig.UserData.maxIterEdit.Value;
+change_thr = fig.UserData.changeThrEdit.Value;
+conf_thr = fig.UserData.confThrEdit.Value;
+
+updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+
+use_tSNR = fig.UserData.useTSNRCheckbox.Value;
+use_inter_subject_var = fig.UserData.useInterSubjectVarCheckbox.Value;
+
+updateStatus(fig, ['Correction parameters - Use tSNR: ' num2str(use_tSNR) ', Use Inter-Subject Var: ' num2str(use_inter_subject_var)]);
+
+InterSubjectVar_heads = struct();
+if use_inter_subject_var
+    updateStatus(fig, 'Calculating Inter-Subject Variability maps for all selected strategies...');
+    for strategy_idx = 1:length(selected_strategies)
+        guiCheckpoint(fig);
+        strategy_suffix = selected_strategies{strategy_idx};
+        InterSubjectVar_head = computeInterSubjectVariabilityBIDS(fig, bidsPath, subjectFilter, strategy_suffix, templatePath);
+        if ~isempty(InterSubjectVar_head)
+            InterSubjectVar_heads.(strategy_suffix) = InterSubjectVar_head;
+            updateStatus(fig, ['Inter-Subject Variability map computed for strategy: ' strategy_suffix]);
+        else
+            updateStatus(fig, ['Warning: Failed to compute Inter-Subject Variability map for strategy ' strategy_suffix '. Continuing without it.']);
+        end
+    end
+end
+
+parcellation_mode = selectParcellationMode(fig);
+
+if isempty(parcellation_mode)
+    updateStatus(fig, 'Parcellation cancelled by user');
+    return;
+end
+
+updateStatus(fig, ['Selected parcellation mode: ' parcellation_mode]);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Individual parcellation (clustering) for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        if isempty(boldFiles)
+            updateStatus(fig, ['No BOLD files found for subject: ' subDirs(i).name]);
+            continue;
+        end
+        
+        switch parcellation_mode
+            case 'Individual Runs (separate folders)'
+                [processed, skipped] = processIndividualRuns_Clust(fig, bidsPath, subDirs(i).name, boldFiles, ...
+                    roi_nums, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+                    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads);
+                processedCount = processedCount + processed;
+                skippedCount = skippedCount + skipped;
+                
+            case 'Concatenated Runs (single folder)'
+                [processed, skipped] = processConcatenatedRuns_Clust(fig, bidsPath, subDirs(i).name, boldFiles, ...
+                    roi_nums, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+                    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads);
+                processedCount = processedCount + processed;
+                skippedCount = skippedCount + skipped;
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in clustering parcellation for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Individual parcellation (clustering) completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+
+function [processedCount, skippedCount] = processIndividualRuns_Clust(fig, bidsPath, subjectName, boldFiles, ...
+    roi_nums, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads)
+
+processedCount = 0;
+skippedCount = 0;
+derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subjectName, 'func');
+
+for roi_idx = 1:length(roi_nums)
+
+    guiCheckpoint(fig);
+    roi_num = roi_nums(roi_idx);
+    
+    for strategy_idx = 1:length(selected_strategies)
+    
+        guiCheckpoint(fig);
+        strategy_suffix = selected_strategies{strategy_idx};
+        strategy_name = strrep(strategy_suffix, 'Regressed', '');
+        
+        strategy_net_maps = [];
+        strategy_run_names = {};
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            output_dir = fullfile(derivFuncPath, [boldBaseName '_parcellation_clust_' num2str(roi_num) '_' strategy_suffix]);
+            strategy_parcellationPath = MIKey_bids_path(output_dir, [boldBaseName '_space-template_desc-individualParcellation' ext]);
+            
+            if exist(strategy_parcellationPath, 'file')
+                updateStatus(fig, ['Skipping - individual parcellation already exists for: ' boldFile ' with ROI ' num2str(roi_num) ' and ' strategy_name]);
+                skippedCount = skippedCount + 1;
+                
+                existing_net_map = spm_read_vols(spm_vol(strategy_parcellationPath));
+                strategy_net_maps(:, :, :, end+1) = existing_net_map;
+                strategy_run_names{end+1} = boldBaseName;
+                continue;
+            end
+            
+            regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix ext], 'input');
+            if ~exist(regressedBoldPath, 'file')
+                updateStatus(fig, ['Warning: Regression output not found for ' strategy_name ': ' regressedBoldPath]);
+                continue;
+            end
+            
+            group_net_file = getGroupNetworkFile(fig, templatePath);
+            group_net = spm_read_vols(spm_vol(group_net_file));
+            
+            tSNR_path = '';
+            if use_tSNR
+                tSNR_path = calculateTSNR(fig, derivFuncPath, boldBaseName, strategy_suffix);
+                if isempty(tSNR_path)
+                    updateStatus(fig, ['Warning: Failed to calculate tSNR for ' boldFile '. Continuing without tSNR correction.']);
+                else
+                    updateStatus(fig, ['tSNR calculated for: ' boldFile]);
+                end
+            end
+            
+            InterSubjectVar_head = [];
+            if isfield(InterSubjectVar_heads, strategy_suffix)
+                InterSubjectVar_head = InterSubjectVar_heads.(strategy_suffix);
+            end
+            
+            if exist(regressedBoldPath, 'file')
+                cd(derivFuncPath);
+                
+                fMRI_4D = spm_read_vols(spm_vol(regressedBoldPath));
+                
+                optional_params = {'UseParallel', fig.UserData.parcellationUseParallelCheckbox.Value, 'CheckpointFcn', @() guiCheckpoint(fig)};
+                if use_tSNR && ~isempty(tSNR_path)
+                    optional_params{end+1} = 'tSNR';
+                    optional_params{end+1} = true;
+                    optional_params{end+1} = 'tSNRfile';
+                    optional_params{end+1} = tSNR_path;
+                end
+                
+                if ~isempty(InterSubjectVar_head)
+                    optional_params{end+1} = 'InterSubjectVar';
+                    optional_params{end+1} = InterSubjectVar_head;
+                end
+                
+                [net_map, corr_map, iter] = individualized_parcellation_rsfMRI_v3(fMRI_4D, group_net, GMWM_head, 'kmeans', roi_num, percent_top, output_dir, max_iter, change_thr, conf_thr, optional_params{:});
+                
+                strategy_net_maps(:, :, :, end+1) = net_map;
+                strategy_run_names{end+1} = boldBaseName;
+                
+                net_head = GMWM_head;
+                net_head.fname = strategy_parcellationPath;
+                net_head.dt = [16 0];
+                spm_write_vol(net_head, net_map);
+                
+                updateStatus(fig, ['Completed individual parcellation for: ' boldFile ' with ROI ' num2str(roi_num) ' and ' strategy_name]);
+                updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+                processedCount = processedCount + 1;
+            end
+        end
+        
+        if size(strategy_net_maps, 4) > 1
+            M = size(strategy_net_maps, 4);
+            dice_strategy = zeros(M, M);
+            for k = 1:M
+                for m = 1:M
+                    dice_strategy(k, m) = dice_coefficient(strategy_net_maps(:, :, :, k), strategy_net_maps(:, :, :, m), GMWM_mask);
+                end
+            end
+            
+            strategy_dice_file = fullfile(derivFuncPath, ['dice_cross_runs_clust_' num2str(roi_num) '_' strategy_suffix '.mat']);
+            save(strategy_dice_file, 'dice_strategy', 'strategy_run_names');
+            
+            mean_dice = mean(dice_strategy(dice_strategy > 0 & ~eye(M)));
+            updateStatus(fig, ['ROI ' num2str(roi_num) ' strategy ' strategy_name ' average Dice (across runs): ' num2str(mean_dice)]);
+        end
+    end
+end
+
+end
+
+
+function [processedCount, skippedCount] = processConcatenatedRuns_Clust(fig, bidsPath, subjectName, boldFiles, ...
+    roi_nums, selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+    percent_top, max_iter, change_thr, conf_thr, use_tSNR, InterSubjectVar_heads)
+
+processedCount = 0;
+skippedCount = 0;
+derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subjectName, 'func');
+
+concatenated_dir = fullfile(derivFuncPath, 'parcellation_concatenated_clust');
+concatenated_dir = selectedConcatenatedDirectory(fig, concatenated_dir);
+if ~exist(concatenated_dir, 'dir')
+    mkdir(concatenated_dir);
+end
+
+for roi_idx = 1:length(roi_nums)
+
+    guiCheckpoint(fig);
+    roi_num = roi_nums(roi_idx);
+    
+    for strategy_idx = 1:length(selected_strategies)
+    
+        guiCheckpoint(fig);
+        strategy_suffix = selected_strategies{strategy_idx};
+        strategy_name = strrep(strategy_suffix, 'Regressed', '');
+        
+        config_output_dir = fullfile(concatenated_dir, ['clust_' num2str(roi_num) '_' strategy_suffix]);
+        concatenated_parcellationPath = MIKey_bids_path(config_output_dir, [scopeFilename(subjectName) '_space-template_desc-concatenatedParcellation.nii']);
+        
+        if exist(concatenated_parcellationPath, 'file')
+            updateStatus(fig, ['Skipping - concatenated parcellation already exists for ROI ' num2str(roi_num) ' and ' strategy_name]);
+            skippedCount = skippedCount + 1;
+            continue;
+        end
+        
+        all_fMRI_data = [];
+        valid_runs = {};
+        
+        for j = 1:length(boldFiles)
+        
+            guiCheckpoint(fig);
+            boldFile = boldFiles(j).name;
+            [~, boldBaseName, ext] = fileparts(boldFile);
+            
+            regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix ext], 'input');
+            
+            if exist(regressedBoldPath, 'file')
+                fMRI_data = spm_read_vols(spm_vol(regressedBoldPath));
+                
+                if isempty(all_fMRI_data)
+                    all_fMRI_data = fMRI_data;
+                else
+                    all_fMRI_data = cat(4, all_fMRI_data, fMRI_data);
+                end
+                
+                valid_runs{end+1} = boldBaseName;
+                updateStatus(fig, ['Added run ' boldBaseName ' to concatenated data for ROI ' num2str(roi_num) ' and ' strategy_name]);
+            else
+                updateStatus(fig, ['Skipping run ' boldBaseName ' - missing regression output for ROI ' num2str(roi_num) ' and ' strategy_name]);
+            end
+        end
+        
+        if isempty(all_fMRI_data)
+            updateStatus(fig, ['No valid runs found for concatenation with ROI ' num2str(roi_num) ' and strategy ' strategy_name]);
+            continue;
+        end
+        
+        updateStatus(fig, ['Concatenated ' num2str(length(valid_runs)) ' runs for ROI ' num2str(roi_num) ' and strategy ' strategy_name]);
+        updateStatus(fig, ['Final data dimensions: ' mat2str(size(all_fMRI_data))]);
+        
+        if ~exist(config_output_dir, 'dir')
+            mkdir(config_output_dir);
+        end
+        
+        group_net_file = getGroupNetworkFile(fig, templatePath);
+        group_net = spm_read_vols(spm_vol(group_net_file));
+        
+        tSNR_path = '';
+        if use_tSNR
+            tSNR_path = calculateTSNRFromData(fig, config_output_dir, all_fMRI_data, GMWM_head, [scopeFilename(subjectName) '_space-template_desc-tSNRconcatenated.nii']);
+            if isempty(tSNR_path)
+                updateStatus(fig, ['Warning: Failed to calculate tSNR for concatenated data. Continuing without tSNR correction.']);
+            else
+                updateStatus(fig, 'tSNR calculated for concatenated data');
+            end
+        end
+        
+        InterSubjectVar_head = [];
+        if isfield(InterSubjectVar_heads, strategy_suffix)
+            InterSubjectVar_head = InterSubjectVar_heads.(strategy_suffix);
+        end
+        
+        optional_params = {'UseParallel', fig.UserData.parcellationUseParallelCheckbox.Value, 'CheckpointFcn', @() guiCheckpoint(fig)};
+        if use_tSNR && ~isempty(tSNR_path)
+            optional_params{end+1} = 'tSNR';
+            optional_params{end+1} = true;
+            optional_params{end+1} = 'tSNRfile';
+            optional_params{end+1} = tSNR_path;
+        end
+        
+        if ~isempty(InterSubjectVar_head)
+            optional_params{end+1} = 'InterSubjectVar';
+            optional_params{end+1} = InterSubjectVar_head;
+        end
+        
+        cd(derivFuncPath);
+        [net_map, corr_map, iter] = individualized_parcellation_rsfMRI_v3(all_fMRI_data, group_net, GMWM_head, 'kmeans', roi_num, percent_top, config_output_dir, max_iter, change_thr, conf_thr, optional_params{:});
+        
+        net_head = GMWM_head;
+        net_head.fname = concatenated_parcellationPath;
+        net_head.dt = [16 0];
+        spm_write_vol(net_head, net_map);
+        
+        concat_info.valid_runs = valid_runs;
+        concat_info.strategy = strategy_name;
+        concat_info.roi_num = roi_num;
+        concat_info.use_tSNR = use_tSNR;
+        concat_info.use_inter_subject_var = ~isempty(InterSubjectVar_head);
+        concat_info.data_dimensions = size(all_fMRI_data);
+        concat_info.parcellation_params = struct('percent_top', percent_top, 'max_iter', max_iter, 'change_thr', change_thr, 'conf_thr', conf_thr);
+        save(fullfile(config_output_dir, 'concatenation_info.mat'), 'concat_info');
+        
+        updateStatus(fig, ['Completed concatenated parcellation for ' subjectName ' with ROI ' num2str(roi_num) ' and ' strategy_name]);
+        updateStatus(fig, ['Used ' num2str(length(valid_runs)) ' runs: ' strjoin(valid_runs, ', ')]);
+        updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+        processedCount = processedCount + 1;
+        
+        clear all_fMRI_data net_map corr_map;
+    end
+end
+end
+
+
+function processIndividualParcellationVoxel_BIDS(fig, subjectFilter, templatePath)
+bidsPath = fig.UserData.bidsPath;
+GMWM_head = spm_vol(fullfile(templatePath, 'AMCP_temp', 'AMCP_GMWM_mask.nii'));
+GMWM_mask = spm_read_vols(GMWM_head);
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+downsample_factor = fig.UserData.voxelDownsampleEdit.Value;
+use_tSNR = fig.UserData.useTSNRCheckbox.Value;
+use_inter_subject_var = fig.UserData.useInterSubjectVarCheckbox.Value;
+
+updateStatus(fig, ['Using voxel mode parameters - Downsample Factor: ' num2str(downsample_factor) ...
+    ', Use tSNR: ' num2str(use_tSNR) ', Use Inter-Subject Var: ' num2str(use_inter_subject_var)]);
+
+selected_strategies = {};
+if fig.UserData.advRegressionPCOnlyCheckbox.Value
+    selected_strategies{end+1} = 'Regressedpc';
+end
+if fig.UserData.advRegressionPCCSFCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSF';
+end
+if fig.UserData.advRegressionPCGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcGS';
+end
+if fig.UserData.advRegressionPCCSFGSCheckbox.Value
+    selected_strategies{end+1} = 'RegressedpcCSFGS';
+end
+
+if isempty(selected_strategies)
+    updateStatus(fig, 'Warning: No regression strategies selected for voxel parcellation. Using default PC only.');
+    selected_strategies = {'Regressedpc'};
+end
+
+updateStatus(fig, ['Voxel parcellation will use strategies: ' strjoin(selected_strategies, ', ')]);
+
+percent_top = fig.UserData.percentTopEdit.Value;
+max_iter = fig.UserData.maxIterEdit.Value;
+change_thr = fig.UserData.changeThrEdit.Value;
+conf_thr = fig.UserData.confThrEdit.Value;
+
+updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+
+InterSubjectVar_head = [];
+if use_inter_subject_var
+    updateStatus(fig, 'Calculating Inter-Subject Variability map...');
+    InterSubjectVar_head = computeInterSubjectVariabilityBIDS(fig, bidsPath, subjectFilter, selected_strategies, templatePath);
+    if isempty(InterSubjectVar_head)
+        updateStatus(fig, 'Warning: Failed to compute Inter-Subject Variability map. Continuing without it.');
+        use_inter_subject_var = false;
+    else
+        updateStatus(fig, 'Inter-Subject Variability map computed successfully.');
+    end
+end
+
+parcellation_mode = selectParcellationMode(fig);
+
+if isempty(parcellation_mode)
+    updateStatus(fig, 'Parcellation cancelled by user');
+    return;
+end
+
+updateStatus(fig, ['Selected parcellation mode: ' parcellation_mode]);
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Individual parcellation (voxel mode) for: ' subDirs(i).name]);
+        
+        funcPath = fullfile(subPath, 'func');
+        boldFiles = getBoldFiles(fig, funcPath);
+        
+        if isempty(boldFiles)
+            updateStatus(fig, ['No BOLD files found for subject: ' subDirs(i).name]);
+            continue;
+        end
+        
+        switch parcellation_mode
+            case 'Individual Runs (separate folders)'
+                [processed, skipped] = processIndividualRuns_Voxel(fig, bidsPath, subDirs(i).name, boldFiles, ...
+                    selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+                    downsample_factor, use_tSNR, InterSubjectVar_head, ...
+                    percent_top, max_iter, change_thr, conf_thr);
+                processedCount = processedCount + processed;
+                skippedCount = skippedCount + skipped;
+                
+            case 'Concatenated Runs (single folder)'
+                [processed, skipped] = processConcatenatedRuns_Voxel(fig, bidsPath, subDirs(i).name, boldFiles, ...
+                    selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+                    downsample_factor, use_tSNR, InterSubjectVar_head, ...
+                    percent_top, max_iter, change_thr, conf_thr);
+                processedCount = processedCount + processed;
+                skippedCount = skippedCount + skipped;
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in voxel parcellation for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Individual parcellation (voxel mode) completed: %d files processed, %d files skipped', processedCount, skippedCount));
+end
+
+function [processedCount, skippedCount] = processIndividualRuns_Voxel(fig, bidsPath, subjectName, boldFiles, ...
+    selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+    downsample_factor, use_tSNR, InterSubjectVar_head, ...
+    percent_top, max_iter, change_thr, conf_thr)
+
+processedCount = 0;
+skippedCount = 0;
+derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subjectName, 'func');
+
+group_net_file = getGroupNetworkFile(fig, templatePath);
+group_net = spm_read_vols(spm_vol(group_net_file));
+
+all_var_heads = InterSubjectVar_head;
+for strategy_idx = 1:length(selected_strategies)
+    guiCheckpoint(fig);
+    strategy_suffix = selected_strategies{strategy_idx};
+    InterSubjectVar_head = all_var_heads;
+    if isstruct(all_var_heads) && ~isfield(all_var_heads, 'fname')
+        InterSubjectVar_head = [];
+        if isfield(all_var_heads, strategy_suffix)
+            InterSubjectVar_head = all_var_heads.(strategy_suffix);
+        end
+    end
+    strategy_name = strrep(strategy_suffix, 'Regressed', '');
+    
+    strategy_net_maps = [];
+    strategy_run_names = {};
+    
+    for j = 1:length(boldFiles)
+    
+        guiCheckpoint(fig);
+        boldFile = boldFiles(j).name;
+        [~, boldBaseName, ext] = fileparts(boldFile);
+        
+        output_dir = fullfile(derivFuncPath, [boldBaseName '_parcellation_voxel_' num2str(downsample_factor) '_' strategy_suffix]);
+        parcellationPath = MIKey_bids_path(output_dir, [boldBaseName '_space-template_desc-individualParcellation' ext]);
+        
+        if exist(parcellationPath, 'file')
+            updateStatus(fig, ['Skipping - voxel parcellation already exists for: ' boldFile ' with ' strategy_name]);
+            skippedCount = skippedCount + 1;
+            
+            existing_net_map = spm_read_vols(spm_vol(parcellationPath));
+            strategy_net_maps(:, :, :, end+1) = existing_net_map;
+            strategy_run_names{end+1} = boldBaseName;
+            continue;
+        end
+        
+        regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix ext], 'input');
+        if ~exist(regressedBoldPath, 'file')
+            updateStatus(fig, ['Warning: Regression output not found for ' strategy_name ': ' regressedBoldPath]);
+            continue;
+        end
+        
+        tSNR_path = '';
+        if use_tSNR
+            tSNR_path = calculateTSNR(fig, derivFuncPath, boldBaseName, strategy_suffix);
+            if isempty(tSNR_path)
+                updateStatus(fig, ['Warning: Failed to calculate tSNR for ' boldFile '. Continuing without tSNR correction.']);
+            else
+                updateStatus(fig, ['tSNR calculated for: ' boldFile]);
+            end
+        end
+        
+        if exist(regressedBoldPath, 'file')
+            cd(derivFuncPath);
+            
+            fMRI_4D = spm_read_vols(spm_vol(regressedBoldPath));
+            
+            optional_params = {'DownsampleMethod', 'nearest', 'UseParallel', fig.UserData.parcellationUseParallelCheckbox.Value, 'CheckpointFcn', @() guiCheckpoint(fig)};
+            
+            if use_tSNR && ~isempty(tSNR_path)
+                optional_params{end+1} = 'tSNR';
+                optional_params{end+1} = true;
+                optional_params{end+1} = 'tSNRfile';
+                optional_params{end+1} = tSNR_path;
+            end
+            
+            if ~isempty(InterSubjectVar_head)
+                optional_params{end+1} = 'InterSubjectVar';
+                optional_params{end+1} = InterSubjectVar_head;
+            end
+            
+            [net_map, corr_map, iter] = individualized_parcellation_rsfMRI_v3(fMRI_4D, group_net, GMWM_head, ...
+                'voxel', downsample_factor, percent_top, output_dir, max_iter, change_thr, conf_thr, optional_params{:});
+            
+            net_head = GMWM_head;
+            net_head.fname = parcellationPath;
+            net_head.dt = [16 0];
+            spm_write_vol(net_head, net_map);
+            
+            strategy_net_maps(:, :, :, end+1) = net_map;
+            strategy_run_names{end+1} = boldBaseName;
+            
+            updateStatus(fig, ['Completed voxel parcellation for: ' boldFile ' with downsample factor ' num2str(downsample_factor) ' and ' strategy_name]);
+            updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+            processedCount = processedCount + 1;
+        end
+    end
+    
+    if size(strategy_net_maps, 4) > 1
+        M = size(strategy_net_maps, 4);
+        dice_strategy = zeros(M, M);
+        for k = 1:M
+            for m = 1:M
+                dice_strategy(k, m) = dice_coefficient(strategy_net_maps(:, :, :, k), strategy_net_maps(:, :, :, m), GMWM_mask);
+            end
+        end
+        
+        strategy_dice_file = fullfile(derivFuncPath, ['dice_cross_runs_voxel_' num2str(downsample_factor) '_' strategy_suffix '.mat']);
+        save(strategy_dice_file, 'dice_strategy', 'strategy_run_names');
+        
+        mean_dice = mean(dice_strategy(dice_strategy > 0 & ~eye(M)));
+        updateStatus(fig, ['Voxel mode strategy ' strategy_name ' average Dice (across runs): ' num2str(mean_dice)]);
+    end
+end
+
+end
+
+function [processedCount, skippedCount] = processConcatenatedRuns_Voxel(fig, bidsPath, subjectName, boldFiles, ...
+    selected_strategies, GMWM_head, GMWM_mask, templatePath, ...
+    downsample_factor, use_tSNR, InterSubjectVar_head, ...
+    percent_top, max_iter, change_thr, conf_thr)
+
+processedCount = 0;
+skippedCount = 0;
+derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subjectName, 'func');
+
+concatenated_dir = fullfile(derivFuncPath, 'parcellation_concatenated_voxel');
+concatenated_dir = selectedConcatenatedDirectory(fig, concatenated_dir);
+if ~exist(concatenated_dir, 'dir')
+    mkdir(concatenated_dir);
+end
+
+group_net_file = getGroupNetworkFile(fig, templatePath);
+group_net = spm_read_vols(spm_vol(group_net_file));
+
+all_var_heads = InterSubjectVar_head;
+for strategy_idx = 1:length(selected_strategies)
+    guiCheckpoint(fig);
+    strategy_suffix = selected_strategies{strategy_idx};
+    InterSubjectVar_head = all_var_heads;
+    if isstruct(all_var_heads) && ~isfield(all_var_heads, 'fname')
+        InterSubjectVar_head = [];
+        if isfield(all_var_heads, strategy_suffix)
+            InterSubjectVar_head = all_var_heads.(strategy_suffix);
+        end
+    end
+    strategy_name = strrep(strategy_suffix, 'Regressed', '');
+    
+    config_output_dir = fullfile(concatenated_dir, ['voxel_' num2str(downsample_factor) '_' strategy_suffix]);
+    concatenated_parcellationPath = MIKey_bids_path(config_output_dir, [scopeFilename(subjectName) '_space-template_desc-concatenatedParcellation.nii']);
+    
+    if exist(concatenated_parcellationPath, 'file')
+        updateStatus(fig, ['Skipping - concatenated voxel parcellation already exists for ' strategy_name]);
+        skippedCount = skippedCount + 1;
+        continue;
+    end
+    
+    all_fMRI_data = [];
+    valid_runs = {};
+    
+    for j = 1:length(boldFiles)
+    
+        guiCheckpoint(fig);
+        boldFile = boldFiles(j).name;
+        [~, boldBaseName, ext] = fileparts(boldFile);
+        
+        regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix ext], 'input');
+        
+        if exist(regressedBoldPath, 'file')
+            fMRI_data = spm_read_vols(spm_vol(regressedBoldPath));
+            
+            if isempty(all_fMRI_data)
+                all_fMRI_data = fMRI_data;
+            else
+                all_fMRI_data = cat(4, all_fMRI_data, fMRI_data);
+            end
+            
+            valid_runs{end+1} = boldBaseName;
+            updateStatus(fig, ['Added run ' boldBaseName ' to concatenated data for ' strategy_name]);
+        else
+            updateStatus(fig, ['Skipping run ' boldBaseName ' - missing regression output for ' strategy_name]);
+        end
+    end
+    
+    if isempty(all_fMRI_data)
+        updateStatus(fig, ['No valid runs found for concatenation with strategy ' strategy_name]);
+        continue;
+    end
+    
+    updateStatus(fig, ['Concatenated ' num2str(length(valid_runs)) ' runs for strategy ' strategy_name]);
+    updateStatus(fig, ['Final data dimensions: ' mat2str(size(all_fMRI_data))]);
+    
+    if ~exist(config_output_dir, 'dir')
+        mkdir(config_output_dir);
+    end
+    
+    tSNR_path = '';
+    if use_tSNR
+        tSNR_path = calculateTSNRFromData(fig, config_output_dir, all_fMRI_data, GMWM_head, [scopeFilename(subjectName) '_space-template_desc-tSNRconcatenated.nii']);
+        if isempty(tSNR_path)
+            updateStatus(fig, ['Warning: Failed to calculate tSNR for concatenated data. Continuing without tSNR correction.']);
+        else
+            updateStatus(fig, 'tSNR calculated for concatenated data');
+        end
+    end
+    
+    optional_params = {'DownsampleMethod', 'nearest', 'UseParallel', fig.UserData.parcellationUseParallelCheckbox.Value, 'CheckpointFcn', @() guiCheckpoint(fig)};
+    
+    if use_tSNR && ~isempty(tSNR_path)
+        optional_params{end+1} = 'tSNR';
+        optional_params{end+1} = true;
+        optional_params{end+1} = 'tSNRfile';
+        optional_params{end+1} = tSNR_path;
+    end
+    
+    if ~isempty(InterSubjectVar_head)
+        optional_params{end+1} = 'InterSubjectVar';
+        optional_params{end+1} = InterSubjectVar_head;
+    end
+    
+    cd(derivFuncPath);
+    [net_map, corr_map, iter] = individualized_parcellation_rsfMRI_v3(all_fMRI_data, group_net, GMWM_head, ...
+        'voxel', downsample_factor, percent_top, config_output_dir, max_iter, change_thr, conf_thr, optional_params{:});
+    
+    net_head = GMWM_head;
+    net_head.fname = concatenated_parcellationPath;
+    net_head.dt = [16 0];
+    spm_write_vol(net_head, net_map);
+    
+    concat_info.valid_runs = valid_runs;
+    concat_info.strategy = strategy_name;
+    concat_info.downsample_factor = downsample_factor;
+    concat_info.use_tSNR = use_tSNR;
+    concat_info.use_inter_subject_var = ~isempty(InterSubjectVar_head);
+    concat_info.data_dimensions = size(all_fMRI_data);
+    concat_info.parcellation_params = struct('percent_top', percent_top, 'max_iter', max_iter, 'change_thr', change_thr, 'conf_thr', conf_thr);
+    save(fullfile(config_output_dir, 'concatenation_info.mat'), 'concat_info');
+    
+    updateStatus(fig, ['Completed concatenated voxel parcellation for ' subjectName ' with downsample factor ' num2str(downsample_factor) ' and ' strategy_name]);
+    updateStatus(fig, ['Used ' num2str(length(valid_runs)) ' runs: ' strjoin(valid_runs, ', ')]);
+    updateStatus(fig, ['Parcellation parameters - Percent Top: ' num2str(percent_top) ', Max Iter: ' num2str(max_iter) ', Change Thr: ' num2str(change_thr) ', Conf Thr: ' num2str(conf_thr)]);
+    processedCount = processedCount + 1;
+    
+    clear all_fMRI_data net_map corr_map;
+end
+end
+
+function tSNR_path = calculateTSNR(fig, derivFuncPath, boldBaseName, strategy_suffix)
+try
+    regressedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-' strategy_suffix '.nii'], 'input');
+    
+    if ~exist(regressedBoldPath, 'file')
+        updateStatus(fig, ['Warning: Regression output not found for tSNR calculation: ' regressedBoldPath]);
+        tSNR_path = '';
+        return;
+    end
+    
+    bold_head = spm_vol(regressedBoldPath);
+    bold_data = spm_read_vols(bold_head);
+    
+    tSNR_data = mean(bold_data, 4) ./ std(bold_data, 0, 4);
+    tSNR_data(isnan(tSNR_data) | isinf(tSNR_data)) = 0;
+    
+    tSNR_path = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-tSNR_' strategy_suffix '.nii']);
+    tSNR_head = bold_head(1);
+    tSNR_head.fname = tSNR_path;
+    tSNR_head.dt = [16 0];
+    spm_write_vol(tSNR_head, tSNR_data);
+    
+    updateStatus(fig, ['tSNR map saved: ' tSNR_path]);
+    
+catch ME
+    
+    if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+    if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+    updateStatus(fig, ['Error calculating tSNR: ' ME.message]);
+    tSNR_path = '';
+end
+end
+
+function tSNR_path = calculateTSNRFromData(fig, output_dir, bold_data, template_head, output_filename)
+try
+    tSNR_data = mean(bold_data, 4) ./ std(bold_data, 0, 4);
+    tSNR_data(isnan(tSNR_data) | isinf(tSNR_data)) = 0;
+    
+    tSNR_path = MIKey_bids_path(output_dir, output_filename);
+    tSNR_head = template_head;
+    tSNR_head.fname = tSNR_path;
+    tSNR_head.dt = [16 0];
+    spm_write_vol(tSNR_head, tSNR_data);
+    
+    updateStatus(fig, ['tSNR map saved: ' tSNR_path]);
+    
+catch ME
+    
+    if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+    if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+    updateStatus(fig, ['Error calculating tSNR from data: ' ME.message]);
+    tSNR_path = '';
+end
+end
+
+function InterSubjectVar_head = computeInterSubjectVariabilityBIDS(fig, bidsPath, subjectFilter, strategy_suffix, templatePath)
+if iscell(strategy_suffix)
+    InterSubjectVar_head = struct();
+    for strategy_idx = 1:numel(strategy_suffix)
+        guiCheckpoint(fig);
+        name = strategy_suffix{strategy_idx};
+        head = computeInterSubjectVariabilityBIDS(fig, bidsPath, subjectFilter, name, templatePath);
+        if ~isempty(head), InterSubjectVar_head.(name) = head; end
+    end
+    return;
+end
+try
+    updateStatus(fig, ['Starting inter-subject variability calculation for strategy: ' strategy_suffix]);
+    
+    template_head = spm_vol(fullfile(templatePath, 'Template_Mouse_v38.nii'));
+    Gmask_head = spm_vol(fullfile(templatePath, 'brainmask_Mouse_v38.nii'));
+    Gmask = spm_read_vols(Gmask_head);
+    
+    group_net_file = getGroupNetworkFile(fig, templatePath);
+    group_net = spm_read_vols(spm_vol(group_net_file));
+    
+    net_labels = unique(group_net(Gmask > 0));
+    net_labels = net_labels(net_labels > 0);
+    n_nets = numel(net_labels);
+    
+    scopes = getSubjectContexts(fig, bidsPath, subjectFilter);
+    subject_ids = unique({scopes.subjectID}, 'stable');
+    all_sub_corr = [];
+    valid_subjects = {};
+    for subject_idx = 1:numel(subject_ids)
+        guiCheckpoint(fig);
+        selected_scopes = scopes(strcmp({scopes.subjectID}, subject_ids{subject_idx}));
+        subject_sum = zeros(size(Gmask));
+        run_count = 0;
+        for scope_idx = 1:numel(selected_scopes)
+            guiCheckpoint(fig);
+            scope = selected_scopes(scope_idx);
+            rawFunc = fullfile(scope.folder, scope.name, 'func');
+            derivFunc = fullfile(bidsPath, 'derivatives', 'MIKey', scope.name, 'func');
+            selectedBold = getBoldFiles(fig, rawFunc);
+            for run_idx = 1:numel(selectedBold)
+                guiCheckpoint(fig);
+                [~, base] = fileparts(selectedBold(run_idx).name);
+                boldPath = MIKey_bids_path(derivFunc, [base '_space-template_desc-' strategy_suffix '.nii'], 'input');
+                if ~exist(boldPath, 'file')
+                    updateStatus(fig, ['Warning: Selected regression output missing: ' boldPath]);
+                    continue;
+                end
+                bold_data = spm_read_vols(spm_vol(boldPath));
+                sub_corr_map = zeros(size(Gmask));
+                for net_idx = 1:n_nets
+                    guiCheckpoint(fig);
+                    net_mask = (group_net == net_labels(net_idx)) & (Gmask > 0);
+                    if nnz(net_mask) < 10, continue; end
+                    net_ts = mean(reshape(bold_data(repmat(net_mask, [1,1,1,size(bold_data,4)])), nnz(net_mask), size(bold_data,4)), 1);
+                    for z = 1:size(bold_data,3)
+                        guiCheckpoint(fig);
+                        for y = 1:size(bold_data,2)
+                            for x = 1:size(bold_data,1)
+                                if net_mask(x,y,z)
+                                    value = corr(squeeze(bold_data(x,y,z,:)), net_ts');
+                                    if isnan(value), value = 0; end
+                                    sub_corr_map(x,y,z) = value;
+                                end
+                            end
+                        end
+                    end
+                end
+                subject_sum = subject_sum + sub_corr_map;
+                run_count = run_count + 1;
+            end
+        end
+        if run_count > 0
+            all_sub_corr(:,:,:,numel(valid_subjects)+1) = subject_sum/run_count;
+            valid_subjects{end+1} = subject_ids{subject_idx};
+            updateStatus(fig, sprintf('Processed subject %s: %d selected runs', subject_ids{subject_idx}, run_count));
+        end
+    end
+    if isempty(all_sub_corr) || size(all_sub_corr,4) < 2
+        updateStatus(fig, 'Warning: Not enough subjects with valid data for variability calculation.');
+        InterSubjectVar_head = [];
+        return;
+    end
+    
+    updateStatus(fig, ['Calculating variability across ' num2str(size(all_sub_corr,4)) ' valid subjects...']);
+    
+    inter_var_map = std(all_sub_corr, 0, 4);
+    inter_var_map = smooth3(inter_var_map, 'gaussian', [3,3,3], 1);
+    inter_var_map(~Gmask) = 0;
+    
+    groupAnalysisPath = getGroupAnalysisPath(fig, bidsPath);
+    if ~exist(groupAnalysisPath, 'dir')
+        mkdir(groupAnalysisPath);
+    end
+    
+    inter_var_path = fullfile(groupAnalysisPath, ['InterSubjectVariability_' strategy_suffix '.nii']);
+    inter_var_head = template_head;
+    inter_var_head.fname = inter_var_path;
+    inter_var_head.dt = [16 0];
+    spm_write_vol(inter_var_head, inter_var_map);
+    
+    var_info.valid_subjects = valid_subjects;
+    var_info.strategy_used = strategy_suffix;
+    var_info.n_subjects = length(valid_subjects);
+    save(fullfile(groupAnalysisPath, ['InterSubjectVariability_info_' strategy_suffix '.mat']), 'var_info');
+    
+    updateStatus(fig, ['Inter-subject variability map saved: ' inter_var_path]);
+    updateStatus(fig, ['Based on ' num2str(length(valid_subjects)) ' subjects']);
+    
+    InterSubjectVar_head = inter_var_head;
+    
+catch ME
+    
+    if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+    if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+    updateStatus(fig, ['Error in inter-subject variability calculation: ' ME.message]);
+    InterSubjectVar_head = [];
+end
+end
+
+function dice_val = dice_coefficient(img1, img2, mask)
+img1_mask = img1(mask > 0);
+img2_mask = img2(mask > 0);
+
+intersection = sum(img1_mask & img2_mask);
+sum_img1 = sum(img1_mask);
+sum_img2 = sum(img2_mask);
+
+if (sum_img1 + sum_img2) == 0
+    dice_val = 0;
+else
+    dice_val = 2 * intersection / (sum_img1 + sum_img2);
+end
+end
+
+function processTissueSegmentation_BIDS(fig, subjectFilter)
+bidsPath = fig.UserData.bidsPath;
+templatePath = fig.UserData.templateEdit.Value;
+subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+
+ref_prob = {
+    fullfile(templatePath,'AMCP_temp','AMCP_TPM.nii,1');
+    fullfile(templatePath,'AMCP_temp','AMCP_TPM.nii,2');
+    fullfile(templatePath,'AMCP_temp','AMCP_TPM.nii,3');
+    fullfile(templatePath,'AMCP_temp','AMCP_TPM.nii,4');
+    fullfile(templatePath,'AMCP_temp','AMCP_TPM.nii,5')
+    };
+
+processedCount = 0;
+skippedCount = 0;
+
+for i = 1:length(subDirs)
+
+    guiCheckpoint(fig);
+    try
+        subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+        updateStatus(fig, ['Tissue segmentation: ' subDirs(i).name]);
+        
+        anatPath = MIKey_anat_path(subPath);
+        t2Files = MIKey_nifti_files(anatPath, '*_T2w.nii');
+        if isempty(t2Files)
+            continue;
+        end
+        for j = 1:length(t2Files)
+            guiCheckpoint(fig);
+            t2File = t2Files(j).name;
+            [~, baseName, ext] = fileparts(t2File);
+            derivAnatPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'anat');
+            
+            oldsegGMPath = MIKey_bids_path(derivAnatPath, [baseName '_desc-gmvol' ext]);
+            if exist(oldsegGMPath, 'file')
+                updateStatus(fig, ['Skipping - Tissue segmentation already completed for: ' t2File]);
+                skippedCount = skippedCount + 1;
+                continue;
+            end
+            maskedT2Path = MIKey_bids_path(derivAnatPath, [t2Files(j).name(1:end-4) '_desc-masked' ext], 'input');
+            scaledT2Path = MIKey_bids_path(derivAnatPath, [t2Files(j).name(1:end-4) '_desc-scaled' ext], 'input');
+            
+            if exist(scaledT2Path, 'file')
+                ref{1,1} = fullfile(templatePath, 'Template_Mouse_v38.nii');
+                source{1,1} = [ maskedT2Path ',1'];
+                all_func = [source; [scaledT2Path ',1']];
+                OldNormalize_mlb = UN_get_default_oldnormalize_batch_struct(ref, source, all_func,2);
+                spm_jobman('run',OldNormalize_mlb);
+                movefile(MIKey_prefixed_file('norm', scaledT2Path), MIKey_bids_path(derivAnatPath, [t2Files(j).name(1:end-4) '_space-template' ext]));
+                movefile(MIKey_prefixed_file('norm', maskedT2Path),MIKey_bids_path(derivAnatPath, [t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]));
+                clear OldNormalize_mlb;
+                
+                % seg
+                %                 tempCoregT2Path = MIKey_prefixed_file('coreg', scaledT2Pathnew);
+                %                 segment_mlb = UN_get_segment_batch_struct(tempCoregT2Path, ref_prob);
+                %                 spm_jobman('run',segment_mlb);
+                %                 clear segment_mlb;
+                %
+                %                 smooth_para = [6,6,6];
+                %                 all_func = {
+                %                     fullfile(derivAnatPath, ['c1norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                     fullfile(derivAnatPath, ['c2norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                     fullfile(derivAnatPath, ['c3norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                     fullfile(derivAnatPath, ['c4norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                     fullfile(derivAnatPath, ['c5norm' t2Files(j).name(1:end-4) '_desc-scaled' ext])
+                %                     };
+                %                 Smooth_mlb = MY_get_default_smooth_batch_struct(all_func, smooth_para);
+                %                 updateStatus(fig, 'Start to process Smooth!');
+                %                 spm_jobman('run',Smooth_mlb);
+                %                 clear Smooth_mlb;
+                %                  segGMPath = fullfile(derivAnatPath, [baseName '_desc-gmprob' ext]);
+                %                 segWMPath = fullfile(derivAnatPath, [baseName '_desc-wmprob' ext]);
+                %                 segCSFPath = fullfile(derivAnatPath, [baseName '_desc-csfprob' ext]);
+                %                 segOTPath = fullfile(derivAnatPath, [baseName '_desc-otprob' ext]);
+                %                 segAIRPath = fullfile(derivAnatPath, [baseName '_desc-airprob' ext]);
+                %
+                %                 tempSegGMPath =  fullfile(derivAnatPath, ['sc1norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                 tempSegWMPath =  fullfile(derivAnatPath, ['sc2norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                 tempSegCSFPath = fullfile(derivAnatPath, ['sc3norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                 tempSegOTPath =  fullfile(derivAnatPath, ['sc4norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                 tempSegAIRPath =  fullfile(derivAnatPath, ['sc5norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %                 tempT2path = fullfile(derivAnatPath, ['norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]);
+                %
+                %                 movefile(tempSegGMPath, segGMPath);
+                %                 movefile(tempSegWMPath, segWMPath);
+                %                 movefile(tempSegCSFPath, segCSFPath);
+                %                 movefile(tempSegOTPath, segOTPath);
+                %                 movefile(tempSegAIRPath, segAIRPath);
+                
+                %                 updateStatus(fig, ['Completed tissue segmentation for: ' t2File]);
+                %                 processedCount = processedCount + 1;
+                %
+                %                 delete( fullfile(derivAnatPath, ['c1norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]));
+                %                 delete( fullfile(derivAnatPath, ['c2norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]));
+                %                 delete( fullfile(derivAnatPath, ['c3norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]));
+                %                 delete( fullfile(derivAnatPath, ['c4norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]));
+                %                 delete( fullfile(derivAnatPath, ['c5norm' t2Files(j).name(1:end-4) '_desc-scaled' ext]));
+                
+                %oldseg
+                source = {MIKey_bids_path(derivAnatPath, [t2Files(j).name(1:end-4) '_space-template_desc-masked' ext])};
+                ref_prob_old = {
+                    fullfile(fig.UserData.codeEdit.Value, 'AMCP_GM.nii,1');
+                    fullfile(fig.UserData.codeEdit.Value, 'AMCP_WM.nii,1');
+                    fullfile(fig.UserData.codeEdit.Value, 'AMCP_CSF.nii,1')};
+                segment_mlb = UN_get_old_segment_batch_struct(source, ref_prob_old);
+                spm_jobman('run',segment_mlb);
+                clear segment_mlb;
+                
+                smooth_para = [6,6,6];
+                all_func_old = {
+                    MIKey_bids_path(derivAnatPath, ['mwc1' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]);
+                    MIKey_bids_path(derivAnatPath, ['mwc2' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]);
+                    MIKey_bids_path(derivAnatPath, ['mwc3' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext])
+                    };
+                Smooth_mlb = MY_get_default_smooth_batch_struct(all_func_old, smooth_para);
+                spm_jobman('run',Smooth_mlb);
+                clear Smooth_mlb;
+                oldsegGMPath = MIKey_bids_path(derivAnatPath, [baseName '_desc-gmvol' ext]);
+                oldsegWMPath = MIKey_bids_path(derivAnatPath, [baseName '_desc-wmvol' ext]);
+                oldsegCSFPath = MIKey_bids_path(derivAnatPath, [baseName '_desc-csfvol' ext]);
+                
+                oldtempSegGMPath =  MIKey_bids_path(derivAnatPath, ['smwc1' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]);
+                oldtempSegWMPath =  MIKey_bids_path(derivAnatPath, ['smwc2' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]);
+                oldtempSegCSFPath = MIKey_bids_path(derivAnatPath, ['smwc3' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]);
+                movefile(oldtempSegGMPath, oldsegGMPath);
+                movefile(oldtempSegWMPath, oldsegWMPath);
+                movefile(oldtempSegCSFPath, oldsegCSFPath);
+                delete(MIKey_bids_path(derivAnatPath, ['mwc1' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]));
+                delete(MIKey_bids_path(derivAnatPath, ['mwc2' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]));
+                delete( MIKey_bids_path(derivAnatPath, ['mwc3' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]));
+                delete( MIKey_bids_path(derivAnatPath, ['m' t2Files(j).name(1:end-4) '_space-template_desc-masked' ext]));
+                % Keep SPM parameter files for reproducibility; never delete all MAT files.
+                processedCount = processedCount + 1;
+                updateStatus(fig, ['Completed tissue segmentation for: ' t2File]);
+            end
+        end
+        
+    catch ME
+        
+        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+        updateStatus(fig, ['Error in tissue segmentation for ' subDirs(i).name ': ' ME.message]);
+    end
+end
+updateStatus(fig, sprintf('Tissue segmentation completed: %d files processed, %d files skipped', processedCount, skippedCount));
+updateStatus(fig, ['Please proceed to the next step']);
+end

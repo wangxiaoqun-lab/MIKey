@@ -1,0 +1,5 @@
+{
+  "Started": "2026-10-19T15:58:36.2854166+08:00",
+  "PID": 24108,
+  "Arguments": "-nodesktop -nosplash -noFigureWindows -logfile C:\\MIKeyValidation\\20261019-sidecar-policy\\startup.log -r \"run('K:/toolbox/MIKey_toolbox_main/MIKey_toolbox_main/docs/validation/20261019-sidecar-policy/run_checks.m')\""
+}

@@ -1,0 +1,27 @@
+??? 错误使用 MIKey_registration_qc (line 121)
+Step 6 pre registration check FAILED. Initial foregrounds have almost no overlap (reference coverage 0.000, moving coverage 0.000) and their centers are 0.93 brain spans apart. Check affine origins/translations and explicitly initialize alignment in SPM Display before registration. Reference: C:\MIKeyRealSPM\20261016-958dc7c6\demo_BIDS_dataset\derivatives\MIKey\sub-001\func\sub-001_task-rest_run-01_desc-realign_bold.nii. Moving: C:\MIKeyRealSPM\20261016-958dc7c6\demo_BIDS_dataset\derivatives\MIKey\sub-001\anat\sub-001_acq-t2fsetra_run-01_desc-masked_T2w.nii. QC report: C:\MIKeyRealSPM\20261016-958dc7c6\demo_BIDS_dataset\derivatives\MIKey\sub-001\func\registration_qc\sub-001_task-rest_run-01_desc-step6preQC.json. Processing stopped; correct the geometry/mask/template and rerun this step. No automatic header correction was applied.
+
+出错 MIKey>runRegistrationCheck (line 1797)
+MIKey_registration_qc(stage, phase, reference, moving, reportPath, @() guiCheckpoint(fig));
+
+出错 MIKey>processCoregistration_BIDS (line 1687)
+            runRegistrationCheck(fig, 6, 'pre', bold, t2, df, base);
+
+出错 MIKey>executeStage (line 905)
+        processCoregistration_BIDS(fig, subjectFilter);
+
+出错 MIKey (line 7)
+    executeStage(varargin{2}, varargin{3});
+
+出错 MIKey_run (line 61)
+        MIKey('batch', state, step);
+
+出错 run_real_demo_pipeline (line 23)
+    report=MIKey_run(cfg);
+
+出错 run_guard_and_success_in_session (line 4)
+    run_real_demo_pipeline('guarded-original','01');
+
+出错 run (line 91)
+evalin('caller', strcat(script, ';'));
+

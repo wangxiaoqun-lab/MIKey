@@ -1,0 +1,141 @@
+ 
+要开始，请键入以下项之一: helpwin、helpdesk 或 demo。
+有关产品信息，请访问 www.mathworks.com。
+ 
+                   ok: 1
+               issues: {0x1 cell}
+                notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+             subjects: {'sub-01\ses-baseline'}
+            rawCounts: [1 1]
+                steps: 1
+       requiredImages: {}
+            functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+            selection: [1x1 struct]
+    groupAnalysisPath: 'C:\Users\Administrator\AppData\Local\Temp\tp2667d764_322b_48bf_9daa_762948144636\derivatives\MIKey\group_analysis\selection-190c65dab33a2ca2'
+           subjectIDs: {'sub-01'}
+               scopes: [1x1 struct]
+
+2026-10-12 17:40:25: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp2667d764_322b_48bf_9daa_762948144636\derivatives\MIKey\logs\tp064fc2a5_89a7_499a_8d43_2d8eea35c744
+2026-10-12 17:40:25: === Starting Step 1 ===
+2026-10-12 17:40:26: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:40:26: Starting Voxel Scaling
+2026-10-12 17:40:26: Processing subject: sub-01\ses-baseline
+2026-10-12 17:40:26: Using voxel scaling factor: 2
+2026-10-12 17:40:27: Completed voxel scaling for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-12 17:40:27: Completed voxel scaling for: sub-01_T2w.nii
+2026-10-12 17:40:27: Completed voxel scaling for: sub-01_magnitude1.nii
+2026-10-12 17:40:27: Completed voxel scaling for: sub-01_magnitude2.nii
+2026-10-12 17:40:27: Completed voxel scaling for: sub-01_phase1.nii
+2026-10-12 17:40:27: Completed voxel scaling for: sub-01_phase2.nii
+2026-10-12 17:40:27: Voxel scaling completed: 6 files processed, 0 files skipped
+2026-10-12 17:40:27: Before Step 2, provide *_desc-boldbrain_mask.nii[.gz] in func and *_desc-anatbrain_mask.nii[.gz] in anat; masks must match scaled image space.
+2026-10-12 17:40:27: === Step 1: completed (1.52 s) ===
+2026-10-12 17:40:27: All selected steps completed.
+2026-10-12 17:40:35: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp2667d764_322b_48bf_9daa_762948144636\derivatives\MIKey\logs\tpc133cf9f_ab29_40fd_8833_12a14a476dc3
+2026-10-12 17:40:35: === Starting Step 2 ===
+2026-10-12 17:40:35: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:40:35: Starting Mask Generation
+2026-10-12 17:40:35: Generating whole-brain masked data for: sub-01\ses-baseline
+2026-10-12 17:40:35: Using BOLD mask: C:\Users\Administrator\AppData\Local\Temp\tp2667d764_322b_48bf_9daa_762948144636\derivatives\MIKey\sub-01\ses-baseline\func\sub-01_desc-boldbrain_mask.nii.gz
+2026-10-12 17:40:36: Completed BOLD masking for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-12 17:40:36: Using T2w mask: C:\Users\Administrator\AppData\Local\Temp\tp2667d764_322b_48bf_9daa_762948144636\derivatives\MIKey\sub-01\ses-baseline\anat\sub-01_desc-anatbrain_mask.nii
+2026-10-12 17:40:36: Completed T2w masking for: sub-01_T2w.nii
+2026-10-12 17:40:36: Mask application completed: 2 files processed, 0 files skipped
+2026-10-12 17:40:36: Please proceed to the next step
+2026-10-12 17:40:36: === Step 2: completed (0.83 s) ===
+2026-10-12 17:40:36: All selected steps completed.
+2026-10-12 17:40:45: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp2667d764_322b_48bf_9daa_762948144636\derivatives\MIKey\logs\tp1bcb0419_7dab_45f8_ae9b_562d84925bc8
+2026-10-12 17:40:45: === Starting Step 9 ===
+2026-10-12 17:40:45: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:40:45: Starting Non-brain Noise PCs Estimation
+2026-10-12 17:40:45: Noise PC estimation for: sub-01\ses-baseline
+2026-10-12 17:40:46: Completed noise PC estimation for: sub-01_ses-baseline_task-rest_run-02_bold.nii
+2026-10-12 17:40:46: Noise PC estimation completed: 1 files processed, 0 files skipped
+2026-10-12 17:40:46: === Step 9: completed (1.41 s) ===
+2026-10-12 17:40:47: All selected steps completed.
+                status: 'passed'
+    syntheticDirectory: 'C:\Users\Administrator\AppData\Local\Temp\tp2667d764_322b_48bf_9daa_762948144636'
+          testedStages: [1 2 9]
+
+MIKEY_COMPRESSED_INPUTS_PASS
+                   ok: 1
+               issues: {0x1 cell}
+                notes: {'Preflight does not verify NIfTI geometry, registration quality or all future derivatives. Runtime warnings are fatal by default.'}
+             subjects: {'sub-01'}
+            rawCounts: [1 1]
+                steps: 1
+       requiredImages: {}
+            functions: {'spm'  'spm_vol'  'spm_read_vols'  'spm_write_vol'  'spm_jobman'  'spm_get_defaults'  'spm_write_vol_4D'}
+            selection: [1x1 struct]
+    groupAnalysisPath: 'C:\Users\Administrator\AppData\Local\Temp\tp07e47436_3c7c_48cf_8ae5_823b404c82d0\derivatives\MIKey\group_analysis'
+           subjectIDs: {'sub-01'}
+               scopes: [1x1 struct]
+
+2026-10-12 17:41:19: Run directory: C:\Users\Administrator\AppData\Local\Temp\tp07e47436_3c7c_48cf_8ae5_823b404c82d0\derivatives\MIKey\logs\tp7cc8f286_1776_4730_bee7_50e485383ed3
+2026-10-12 17:41:19: === Starting Step 1 ===
+2026-10-12 17:41:20: Added code path: K:\toolbox\MIKey_toolbox_main\MIKey_toolbox_main\scripts
+2026-10-12 17:41:20: Starting Voxel Scaling
+2026-10-12 17:41:20: Processing subject: sub-01
+2026-10-12 17:41:20: Using voxel scaling factor: 2
+
+--------------------------------------------------------------------------------
+         Access violation detected at 周一 10月 12 05:41:20 2026 +0800
+--------------------------------------------------------------------------------
+
+Configuration:
+  Crash Decoding           : Disabled - No sandbox or build area path
+  Crash Mode               : continue (default)
+  Default Encoding         : GBK
+  Deployed                 : false
+  Graphics Driver          : Unknown software 
+  Graphics card 1          : Shanghai Best Oray Information Technology Co., Ltd. ( 0x0 ) OrayIddDriver Device Version 17.50.19.949 (2025-6-11)
+  Graphics card 2          : Intel Corporation ( 0x8086 ) Intel(R) HD Graphics Version 9.17.10.4459 (2016-5-19)
+  Java Version             : Java 1.8.0_144-b01 with Oracle Corporation Java HotSpot(TM) 64-Bit Server VM mixed mode
+  MATLAB Architecture      : win64
+  MATLAB Entitlement ID    : 6257193
+  MATLAB Root              : D:\Program Files\MATLAB\R2018a
+  MATLAB Version           : 9.4.0.813654 (R2018a)
+  OpenGL                   : software
+  Operating System         : Microsoft Windows 10 教育版
+  Process ID               : 15724
+  Processor ID             : x86 Family 6 Model 42 Stepping 7, GenuineIntel
+  Session Key              : cd6357a6-b807-4a2e-a3a3-9b86575ce546
+  Window System            : Version 10.0 (Build 19045)
+
+Fault Count: 1
+
+
+Abnormal termination
+
+Register State (from fault):
+  RAX = 00007ffe21814ea4  RBX = 00000000000300cc
+  RCX = 00000000000300cc  RDX = ffffffffffffffff
+  RSP = 00000000043f6468  RBP = 0000000000030044
+  RSI = 0000000000000000  RDI = 00000000f04925e0
+ 
+   R8 = 00000000043f64c8   R9 = 0000000000000000
+  R10 = 00000000ffffffff  R11 = 0000000000000000
+  R12 = 0000000000000000  R13 = 0000000000000020
+  R14 = 00000000efd12460  R15 = 0000000000000002
+ 
+  RIP = 00007ffe21814ea4  EFL = 00010246
+ 
+   CS = 0033   FS = 0053   GS = 002b
+
+Stack Trace (from fault):
+[  0] 0x00007ffe21814ea4                                   <unknown-module>+00000000
+[  1] 0x00007ffe39fd7f56                 C:\Windows\System32\KERNELBASE.dll+00425814
+
+
+This error was detected while a MEX-file was running. If the MEX-file
+is not an official MathWorks function, please examine its source code
+for errors. Please consult the External Interfaces Guide for information
+on debugging MEX-files.
+** This crash report has been saved to disk as C:\Users\ADMINI~1\AppData\Local\Temp\matlab_crash_dump.15724-1 **
+
+
+Caught "std::exception" Exception message is:
+FatalException
+Caught "std::exception" Exception message is:
+FatalException
+Caught MathWorks::System::FatalException

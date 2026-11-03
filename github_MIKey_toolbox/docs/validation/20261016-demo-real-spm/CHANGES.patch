@@ -1,0 +1,60 @@
+--- before/MIKey_registration_qc.m
++++ updated/MIKey_registration_qc.m
+@@ -7,6 +7,7 @@
+ end
+ limits = struct('maxSizeRatio',2,'maxInitialCenterDistance',1, ...
+     'maxInitialAxisAngle',75,'minAxisAnisotropy',1.4, ...
++    'minInitialCoverage',0.01,'maxNoOverlapCenterDistance',0.5, ...
+     'minCoverage',0.20,'minSupportOverlap',0.30,'maxFinalCenterDistance',0.45, ...
+     'maxFinalAxisAngle',60,'maxFinalSizeRatio',1.8);
+ if stage == 7
+@@ -38,6 +39,15 @@
+         if center>limits.maxInitialCenterDistance
+             report.reasons{end+1}=sprintf('Image centers are %.2f brain spans apart. Check image origins/translations in SPM Display before registration.',center);
+         end
++        checkpoint();
++        mr=sampleAt(vm(1),r.world);rm=sampleAt(vr(1),m.world);
++        coverageR=nnz(r.mask & isfinite(mr) & abs(mr)>m.threshold)/nnz(r.mask);
++        coverageM=nnz(m.mask & isfinite(rm) & abs(rm)>r.threshold)/nnz(m.mask);
++        report.metrics.initialReferenceCoverage=coverageR;
++        report.metrics.initialMovingCoverage=coverageM;
++        if max(coverageR,coverageM)<limits.minInitialCoverage && center>limits.maxNoOverlapCenterDistance
++            report.reasons{end+1}=sprintf('Initial foregrounds have almost no overlap (reference coverage %.3f, moving coverage %.3f) and their centers are %.2f brain spans apart. Check affine origins/translations and explicitly initialize alignment in SPM Display before registration.',coverageR,coverageM,center);
++        end
+         if reliable && angle>limits.maxInitialAxisAngle
+             report.reasons{end+1}=sprintf('Physical brain long axes differ by %.1f degrees. Check acquisition orientation and affine rotations with SPM Check Reg.',angle);
+         end
+--- before/tests/test_mikey_registration_qc.m
++++ updated/tests/test_mikey_registration_qc.m
+@@ -30,6 +30,12 @@
+ permuteMatrix=eye(4);permuteMatrix(1:3,1:3)=[0 1 0;1 0 0;0 0 1];
+ write(moving,permute(image,[2 1 3]),a*permuteMatrix);check(6,'pre',moving);check(7,'post',moving);
+ for stage=[6 7]
++    % A sub-span center offset can still leave the short axis disjoint.
++    offset=a;offset(3,4)=offset(3,4)+20;write(moving,image,offset);
++    expectFailure(stage,'pre',moving,'overlap');
++    % A similar offset along the long axis retains overlap and remains usable.
++    offset=a;offset(2,4)=offset(2,4)+20;write(moving,image,offset);
++    check(stage,'pre',moving);
+     scaled=a;scaled(1:3,:)=20*scaled(1:3,:);write(moving,image,scaled);
+     expectFailure(stage,'pre',moving,'scale');
+     offset=a;offset(1,4)=offset(1,4)+300;write(moving,image,offset);
+--- before/README.md
++++ updated/README.md
+@@ -251,7 +251,7 @@
+ 
+ These checks run automatically in both the GUI and script interfaces, before estimation and before new results are published. Existing results are rechecked before being skipped. Step 6 compares masked T2w against realigned/mean BOLD; Step 7 compares coregistered T2w and normalized T2w/BOLD against the selected template. Missing or ambiguous inputs and estimator exceptions also stop the pipeline.
+ 
+-The checks validate finite, nonsingular affines, physical foreground size, center distance and gross long-axis orientation in SPM world coordinates. Different voxel resolutions, valid storage flips and axis permutations are allowed when their affines describe compatible physical geometry. Step 6 also checks the cached mean BOLD grid. Post-registration checks evaluate bidirectional foreground coverage, residual center/axis/extent mismatch and blank or unreadable images. Normalized BOLD must retain the input volume count and share the T2w spatial grid. First, middle and last output frames are sampled for blank/corrupt data; this is not an exhaustive corruption scan of every voxel/frame.
++The checks validate finite, nonsingular affines, physical foreground size, center distance and gross long-axis orientation in SPM world coordinates. Different voxel resolutions, valid storage flips and axis permutations are allowed when their affines describe compatible physical geometry. The initial overlap gate rejects nearly disjoint foregrounds only when their centers also exceed half a larger brain span; an overlapping initial offset can still proceed to SPM. Step 6 also checks the cached mean BOLD grid. Post-registration checks evaluate bidirectional foreground coverage, residual center/axis/extent mismatch and blank or unreadable images. Normalized BOLD must retain the input volume count and share the T2w spatial grid. First, middle and last output frames are sampled for blank/corrupt data; this is not an exhaustive corruption scan of every voxel/frame.
+ 
+ The initial foreground is estimated on a bounded grid (up to 48 samples per axis), using the 2nd/98th intensity percentiles and an 8% range cutoff. Principal axes and robust foreground spans are computed in world space. NMI is recorded as a multimodal diagnostic; there is no universal NMI pass cutoff.
+ 
+@@ -260,6 +260,7 @@
+ | Initial uniform physical-size mismatch | All principal-span ratios >2 or <0.5 | Same |
+ | Initial extreme extent mismatch | Any principal-span ratio >4 or <0.25 | Same |
+ | Initial center separation | >1 larger brain span | Same |
++| Disjoint initial foregrounds | Both coverages <0.01 and centers >0.5 larger brain span | Same |
+ | Initial long-axis discrepancy | >75 degrees when both supports have eigenvalue anisotropy >=1.4 | Same |
+ | Minimum coverage in either direction | 0.20 | 0.25 |
+ | Minimum support overlap | 0.30 | 0.35 |

@@ -1,0 +1,896 @@
+--- original/MIKey.m
++++ updated/MIKey.m
+@@ -795,6 +795,8 @@
+ function reportGUIRunError(fig, exception)
+ if strcmp(exception.identifier, 'MIKey:Stopped')
+     appendStatus(fig, 'Stopped by user. Completed outputs are retained; no further files or steps will run.');
++elseif strncmp(exception.identifier, 'MIKey:Registration', 18)
++    appendStatus(fig, ['Processing stopped: ' exception.message]);
+ else
+     appendStatus(fig, ['Error: ' exception.message]);
+ end
+@@ -1661,187 +1663,172 @@
+ function processCoregistration_BIDS(fig, subjectFilter)
+ bidsPath = fig.UserData.bidsPath;
+ subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+-
+-if isfield(fig.UserData, 'coregInterpEdit')
+-    interp = fig.UserData.coregInterpEdit.Value;
+-else
+-    interp = 2;
+-end
+-
+-updateStatus(fig, ['Using coregistration interpolation method: ' num2str(interp) ' (0-Nearest neighbour; 1-Trilinear; 2-2nd Degree B-Spline; 3-3rd Degree B-Spline; 4-4th Degree B-Spline; 5-5th Degree B-Spline; 6-6th Degree B-Spline; 7-7th Degree B-Spline)']);
+-
+-processedCount = 0;
+-skippedCount = 0;
+-
++interp = fig.UserData.coregInterpEdit.Value;
++processedCount = 0; skippedCount = 0;
+ for i = 1:length(subDirs)
+-
+     guiCheckpoint(fig);
+     try
+         subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+-        updateStatus(fig, ['Coregistration for: ' subDirs(i).name]);
+-        
+-        funcPath = fullfile(subPath, 'func');
+-        anatPath = MIKey_anat_path(subPath);
+-        
+-        boldFiles = getBoldFiles(fig, funcPath);
+-        t2Files = MIKey_nifti_files(anatPath, '*_T2w.nii');
+-        
+-        if isempty(boldFiles) || isempty(t2Files)
+-            continue;
+-        end
+-        
++        boldFiles = getBoldFiles(fig, fullfile(subPath, 'func'));
++        t2Files = MIKey_nifti_files(MIKey_anat_path(subPath), '*_T2w.nii');
++        if isempty(boldFiles), continue; end
++        if numel(t2Files) ~= 1
++            error('MIKey:RegistrationQC', 'Step 6 requires one unambiguous T2w input; found %d for %s. Processing stopped.', numel(t2Files), subDirs(i).name);
++        end
+         for j = 1:length(boldFiles)
+-        
+             guiCheckpoint(fig);
+             boldFile = boldFiles(j).name;
+-            [~, boldBaseName, ext] = fileparts(boldFile);
+-            
+-            derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+-            derivAnatPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'anat');
+-            
+-            coregT2Path = MIKey_bids_path(derivFuncPath, [boldBaseName '_desc-T2coreg' ext]);
+-            
+-            if exist(coregT2Path, 'file')
+-                updateStatus(fig, ['Skipping - coregistration already completed for: ' boldFile]);
+-                skippedCount = skippedCount + 1;
+-                continue;
+-            end
+-            
+-            realignedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_desc-realign' ext], 'input');
+-            scaledT2Path = MIKey_bids_path(derivAnatPath, [t2Files(1).name(1:end-4) '_desc-masked' ext], 'input');
+-            
+-            if exist(realignedBoldPath, 'file') && exist(scaledT2Path, 'file')
+-                copyfile(scaledT2Path,derivFuncPath);
+-                [~, t2InputStem, t2InputExtension] = fileparts(scaledT2Path);
+-                scaledT2Pathnew = fullfile(derivFuncPath, [t2InputStem t2InputExtension]);
+-                cd(derivFuncPath);
+-                meanBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_desc-mean' ext], 'input');
+-                if ~exist(meanBoldPath, 'file')
+-                    head = spm_vol(realignedBoldPath);
+-                    fMRI_data = spm_read_vols(head);
+-                    fMRI_data1 = mean(fMRI_data, 4);
+-                    head1 = head(1);
+-                    head1.fname = meanBoldPath;
+-                    spm_write_vol_4D(head1, fMRI_data1);
+-                end
+-                
+-                ref{1,1} = [meanBoldPath ',1'];
+-                source{1,1} = [scaledT2Pathnew ',1'];
+-                coreg_mlb = MY_get_default_coreg_batch_struct(ref, source, {''}, interp);
+-                spm_jobman('run', coreg_mlb);
+-                
+-                tempCoregT2Path = MIKey_prefixed_file('coreg', scaledT2Pathnew);
+-                if exist(tempCoregT2Path, 'file')
+-                    movefile(tempCoregT2Path, coregT2Path);
+-                    updateStatus(fig, ['Completed coregistration for: ' boldFile]);
+-                    processedCount = processedCount + 1;
+-                end
+-            end
+-        end
+-        
++            [~, base, ext] = fileparts(boldFile);
++            df = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
++            da = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'anat');
++            output = MIKey_bids_path(df, [base '_desc-T2coreg' ext]);
++            bold = MIKey_bids_path(df, [base '_desc-realign' ext], 'input');
++            t2 = MIKey_bids_path(da, [t2Files(1).name(1:end-4) '_desc-masked' ext], 'input');
++            runRegistrationCheck(fig, 6, 'pre', bold, t2, df, base);
++            meanBold = MIKey_bids_path(df, [base '_desc-mean' ext], 'input');
++            if ~exist(meanBold, 'file')
++                heads = spm_vol(bold);
++                image = zeros(heads(1).dim);
++                for k = 1:numel(heads)
++                    guiCheckpoint(fig);
++                    image = image + spm_read_vols(heads(k));
++                end
++                head = heads(1); head.fname = meanBold;
++                spm_write_vol(head, image / numel(heads));
++            end
++            runRegistrationPair(fig, 6, bold, bold, meanBold, df, [base '_meanCheck']);
++            if exist(output, 'file')
++                runRegistrationCheck(fig, 6, 'post', meanBold, output, df, base);
++                runRegistrationPair(fig, 6, bold, bold, output, df, base);
++                updateStatus(fig, ['Skipping - validated coregistration already completed for: ' boldFile]);
++                skippedCount = skippedCount + 1; continue;
++            end
++            % SPM estimates in-place: work on our private copy, never the source.
++            [workspace, workspaceCleanup] = registrationWorkspace(); %#ok<NASGU>
++            sourceCopy = fullfile(workspace, 'source_T2w.nii');
++            copyfile(t2, sourceCopy);
++            if exist([t2(1:end-4) '.mat'], 'file')
++                copyfile([t2(1:end-4) '.mat'], fullfile(workspace, 'source_T2w.mat'));
++            end
++            job = MY_get_default_coreg_batch_struct({[meanBold ',1']}, {[sourceCopy ',1']}, {''}, interp);
++            guiCheckpoint(fig, true);
++            spm_jobman('run', job);
++            candidate = MIKey_prefixed_file('coreg', sourceCopy);
++            runRegistrationCheck(fig, 6, 'post', meanBold, candidate, df, base);
++            runRegistrationPair(fig, 6, bold, bold, candidate, df, base);
++            guiCheckpoint(fig, true);
++            publishRegistrationImage(candidate, output);
++            clear workspaceCleanup;
++            updateStatus(fig, ['Completed coregistration for: ' boldFile]);
++            processedCount = processedCount + 1;
++        end
+     catch ME
+-        
+-        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+-        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+-        updateStatus(fig, ['Error in coregistration for ' subDirs(i).name ': ' ME.message]);
++        stopRegistration(6, ME);
+     end
+ end
+ updateStatus(fig, sprintf('Coregistration completed: %d files processed, %d files skipped', processedCount, skippedCount));
+-updateStatus(fig, ['Please proceed to the next step']);
+ end
+ 
+ function processNormalization_BIDS(fig, subjectFilter, templatePath)
+ bidsPath = fig.UserData.bidsPath;
+-
+ if fig.UserData.useDefaultTemplateCheckbox.Value
+-    template = fullfile(templatePath, 'Template_Mouse_v38.nii,1');
+-    updateStatus(fig, 'Using default template: Template_Mouse_v38.nii');
++    template = fullfile(templatePath, 'Template_Mouse_v38.nii');
+ else
+-    customTemplatePath = fig.UserData.templateCustomEdit.Value;
+-    if isempty(customTemplatePath) || ~exist(customTemplatePath, 'file')
+-        updateStatus(fig, 'Warning: Custom template not specified or not found. Using default template.');
+-        template = fullfile(templatePath, 'Template_Mouse_v38.nii,1');
+-    else
+-        template = [customTemplatePath ',1'];
+-        updateStatus(fig, ['Using custom template: ' customTemplatePath]);
+-    end
+-end
+-
+-ref{1,1} = template;
+-
+-if isfield(fig.UserData, 'normInterpEdit')
+-    interp = fig.UserData.normInterpEdit.Value;
+-else
+-    interp = 2;
+-end
+-
+-updateStatus(fig, ['Using normalization interpolation method: ' num2str(interp) ' (0-Nearest neighbour; 1-Trilinear; 2-2nd Degree B-Spline; 3-3rd Degree B-Spline; 4-4th Degree B-Spline; 5-5th Degree B-Spline; 6-6th Degree B-Spline; 7-7th Degree B-Spline)']);
+-
++    template = fig.UserData.templateCustomEdit.Value;
++end
++if isempty(template) || ~exist(template, 'file')
++    error('MIKey:RegistrationQC', 'Step 7 template is missing: %s. Select the correct template. Processing stopped.', template);
++end
++interp = fig.UserData.normInterpEdit.Value;
+ subDirs = getSubjectContexts(fig, bidsPath, subjectFilter);
+-
+-processedCount = 0;
+-skippedCount = 0;
+-
++processedCount = 0; skippedCount = 0;
+ for i = 1:length(subDirs)
+-
+     guiCheckpoint(fig);
+     try
+         subPath = fullfile(subDirs(i).folder, subDirs(i).name);
+-        updateStatus(fig, ['Normalization for: ' subDirs(i).name]);
+-        
+-        funcPath = fullfile(subPath, 'func');
+-        boldFiles = getBoldFiles(fig, funcPath);
+-        
++        boldFiles = getBoldFiles(fig, fullfile(subPath, 'func'));
+         for j = 1:length(boldFiles)
+-        
+             guiCheckpoint(fig);
+             boldFile = boldFiles(j).name;
+-            [~, boldBaseName, ext] = fileparts(boldFile);
+-            
+-            derivFuncPath = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
+-            normalizedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-normalized' ext]);
+-            normalizedT2Path = MIKey_bids_path(derivFuncPath, [boldBaseName '_space-template_desc-T2normalized' ext]);
+-            
+-            if exist(normalizedBoldPath, 'file') && exist(normalizedT2Path, 'file')
+-                updateStatus(fig, ['Skipping - normalization already completed for: ' boldFile]);
+-                skippedCount = skippedCount + 1;
+-                continue;
+-            end
+-            
+-            realignedBoldPath = MIKey_bids_path(derivFuncPath, [boldBaseName '_desc-realign' ext], 'input');
+-            coregT2Path = MIKey_bids_path(derivFuncPath, [boldBaseName '_desc-T2coreg' ext], 'input');
+-            
+-            if exist(realignedBoldPath, 'file') && exist(coregT2Path, 'file')
+-                source{1,1} = [coregT2Path ',1'];
+-                all_func = MIKey_scans(realignedBoldPath);
+-                all_func = [all_func; [coregT2Path ',1']];
+-                OldNormalize_mlb = UN_get_default_oldnormalize_batch_struct(ref, source, all_func, interp);
+-                spm_jobman('run', OldNormalize_mlb);
+-                
+-                normBoldPath = MIKey_prefixed_file('norm', realignedBoldPath);
+-                normT2Path = MIKey_prefixed_file('norm', coregT2Path);
+-                
+-                if exist(normBoldPath, 'file')
+-                    movefile(normBoldPath, normalizedBoldPath);
+-                end
+-                if exist(normT2Path, 'file')
+-                    movefile(normT2Path, normalizedT2Path);
+-                end
+-                
+-                updateStatus(fig, ['Completed normalization for: ' boldFile]);
+-                processedCount = processedCount + 1;
+-            end
+-        end
+-        
++            [~, base, ext] = fileparts(boldFile);
++            df = fullfile(bidsPath, 'derivatives', 'MIKey', subDirs(i).name, 'func');
++            bold = MIKey_bids_path(df, [base '_desc-realign' ext], 'input');
++            t2 = MIKey_bids_path(df, [base '_desc-T2coreg' ext], 'input');
++            outputBold = MIKey_bids_path(df, [base '_space-template_desc-normalized' ext]);
++            outputT2 = MIKey_bids_path(df, [base '_space-template_desc-T2normalized' ext]);
++            runRegistrationCheck(fig, 7, 'pre', template, t2, df, base);
++            runRegistrationPair(fig, 7, bold, bold, t2, df, base);
++            if exist(outputBold, 'file') && exist(outputT2, 'file')
++                runRegistrationCheck(fig, 7, 'post', template, outputT2, df, base);
++                runRegistrationCheck(fig, 7, 'post', template, outputBold, df, [base '_boldCheck']);
++                runRegistrationPair(fig, 7, bold, outputBold, outputT2, df, base);
++                updateStatus(fig, ['Skipping - validated normalization already completed for: ' boldFile]);
++                skippedCount = skippedCount + 1; continue;
++            end
++            ref = {[template ',1']}; source = {[t2 ',1']};
++            scans = [MIKey_scans(bold); source];
++            job = UN_get_default_oldnormalize_batch_struct(ref, source, scans, interp);
++            guiCheckpoint(fig, true);
++            spm_jobman('run', job);
++            candidateBold = MIKey_prefixed_file('norm', bold);
++            candidateT2 = MIKey_prefixed_file('norm', t2);
++            runRegistrationCheck(fig, 7, 'post', template, candidateT2, df, base);
++            runRegistrationCheck(fig, 7, 'post', template, candidateBold, df, [base '_boldCheck']);
++            runRegistrationPair(fig, 7, bold, candidateBold, candidateT2, df, base);
++            guiCheckpoint(fig, true);
++            publishRegistrationImage(candidateT2, outputT2);
++            publishRegistrationImage(candidateBold, outputBold);
++            updateStatus(fig, ['Completed normalization for: ' boldFile]);
++            processedCount = processedCount + 1;
++        end
+     catch ME
+-        
+-        if strcmp(ME.identifier, 'MIKey:Stopped'), rethrow(ME); end
+-        if isa(fig, 'MIKeyBatchState'), rethrow(ME); end
+-        updateStatus(fig, ['Error in normalization for ' subDirs(i).name ': ' ME.message]);
++        stopRegistration(7, ME);
+     end
+ end
+ updateStatus(fig, sprintf('Normalization completed: %d files processed, %d files skipped', processedCount, skippedCount));
+-updateStatus(fig, ['Please proceed to the next step']);
++end
++
++function runRegistrationCheck(fig, stage, phase, reference, moving, directory, base)
++entities = regexprep(base, '_bold(?=_|$)', '');
++reportPath = fullfile(directory, 'registration_qc', sprintf('%s_desc-step%d%sQC.json', entities, stage, phase));
++MIKey_registration_qc(stage, phase, reference, moving, reportPath, @() guiCheckpoint(fig));
++updateStatus(fig, sprintf('Registration QC passed: Step %d %s. Report: %s', stage, phase, reportPath));
++end
++
++function runRegistrationPair(fig, stage, original, output, anatomy, directory, base)
++entities = regexprep(base, '_bold(?=_|$)', '');
++reportPath = fullfile(directory, 'registration_qc', sprintf('%s_desc-step%dgridQC.json', entities, stage));
++MIKey_registration_pair(stage, original, output, anatomy, reportPath, @() guiCheckpoint(fig));
++updateStatus(fig, sprintf('Registration grid QC passed: Step %d. Report: %s', stage, reportPath));
++end
++
++function stopRegistration(stage, exception)
++if strcmp(exception.identifier, 'MIKey:Stopped') || strncmp(exception.identifier, 'MIKey:Registration', 18)
++    rethrow(exception);
++end
++failure = MException('MIKey:RegistrationFailed', ...
++    'Step %d registration failed: %s. Processing stopped. Check image scale, affine/origin, orientation, brain mask and selected template with SPM Check Reg.', stage, exception.message);
++failure = addCause(failure, exception); throw(failure);
++end
++
++function publishRegistrationImage(source, destination)
++movefile(source, destination, 'f');
++sidecar = [source(1:end-4) '.mat'];
++if exist(sidecar, 'file'), movefile(sidecar, [destination(1:end-4) '.mat'], 'f'); end
++end
++
++function [directory, cleanup] = registrationWorkspace()
++directory = tempname(tempdir); mkdir(directory);
++cleanup = onCleanup(@() removeRegistrationWorkspace(directory));
++end
++
++function removeRegistrationWorkspace(directory)
++target = char(java.io.File(directory).getCanonicalPath());
++parent = char(java.io.File(tempdir).getCanonicalPath());
++if ~strcmpi(fileparts(target), parent)
++    error('MIKey:TemporaryPath', 'Unexpected registration workspace cleanup path: %s', target);
++end
++if exist(target, 'dir'), rmdir(target, 's'); end
+ end
+ 
+ function processSmoothing_BIDS(fig, subjectFilter)
+--- original/MIKey_run.m
++++ updated/MIKey_run.m
+@@ -75,7 +75,7 @@
+     report.warnings = state.Warnings;
+     save(fullfile(runDirectory, 'report.mat'), 'report');
+     state.log(sprintf('=== Step %d: %s (%.2f s) ===', step, stage.status, stage.seconds));
+-    if strcmp(stage.status, 'failed') && cfg.failFast
++    if strcmp(stage.status, 'failed') && (cfg.failFast || ismember(step, [6 7]) || strncmp(stage.identifier, 'MIKey:Registration', 18))
+         break;
+     end
+ end
+--- original/MIKey_preflight.m
++++ updated/MIKey_preflight.m
+@@ -20,8 +20,8 @@
+     {}; {}; {'UN_fieldmap_batch_struct','UN_find_images_in_all_scans'};
+     {'UN_get_default_slicetiming_batch_struct','UN_find_images_in_all_scans'};
+     {'MY_get_default_realign_batch_struct','UN_find_images_in_all_scans'};
+-    {'MY_get_default_coreg_batch_struct','UN_find_images_in_all_scans'};
+-    {'UN_get_default_oldnormalize_batch_struct','UN_find_images_in_all_scans'};
++    {'MY_get_default_coreg_batch_struct','spm_sample_vol','MIKey_registration_qc','MIKey_registration_pair'};
++    {'UN_get_default_oldnormalize_batch_struct','spm_sample_vol','MIKey_registration_qc','MIKey_registration_pair'};
+     {'MY_get_default_smooth_batch_struct','UN_find_images_in_all_scans'};
+     {'MY_get_principle_component_out_of_brian','pca','strel','imerode'};
+     {'MY_headmotion_regression_estimate','zscore','corr'};
+--- original/README.md
++++ updated/README.md
+@@ -245,7 +245,34 @@
+ 
+ For R2018a, use the examples' `-nodisplay -nosplash -nodesktop -r` form with explicit `try/catch`, stack reporting and `exit(1)` on failure. Configure scheduler resources and licenses for your institution. Run per-subject preparation before a cohort-wide Step 11; then use the matching group selection for final regression. Concurrent jobs must not write the same subject/session outputs.
+ 
+-A real run saves effective configuration/environment/source hashes, `run.log` and `report.mat` in a unique run directory. A failed stage makes the run fail. `failFast=false` records failures and continues requested stages, but does not convert an unsuccessful run into success.
++A real run saves effective configuration/environment/source hashes, `run.log` and `report.mat` in a unique run directory. A failed stage makes the run fail. `failFast=false` records failures and continues requested stages, but does not convert an unsuccessful run into success. Steps 6 and 7 are safety-critical exceptions: any failure in either step stops the selected pipeline even when failFast is false.
++
++## Registration safety checks (Steps 6 and 7)
++
++These checks run automatically in both the GUI and script interfaces, before estimation and before new results are published. Existing results are rechecked before being skipped. Step 6 compares masked T2w against realigned/mean BOLD; Step 7 compares coregistered T2w and normalized T2w/BOLD against the selected template. Missing or ambiguous inputs and estimator exceptions also stop the pipeline.
++
++The checks validate finite, nonsingular affines, physical foreground size, center distance and gross long-axis orientation in SPM world coordinates. Different voxel resolutions, valid storage flips and axis permutations are allowed when their affines describe compatible physical geometry. Step 6 also checks the cached mean BOLD grid. Post-registration checks evaluate bidirectional foreground coverage, residual center/axis/extent mismatch and blank or unreadable images. Normalized BOLD must retain the input volume count and share the T2w spatial grid. First, middle and last output frames are sampled for blank/corrupt data; this is not an exhaustive corruption scan of every voxel/frame.
++
++The initial foreground is estimated on a bounded grid (up to 48 samples per axis), using the 2nd/98th intensity percentiles and an 8% range cutoff. Principal axes and robust foreground spans are computed in world space. NMI is recorded as a multimodal diagnostic; there is no universal NMI pass cutoff.
++
++| Built-in check | Step 6 | Step 7 |
++|---|---:|---:|
++| Initial uniform physical-size mismatch | All principal-span ratios >2 or <0.5 | Same |
++| Initial extreme extent mismatch | Any principal-span ratio >4 or <0.25 | Same |
++| Initial center separation | >1 larger brain span | Same |
++| Initial long-axis discrepancy | >75 degrees when both supports have eigenvalue anisotropy >=1.4 | Same |
++| Minimum coverage in either direction | 0.20 | 0.25 |
++| Minimum support overlap | 0.30 | 0.35 |
++| Maximum final center separation | 0.45 larger brain span | 0.35 larger brain span |
++| Maximum final long-axis discrepancy | 60 degrees when reliable | Same |
++| Final principal-span ratio range | 1/1.8 to 1.8 | Same |
++| BOLD/T2w grid tolerance | 0.001 voxel | 0.001 voxel |
++
++Support overlap is the harmonic mean of the two directional foreground coverages; it is not a manually segmented brain Dice coefficient. These conservative heuristics screen gross geometry/registration failures, not every misregistration. Thresholds are centralized in MIKey_registration_qc.m and saved with each report. Partial fields of view, unusual contrast, severe pathology or a poor brain mask can cause a rejection that needs visual assessment. Left/right mistakes in nearly symmetric brains and subtle local misalignment can escape the checks. A pass is not a registration certificate; inspect overlays with [SPM Check Reg](https://www.fil.ion.ucl.ac.uk/spm/docs/tutorials/fmri_preprocessing/coregistration/).
++
++On failure the GUI displays an English `Processing stopped` message with the step, files, likely causes and report path. The script exits as a failed run, including when failFast=false. Subsequent subjects/runs/selected steps are not processed. New failed candidates are not promoted to final derivative filenames; previously existing failed results are preserved for inspection and block reuse. A failed Step 6 candidate is copied to registration_qc/failed_candidates before its private workspace is cleaned; the JSON and error identify the review image. Step 7 native norm-prefixed candidates remain available at their reported paths until a later attempt overwrites them. Step 6 estimates on a private T2w copy so the masked anatomical input affine is not rewritten. No header is automatically recentered, rescaled or reoriented.
++
++Reports are auxiliary JSON records in each selected functional derivative folder's `registration_qc/` directory. Pre/post reports contain reference/moving paths, affines, voxel sizes, foreground measurements, thresholds and reasons. Grid reports contain the input/output counts and grid-consistency result. In a batch job also read the first failed stage in run.log/report.mat. Correct the stated scale/origin/orientation/mask/template issue and deliberately regenerate or replace affected outputs before retrying; do not delete raw inputs to fix a derivative geometry problem. An old GUI window must be reopened after a code update.
+ 
+ ## Troubleshooting
+ 
+@@ -255,6 +282,7 @@
+ | Missing BOLD/T2w mask | Use the corresponding modality-specific mask in its `func`/`anat` derivative directory. Both `.nii` and `.nii.gz` work. |
+ | `MIKey:MaskGeometry` | Compare mask dimensions and affine with the scaled image; an original-space mask may be incompatible with voxel scaling. |
+ | `MIKey:MaskSelection` | Leave one unambiguous logical mask per modality/scope. A same-name compressed/uncompressed pair counts once. |
++| `MIKey:RegistrationQC` / `MIKey:RegistrationFailed` | Read the registration_qc JSON and failed-stage log. Compare source/reference scaling, origin, orientation and masks in SPM Check Reg. Steps 6/7 stop even when failFast=false. |
+ | Step 3 missing masked BOLD | Complete Step 2 first. Four scaled fieldmap components are also required. |
+ | Missing SPM/helper function | Check `which <function> -all`, root/scripts paths and SPM root. |
+ | Missing `pca/strel/imerode/corr/kmeans` | Check `ver`, toolbox installation and license availability on the compute node. |
+@@ -282,6 +310,10 @@
+ threshold = test_mikey_timepoint_filter(spmPath);
+ controls = test_mikey_run_controls(spmPath);
+ test_mikey_streaming_scaling(spmPath);
++test_mikey_registration_qc(spmPath);
++test_mikey_registration_dispatch(spmPath);
++% Optional GUI callback stop-propagation check:
++% test_mikey_registration_dispatch(spmPath, true);
+ % Optional: exercise Run/Execute through UITest in a desktop session
+ % Control requests are still invoked from timer callbacks in this test.
+ % test_mikey_run_controls(spmPath, true);
+--- original/tests/test_mikey_bids_spm_routing.m
++++ updated/tests/test_mikey_bids_spm_routing.m
+@@ -1,6 +1,7 @@
+ function test_mikey_bids_spm_routing(spmPath)
+ % Actual MIKey dispatch + real NIfTI I/O; SPM transforms are COPY-ONLY stubs.
+-root=fileparts(fileparts(mfilename('fullpath')));addpath(root);MIKey_setup(spmPath);
++root=fileparts(fileparts(mfilename('fullpath')));addpath(root);addpath(fullfile(root,'scripts'));addpath(spmPath);
++spm('defaults','fmri');spm_get_defaults('cmdline',true);
+ work=tempname;mkdir(work);func=fullfile(work,'sub-01','func');mkdir(func);
+ anat=fullfile(work,'sub-01','anat');mkdir(anat);
+ df=fullfile(work,'derivatives','MIKey','sub-01','func');mkdir(df);
+--- /dev/null
++++ updated/MIKey_registration_qc.m
+@@ -0,0 +1,191 @@
++function report = MIKey_registration_qc(stage, phase, reference, moving, reportPath, checkpoint)
++% Conservative, scale-invariant safety checks, not a registration certificate.
++% References/moving inputs may use a ',volume' suffix. No image is modified.
++if nargin < 6, checkpoint = @() []; end
++if ~ismember(stage,[6 7]) || ~any(strcmp(phase,{'pre','post'}))
++    error('MIKey:RegistrationQC','Registration QC requires stage 6/7 and pre/post.');
++end
++limits = struct('maxSizeRatio',2,'maxInitialCenterDistance',1, ...
++    'maxInitialAxisAngle',75,'minAxisAnisotropy',1.4, ...
++    'minCoverage',0.20,'minSupportOverlap',0.30,'maxFinalCenterDistance',0.45, ...
++    'maxFinalAxisAngle',60,'maxFinalSizeRatio',1.8);
++if stage == 7
++    limits.minCoverage=0.25;limits.minSupportOverlap=0.35;
++    limits.maxFinalCenterDistance=0.35;
++end
++report=struct('version',1,'stage',stage,'phase',phase, ...
++    'reference',reference,'moving',moving,'status','failed', ...
++    'limits',limits,'metrics',struct(),'reasons',{{}}, ...
++    'interpretation','Heuristic safety screen; a pass does not certify alignment or exclude left/right errors.');
++try
++    checkpoint();
++    [vr,ar]=header(reference,checkpoint);[vm,am]=header(moving,checkpoint);
++    report.metrics.referenceHeader=ar;report.metrics.movingHeader=am;
++    r=sampleImage(vr(1),checkpoint);m=sampleImage(vm(1),checkpoint);
++    report.metrics.referenceSupport=r.summary;report.metrics.movingSupport=m.summary;
++    ratio=m.summary.principalSpans./r.summary.principalSpans;
++    center=norm(m.summary.center-r.summary.center)/max(r.summary.principalSpans(1),m.summary.principalSpans(1));
++    angle=acosd(min(1,abs(dot(r.axis,m.axis))));
++    reliable=r.summary.anisotropy>=limits.minAxisAnisotropy && m.summary.anisotropy>=limits.minAxisAnisotropy;
++    report.metrics.sizeRatios=ratio;report.metrics.centerDistanceInBrainSpans=center;
++    report.metrics.principalAxisAngleDegrees=angle;report.metrics.axisAngleReliable=reliable;
++    if strcmp(phase,'pre')
++        if all(ratio>limits.maxSizeRatio) || all(ratio<1/limits.maxSizeRatio)
++            report.reasons{end+1}=sprintf('Physical foreground size differs by approximately %.2fx. Check inconsistent voxel scaling (for example scale 1 versus 20) and template units.',median(ratio));
++        elseif any(ratio>4 | ratio<0.25)
++            report.reasons{end+1}='Extreme physical extent mismatch on one or more axes. Check affine voxel sizes, field of view and scale factors.';
++        end
++        if center>limits.maxInitialCenterDistance
++            report.reasons{end+1}=sprintf('Image centers are %.2f brain spans apart. Check image origins/translations in SPM Display before registration.',center);
++        end
++        if reliable && angle>limits.maxInitialAxisAngle
++            report.reasons{end+1}=sprintf('Physical brain long axes differ by %.1f degrees. Check acquisition orientation and affine rotations with SPM Check Reg.',angle);
++        end
++    else
++        checkpoint();
++        mr=sampleAt(vm(1),r.world);rm=sampleAt(vr(1),m.world);
++        jointR=r.mask & isfinite(mr) & abs(mr)>m.threshold;
++        jointM=m.mask & isfinite(rm) & abs(rm)>r.threshold;
++        coverageR=nnz(jointR)/nnz(r.mask);coverageM=nnz(jointM)/nnz(m.mask);
++        overlap=2*coverageR*coverageM/max(eps,coverageR+coverageM);
++        report.metrics.referenceCoverage=coverageR;report.metrics.movingCoverage=coverageM;
++        report.metrics.supportOverlap=overlap;
++        report.metrics.normalizedMutualInformation=nmi(r.values(jointR),mr(jointR));
++        if min(coverageR,coverageM)<limits.minCoverage || overlap<limits.minSupportOverlap
++            report.reasons{end+1}=sprintf('Registered foreground overlap is too low (reference coverage %.3f, moving coverage %.3f, support overlap %.3f). Check the affine, origin, scale, orientation and brain masks.',coverageR,coverageM,overlap);
++        end
++        if center>limits.maxFinalCenterDistance
++            report.reasons{end+1}=sprintf('Registered foreground centers remain %.2f brain spans apart; the estimated registration is implausible.',center);
++        end
++        if any(ratio>limits.maxFinalSizeRatio | ratio<1/limits.maxFinalSizeRatio)
++            report.reasons{end+1}='Registered brain extents remain incompatible. Check scaling, cropping and the selected template.';
++        end
++        if reliable && angle>limits.maxFinalAxisAngle
++            report.reasons{end+1}=sprintf('Registered physical brain long axes remain %.1f degrees apart.',angle);
++        end
++        % A plausible first frame must not hide blank/corrupt later BOLD frames.
++        for k=unique([1 ceil(numel(vm)/2) numel(vm)])
++            checkpoint();sampleImage(vm(k),checkpoint);
++        end
++    end
++    if isempty(report.reasons),report.status='passed';end
++catch ME
++    if strcmp(ME.identifier,'MIKey:Stopped'),rethrow(ME);end
++    report.reasons{end+1}=['QC could not validate the image: ' ME.message];
++end
++report.created=datestr(now,30);
++if strcmp(report.status,'failed') && strcmp(phase,'post')
++    % Step 6's private workspace is removed when the stage unwinds. Retain
++    % its small anatomical candidate so the reported failure can be reviewed.
++    report.reviewImage=regexprep(moving,',\d+$','');
++    [~,candidateName]=fileparts(report.reviewImage);
++    if stage==6 && strncmp(candidateName,'coreg',5) && exist(report.reviewImage,'file')
++        try
++            folder=fullfile(fileparts(reportPath),'failed_candidates');
++            if ~exist(folder,'dir'),mkdir(folder);end
++            [~,reportName]=fileparts(reportPath);
++            retained=fullfile(folder,[reportName '_T2w.nii']);
++            copyfile(report.reviewImage,retained);
++            sidecar=[report.reviewImage(1:end-4) '.mat'];
++            if exist(sidecar,'file'),copyfile(sidecar,[retained(1:end-4) '.mat']);end
++            report.reviewImage=retained;
++        catch ME
++            report.retentionError=ME.message;
++        end
++    end
++end
++try
++    folder=fileparts(reportPath);if ~exist(folder,'dir'),mkdir(folder);end
++    temporary=[tempname(folder) '.json'];
++    cleanup=onCleanup(@()removeTemporary(temporary)); %#ok<NASGU>
++    fid=fopen(temporary,'w','n','UTF-8');
++    if fid<0,error('MIKey:RegistrationQC','Cannot write QC report.');end
++    closeFile=onCleanup(@()fclose(fid));
++    fprintf(fid,'%s',jsonencode(report));clear closeFile;
++    movefile(temporary,reportPath,'f');
++catch ME
++    error('MIKey:RegistrationQC','Step %d %s QC report could not be saved: %s. Processing stopped.',stage,phase,ME.message);
++end
++if ~strcmp(report.status,'passed')
++    review='';if isfield(report,'reviewImage'),review=[' Review image: ' report.reviewImage '.'];end
++    error('MIKey:RegistrationQC','Step %d %s registration check FAILED. %s Reference: %s. Moving: %s. QC report: %s. Processing stopped; correct the geometry/mask/template and rerun this step. No automatic header correction was applied.', ...
++        stage,phase,[strjoin(report.reasons,' ') review],reference,moving,reportPath);
++end
++end
++
++function [v,description]=header(path,checkpoint)
++v=spm_vol(path);
++if isempty(v),error('MIKey:RegistrationQC','No image volumes: %s',path);end
++for i=1:numel(v)
++    if mod(i-1,64)==0,checkpoint();end
++    a=v(i).mat;
++    if ~isequal(size(a),[4 4]) || any(~isfinite(a(:))) || norm(a(4,:)-[0 0 0 1])>1e-6
++        error('MIKey:RegistrationQC','Invalid/nonfinite homogeneous affine: %s',path);
++    end
++    if rcond(a(1:3,1:3))<1e-6 || any(v(i).dim<2)
++        error('MIKey:RegistrationQC','Singular/near-singular affine or invalid 3D dimensions: %s',path);
++    end
++    % Determinant sign alone is not an error: valid storage flips are allowed.
++    if i>1
++        difference=v(1).mat\a-eye(4);
++        if any(v(i).dim~=v(1).dim) || any(abs(difference(:))>1e-3)
++            error('MIKey:RegistrationQC','Volumes do not share a resliced spatial grid: %s',path);
++        end
++    end
++end
++description=struct('dimensions',v(1).dim,'affine',v(1).mat, ...
++    'voxelSizes',sqrt(sum(v(1).mat(1:3,1:3).^2,1)),'volumes',numel(v));
++end
++
++function s=sampleImage(v,checkpoint)
++axes=cell(1,3);
++for j=1:3,axes{j}=linspace(1,v.dim(j),min(48,v.dim(j)));end
++[x,y,z]=ndgrid(axes{:});vox=[x(:)';y(:)';z(:)';ones(1,numel(x))];
++s.world=v.mat*vox;checkpoint();
++s.values=spm_sample_vol(v,x(:),y(:),z(:),1);
++finite=isfinite(s.values);values=abs(s.values(finite));
++if numel(values)<32,error('MIKey:RegistrationQC','Too few finite image samples.');end
++low=percentile(values,0.02);high=percentile(values,0.98);
++if high-low<=max(eps,high*1e-6)
++    error('MIKey:RegistrationQC','Blank/constant image or insufficient intensity contrast.');
++end
++s.threshold=low+0.08*(high-low);
++s.mask=finite & abs(s.values)>s.threshold;
++if nnz(s.mask)<32,error('MIKey:RegistrationQC','Insufficient non-background foreground.');end
++points=s.world(1:3,s.mask);center=mean(points,2);centered=bsxfun(@minus,points,center);
++[directions,variance]=eig(centered*centered'/size(points,2));
++[eigenvalues,order]=sort(diag(variance),'descend');directions=directions(:,order);
++projected=directions'*centered;spans=zeros(1,3);
++for j=1:3,spans(j)=percentile(projected(j,:),0.98)-percentile(projected(j,:),0.02);end
++if any(spans<=0),error('MIKey:RegistrationQC','Degenerate foreground spatial support.');end
++s.axis=directions(:,1);
++s.summary=struct('center',center','principalSpans',spans,'foregroundSamples',nnz(s.mask), ...
++    'anisotropy',eigenvalues(1)/max(eps,eigenvalues(2)),'threshold',s.threshold);
++end
++
++function values=sampleAt(v,world)
++voxel=v.mat\world;
++values=spm_sample_vol(v,voxel(1,:)',voxel(2,:)',voxel(3,:)',1);
++end
++
++function value=percentile(values,fraction)
++values=sort(values(:));position=1+(numel(values)-1)*fraction;
++lo=floor(position);hi=ceil(position);value=values(lo)+(values(hi)-values(lo))*(position-lo);
++end
++
++function value=nmi(a,b)
++% Diagnostic multimodal NMI; no universal NMI cutoff is assumed.
++value=NaN;if numel(a)<64,return;end
++a=bin(a);b=bin(b);joint=accumarray([a b],1,[32 32]);joint=joint/sum(joint(:));
++pa=sum(joint,2);pb=sum(joint,1);
++entropy=@(p)-sum(p(p>0).*log(p(p>0)));
++h=entropy(joint(:));if h>0,value=(entropy(pa)+entropy(pb))/h;end
++end
++
++function a=bin(a)
++lo=min(a);hi=max(a);a=1+min(31,floor(32*(a-lo)/max(eps,hi-lo)));
++end
++
++function removeTemporary(path)
++if exist(path,'file'),delete(path);end
++end
+--- /dev/null
++++ updated/MIKey_registration_pair.m
+@@ -0,0 +1,47 @@
++function MIKey_registration_pair(stage, original, output, anatomy, reportPath, checkpoint)
++% Registered BOLD must be complete and share its anatomical output grid.
++if nargin<5,reportPath='';end
++if nargin<6,checkpoint=@()[];end
++report=struct('stage',stage,'phase','grid','original',original,'output',output, ...
++    'anatomy',anatomy,'status','passed','reason','','gridToleranceInVoxels',1e-3);
++try
++    checkpoint();
++    before=spm_vol(original);after=spm_vol(output);target=spm_vol(anatomy);
++    report.originalVolumes=numel(before);report.outputVolumes=numel(after);
++    if any(~isfinite(target(1).mat(:))) || rcond(target(1).mat(1:3,1:3))<1e-6
++        error('MIKey:RegistrationQC','Anatomical output has an invalid affine.');
++    end
++    if numel(before)~=numel(after)
++        error('MIKey:RegistrationQC','BOLD output contains %d/%d volumes.',numel(after),numel(before));
++    end
++    for i=1:numel(after)
++        if mod(i-1,64)==0,checkpoint();end
++        difference=target(1).mat\after(i).mat-eye(4);
++        if any(after(i).dim~=target(1).dim) || ...
++                any(~isfinite(after(i).mat(:))) || ...
++                any(~isfinite(difference(:))) || any(abs(difference(:))>report.gridToleranceInVoxels)
++            error('MIKey:RegistrationQC','BOLD and T2w do not share the registered grid (volume %d).',i);
++        end
++    end
++catch ME
++    if strcmp(ME.identifier,'MIKey:Stopped'),rethrow(ME);end
++    report.status='failed';report.reason=ME.message;
++end
++if ~isempty(reportPath)
++    folder=fileparts(reportPath);if ~exist(folder,'dir'),mkdir(folder);end
++    temporary=[tempname(folder) '.json'];
++    cleanup=onCleanup(@()removeTemporary(temporary)); %#ok<NASGU>
++    fid=fopen(temporary,'w','n','UTF-8');
++    if fid<0,error('MIKey:RegistrationQC','Cannot save Step %d grid QC report: %s',stage,reportPath);end
++    closeFile=onCleanup(@()fclose(fid));
++    fprintf(fid,'%s',jsonencode(report));clear closeFile;
++    movefile(temporary,reportPath,'f');
++end
++if strcmp(report.status,'failed')
++    error('MIKey:RegistrationQC','Step %d output consistency check FAILED: %s. BOLD: %s. T2w: %s. QC report: %s. Processing stopped.',stage,report.reason,output,anatomy,reportPath);
++end
++end
++
++function removeTemporary(path)
++if exist(path,'file'),delete(path);end
++end
+--- /dev/null
++++ updated/tests/test_mikey_registration_qc.m
+@@ -0,0 +1,85 @@
++function test_mikey_registration_qc(spmPath)
++root=fileparts(fileparts(mfilename('fullpath')));addpath(root);
++if usejava('jvm')
++    MIKey_setup(spmPath);
++else
++    addpath(spmPath);addpath(fullfile(root,'scripts'));spm('defaults','fmri');
++end
++work=tempname;mkdir(work);
++[x,y,z]=ndgrid(1:32,1:40,1:24);
++mask=((x-16.5)/10).^2+((y-20.5)/17).^2+((z-12.5)/7).^2<1;
++image=mask.*(100+20*sin(x/3)+15*cos(y/4)+2*z);
++a=eye(4);a(1:3,4)=-[16.5;20.5;12.5];
++reference=fullfile(work,'ref.nii');moving=fullfile(work,'moving.nii');
++write(reference,image,a);write(moving,sqrt(image)*10,a);
++for stage=[6 7]
++    for phase={'pre','post'}
++        report=check(stage,phase{1},moving);
++        assert(strcmp(report.status,'passed'));
++    end
++end
++% Different voxel resolutions with the same physical object must pass.
++finer=a;finer(1:3,1:3)=diag([0.5 0.5 0.5]);
++[xf,yf,zf]=ndgrid((1:64)*0.5,(1:80)*0.5,(1:48)*0.5);
++fineMask=((xf-16.5)/10).^2+((yf-20.5)/17).^2+((zf-12.5)/7).^2<1;
++write(moving,fineMask.*(100+20*sin(xf/3)+15*cos(yf/4)+2*zf),finer);
++check(6,'pre',moving);check(7,'post',moving);
++% Storage flips and axis permutations do not imply world-space misalignment.
++flipMatrix=eye(4);flipMatrix(1,1)=-1;flipMatrix(1,4)=33;
++write(moving,flip(image,1),a*flipMatrix);check(6,'pre',moving);check(7,'post',moving);
++permuteMatrix=eye(4);permuteMatrix(1:3,1:3)=[0 1 0;1 0 0;0 0 1];
++write(moving,permute(image,[2 1 3]),a*permuteMatrix);check(6,'pre',moving);check(7,'post',moving);
++for stage=[6 7]
++    scaled=a;scaled(1:3,:)=20*scaled(1:3,:);write(moving,image,scaled);
++    expectFailure(stage,'pre',moving,'scale');
++    offset=a;offset(1,4)=offset(1,4)+300;write(moving,image,offset);
++    expectFailure(stage,'pre',moving,'centers');
++    rotation=eye(4);rotation(1:3,1:3)=[0 -1 0;1 0 0;0 0 1];
++    write(moving,image,rotation*a);expectFailure(stage,'pre',moving,'axes');
++    offset=a;offset(1,4)=offset(1,4)+40;write(moving,image,offset);
++    expectFailure(stage,'post',moving,'overlap');
++    write(moving,zeros(size(image)),a);expectFailure(stage,'post',moving,'constant');
++end
++% Incomplete and late blank functional outputs must not be accepted.
++raw=fullfile(work,'bold.nii');write(raw,repmat(image,[1 1 1 3]),a);
++write(moving,image,a);
++try
++    MIKey_registration_pair(7,raw,moving,reference);error('MIKey:Test','Expected incomplete output failure.');
++catch ME,assert(strcmp(ME.identifier,'MIKey:RegistrationQC'));end
++write(moving,cat(4,image,image,zeros(size(image))),a);
++expectFailure(7,'post',moving,'constant');
++% Near-singular geometry is unsafe even if its voxel data are present.
++bad=a;bad(3,3)=1e-8;write(moving,image,bad);
++expectFailure(6,'pre',moving,'singular');
++% A large origin must not inflate the allowed BOLD/T2w grid mismatch.
++largeOrigin=a;largeOrigin(1:3,4)=1e6;
++write(reference,image,largeOrigin);write(raw,image,largeOrigin);
++shifted=largeOrigin;shifted(1,4)=shifted(1,4)+1;
++write(moving,image,shifted);
++try
++    MIKey_registration_pair(7,raw,moving,reference);error('MIKey:Test','Expected grid mismatch failure.');
++catch ME,assert(strcmp(ME.identifier,'MIKey:RegistrationQC'));end
++disp('MIKEY_REGISTRATION_QC_PASS');
++
++    function report=check(stage,phase,path)
++        report=MIKey_registration_qc(stage,phase,reference,path,fullfile(work,'qc.json'));
++    end
++    function expectFailure(stage,phase,path,reason)
++        try
++            check(stage,phase,path);error('MIKey:Test','Expected registration QC failure.');
++        catch ME,assert(strcmp(ME.identifier,'MIKey:RegistrationQC'),ME.message);end
++        saved=jsondecode(fileread(fullfile(work,'qc.json')));
++        assert(strcmp(saved.status,'failed'));
++        assert(~isempty(strfind(lower(strjoin(saved.reasons,' ')),reason))); %#ok<STREMP>
++    end
++end
++
++function write(path,data,matrix)
++if exist(path,'file'),delete(path);end
++sidecar=[path(1:end-4) '.mat'];if exist(sidecar,'file'),delete(sidecar);end
++for i=1:size(data,4)
++    v=struct('fname',path,'dim',[size(data,1) size(data,2) size(data,3)], ...
++        'dt',[16 0],'mat',matrix,'pinfo',[1;0;0],'n',[i 1],'descrip','Registration QC synthetic test');
++    spm_write_vol(v,data(:,:,:,i));
++end
++end
+--- /dev/null
++++ updated/tests/test_mikey_registration_dispatch.m
+@@ -0,0 +1,106 @@
++function test_mikey_registration_dispatch(spmPath, testGUI)
++% Actual stage dispatch; COPY-ONLY SPM fixture isolates QC/failure propagation.
++if nargin<2,testGUI=false;end
++root=fileparts(fileparts(mfilename('fullpath')));addpath(root);addpath(fullfile(root,'scripts'));addpath(spmPath);
++spm('defaults','fmri');spm_get_defaults('cmdline',true);
++work=tempname;mkdir(work);oldPath=path;
++cleanup=onCleanup(@()restore(oldPath)); %#ok<NASGU>
++mock=fullfile(work,'stub');mkdir(mock);
++copyfile(fullfile(root,'tests','fixtures','registration_stub','spm_jobman.m.fixture'),fullfile(mock,'spm_jobman.m'));
++addpath(mock,'-begin');clear spm_jobman;
++[cfg,df,da,base,t2,image,a]=prepare(fullfile(work,'valid'));
++setappdata(0,'MIKeyRegistrationFixtureMode','copy');setappdata(0,'MIKeyRegistrationCalls',[]);
++state=MIKeyBatchState(cfg,-1);
++MIKey('batch',state,6);MIKey('batch',state,7);
++coreg=MIKey_bids_path(df,[base '_desc-T2coreg.nii']);
++norm=MIKey_bids_path(df,[base '_space-template_desc-normalized.nii']);
++assert(exist(coreg,'file')==2 && exist(norm,'file')==2);
++% Cached outputs are rechecked, not blindly skipped.
++write(coreg,zeros(size(image)),a);expect(@()MIKey('batch',state,6));
++assert(exist(coreg,'file')==2); % Never delete an existing user's failed result.
++write(coreg,image,a);write(norm,image,a);expect(@()MIKey('batch',state,7));
++% Fresh failed candidates are never promoted to canonical output names.
++for stage=[6 7]
++    [current,funcPath,~,stem]=prepare(fullfile(work,sprintf('bad%d',stage)));
++    if stage==7,copyfile(fullfile(da,[t2 '_desc-masked_T2w.nii']),MIKey_bids_path(funcPath,[stem '_desc-T2coreg.nii']));end
++    setappdata(0,'MIKeyRegistrationFixtureMode',sprintf('blank%d',stage));
++    expect(@()MIKey('batch',MIKeyBatchState(current,-1),stage));
++    if stage==6,target=MIKey_bids_path(funcPath,[stem '_desc-T2coreg.nii']);
++    else,target=MIKey_bids_path(funcPath,[stem '_space-template_desc-normalized.nii']);end
++    assert(~exist(target,'file'));
++end
++% Unsafe input geometry must block SPM before estimation in both stages.
++for stage=[6 7]
++    [current,funcPath,anatomical,stem,~,data,matrix]=prepare(fullfile(work,sprintf('pre%d',stage)));
++    matrix(1:3,:)=matrix(1:3,:)*20;
++    if stage==6,target=fullfile(anatomical,'sub-01_desc-masked_T2w.nii');
++    else,target=MIKey_bids_path(funcPath,[stem '_desc-T2coreg.nii']);end
++    write(target,data,matrix);
++    setappdata(0,'MIKeyRegistrationFixtureMode','copy');setappdata(0,'MIKeyRegistrationCalls',[]);
++    expect(@()MIKey('batch',MIKeyBatchState(current,-1),stage));
++    assert(isempty(getappdata(0,'MIKeyRegistrationCalls')));
++end
++% Estimator exceptions also escape the per-subject loop as fatal failures.
++[current,~,~,~]=prepare(fullfile(work,'estimator'));
++setappdata(0,'MIKeyRegistrationFixtureMode','crash');
++expect(@()MIKey('batch',MIKeyBatchState(current,-1),6));
++% Script must stop even if failFast=false; Stage 7/8 must not start.
++[current,funcPath,~,stem]=prepare(fullfile(work,'failfast'));
++current.steps=[6 7 8];current.failFast=false;current.spmPath='';
++current.logDir=fullfile(current.bidsPath,'logs');
++setappdata(0,'MIKeyRegistrationFixtureMode','blank6');
++try,MIKey_run(current);error('MIKey:Test','Expected a failed run.');
++catch ME,assert(strcmp(ME.identifier,'MIKey:RunFailed'),ME.message);end
++saved=dir(fullfile(current.logDir,'*','report.mat'));assert(numel(saved)==1);
++result=load(fullfile(saved(1).folder,saved(1).name));
++assert(numel(result.report.stages)==1 && result.report.stages.step==6);
++assert(~exist(MIKey_bids_path(funcPath,[stem '_space-template_desc-normalized.nii']),'file'));
++if testGUI
++    oldVisible=get(groot,'DefaultFigureVisible');visibility=onCleanup(@()set(groot,'DefaultFigureVisible',oldVisible)); %#ok<NASGU>
++    set(groot,'DefaultFigureVisible','off');before=findall(groot,'Type','figure');MIKey;
++    figures=findall(groot,'Type','figure');figures=figures(~ismember(figures,before));assert(numel(figures)==1);
++    fig=figures(1);closeFigure=onCleanup(@()delete(fig)); %#ok<NASGU>
++    fig.UserData.bidsPath=current.bidsPath;fig.UserData.stagesEdit.Value='6:8';
++    fig.UserData.useDefaultTemplateCheckbox.Value=false;fig.UserData.templateCustomEdit.Value=current.customTemplatePath;
++    ui=fig.UserData;ui.runStepsButton.ButtonPushedFcn(ui.runStepsButton,[]);
++    log=strjoin(ui.statusText.Value,sprintf('\n'));
++    assert(~isempty(strfind(log,'Processing stopped:')) && isempty(strfind(log,'=== Starting Step 7 ==='))); %#ok<STREMP>
++    assert(~ui.runControl.Active && strcmp(ui.runStepsButton.Enable,'on'));
++    disp('MIKEY_REGISTRATION_GUI_STOP_PASS');
++end
++disp('MIKEY_REGISTRATION_DISPATCH_PASS');
++end
++
++function [cfg,df,da,base,t2,image,a]=prepare(work)
++func=fullfile(work,'sub-01','func');anat=fullfile(work,'sub-01','anat');mkdir(func);mkdir(anat);
++df=fullfile(work,'derivatives','MIKey','sub-01','func');da=fullfile(work,'derivatives','MIKey','sub-01','anat');mkdir(df);mkdir(da);
++[x,y,z]=ndgrid(1:20,1:28,1:16);mask=((x-10.5)/7).^2+((y-14.5)/11).^2+((z-8.5)/5).^2<1;
++image=mask.*(100+20*sin(x/3)+10*cos(y/3)+z);
++a=eye(4);a(1:3,4)=-[10.5;14.5;8.5];base='sub-01_task-rest_run-01_bold';t2='sub-01';
++write(fullfile(func,[base '.nii']),repmat(image,[1 1 1 3]),a);
++write(fullfile(anat,'sub-01_T2w.nii'),image,a);
++write(MIKey_bids_path(df,[base '_desc-realign.nii']),repmat(image,[1 1 1 3]),a);
++write(fullfile(da,'sub-01_desc-masked_T2w.nii'),image,a);
++cfg=MIKey_defaults();cfg.bidsPath=work;cfg.useDefaultTemplate=false;cfg.customTemplatePath=fullfile(anat,'sub-01_T2w.nii');
++end
++
++function write(funcPath,data,a)
++if exist(funcPath,'file'),delete(funcPath);end
++for i=1:size(data,4)
++    v=struct('fname',funcPath,'dim',[size(data,1) size(data,2) size(data,3)],'dt',[16 0], ...
++        'mat',a,'pinfo',[1;0;0],'n',[i 1],'descrip','Registration dispatch fixture');
++    spm_write_vol(v,data(:,:,:,i));
++end
++end
++
++function expect(call)
++try,call();error('MIKey:Test','Expected registration failure.');
++catch ME,assert(strncmp(ME.identifier,'MIKey:Registration',18),ME.message);end
++end
++
++function restore(oldPath)
++path(oldPath);clear spm_jobman;
++for key={'MIKeyRegistrationCalls','MIKeyRegistrationFixtureMode'}
++    if isappdata(0,key{1}),rmappdata(0,key{1});end
++end
++end
+--- /dev/null
++++ updated/tests/fixtures/registration_stub/spm_jobman.m.fixture
+@@ -0,0 +1,24 @@
++function spm_jobman(action,batch)
++% Test-only COPY stub; never installed as .m inside the toolbox tree.
++if strcmp(action,'initcfg'),return;end
++assert(strcmp(action,'run'));
++job=batch{1}.spm;
++if isfield(job,'spatial') && isfield(job.spatial,'coreg')
++    stage=6;inputs=job.spatial.coreg.estwrite.source;prefix='coreg';
++elseif isfield(job,'tools') && isfield(job.tools,'oldnorm')
++    stage=7;inputs=job.tools.oldnorm.estwrite.subj.resample;prefix='norm';
++else
++    error('MIKey:Test','Unexpected test job.');
++end
++calls=getappdata(0,'MIKeyRegistrationCalls');setappdata(0,'MIKeyRegistrationCalls',[calls stage]);
++mode=getappdata(0,'MIKeyRegistrationFixtureMode');
++if strcmp(mode,'crash'),error('SPM:TestFailure','Synthetic SPM estimator failure.');end
++inputs=unique(regexprep(inputs,',\d+$',''));
++for i=1:numel(inputs)
++    output=MIKey_prefixed_file(prefix,inputs{i});copyfile(inputs{i},output);
++    if strcmp(mode,sprintf('blank%d',stage))
++        v=spm_vol(output);
++        for k=1:numel(v),spm_write_vol(v(k),zeros(v(k).dim));end
++    end
++end
++end

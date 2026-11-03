@@ -1,0 +1,27 @@
+??? 错误使用 MIKey_registration_qc (line 111)
+Step 6 post registration check FAILED. QC could not validate the image: Blank/constant image or insufficient intensity contrast. Review image: C:\MIKeyRealSPM\20261016-958dc7c6\demo_BIDS_dataset\derivatives\MIKey\sub-001\func\registration_qc\failed_candidates\sub-001_task-rest_run-01_desc-step6postQC_T2w.nii. Reference: C:\MIKeyRealSPM\20261016-958dc7c6\demo_BIDS_dataset\derivatives\MIKey\sub-001\func\sub-001_task-rest_run-01_desc-mean_boldref.nii. Moving: C:\Users\Administrator\AppData\Local\Temp\tpb98ae54b_c34b_4b36_9aca_ba1b2320978b\coregsource_T2w.nii. QC report: C:\MIKeyRealSPM\20261016-958dc7c6\demo_BIDS_dataset\derivatives\MIKey\sub-001\func\registration_qc\sub-001_task-rest_run-01_desc-step6postQC.json. Processing stopped; correct the geometry/mask/template and rerun this step. No automatic header correction was applied.
+
+出错 MIKey>runRegistrationCheck (line 1797)
+MIKey_registration_qc(stage, phase, reference, moving, reportPath, @() guiCheckpoint(fig));
+
+出错 MIKey>processCoregistration_BIDS (line 1718)
+            runRegistrationCheck(fig, 6, 'post', meanBold, candidate, df, base);
+
+出错 MIKey>executeStage (line 905)
+        processCoregistration_BIDS(fig, subjectFilter);
+
+出错 MIKey (line 7)
+    executeStage(varargin{2}, varargin{3});
+
+出错 MIKey_run (line 61)
+        MIKey('batch', state, step);
+
+出错 run_real_demo_pipeline (line 22)
+    report=MIKey_run(cfg);
+
+出错 run_baseline_in_session (line 2)
+    run_real_demo_pipeline('baseline');
+
+出错 run (line 91)
+evalin('caller', strcat(script, ';'));
+
